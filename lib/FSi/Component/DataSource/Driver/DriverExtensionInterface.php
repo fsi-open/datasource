@@ -1,0 +1,65 @@
+<?php
+
+/*
+ * This file is part of the FSi Component package.
+ *
+ * (c) Szczepan Cieślik <szczepan@fsi.pl>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+namespace FSi\Component\DataSource\Driver;
+
+/**
+ * Extension of driver.
+ */
+interface DriverExtensionInterface
+{
+    /**
+     * Checks whether given extension has field for given type.
+     *
+     * @param string $type
+     * @return bool
+     */
+    public function hasFieldType($type);
+
+    /**
+     * Returns field for given type, or, if can't fine one, throws exception.
+     *
+     * @param string $type
+     * @return \FSi\Component\DataSource\Driver\Field\FieldTypeInterface
+     */
+    public function getFieldType($type);
+
+    /**
+     * Checks whether given extension has any extension for given field type.
+     *
+     * @param string $type
+     * @return bool
+     */
+    public function hasFieldTypeExtensions($type);
+
+    /**
+     * Returns collection of extensions for given field type.
+     *
+     * @param string $type
+     * @return \Traversable
+     */
+    public function getFieldTypeExtensions($type);
+
+    /**
+     * Event called by driver before getting data.
+     *
+     * @param DriverInterface $driver
+     */
+    public function preGetResult(DriverInterface $driver);
+
+    /**
+     * Event called by driver at the end of getting data.
+     *
+     * @param DriverInterface $driver
+     */
+    public function postGetResult(DriverInterface $driver);
+}
+
