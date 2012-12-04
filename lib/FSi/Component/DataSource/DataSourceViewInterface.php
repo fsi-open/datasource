@@ -15,7 +15,7 @@ namespace FSi\Component\DataSource;
  * DataSources view is responsible for keeping options needed to build view, fields view objects,
  * and proxy some requests to DataSource.
  */
-interface DataSourceViewInterface
+interface DataSourceViewInterface extends \ArrayAccess, \Countable, \SeekableIterator
 {
     /**
      * Counts all available pages.

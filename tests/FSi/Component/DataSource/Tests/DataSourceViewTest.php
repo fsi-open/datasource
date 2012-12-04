@@ -291,4 +291,80 @@ class DataSourceViewTest extends \PHPUnit_Framework_TestCase
         $this->setExpectedException('FSi\Component\DataSource\Exception\DataSourceViewException');
         $view->getField('wrong');
     }
+
+    /**
+     * Checks implementation of \Countable, \SeekableIterator and \ArrayAccess interface.
+     */
+    public function testInterfaces()
+    {
+        $driver = $this->getMock('FSi\Component\DataSource\Driver\DriverInterface');
+        $datasource = $this->getMock('FSi\Component\DataSource\DataSource', array(), array($driver));
+
+        $fielsViews = array();
+        for ($x = 0; $x < 5; $x++) {
+            $field = $this->getMock('FSi\Component\DataSource\Field\FieldTypeInterface');
+            $fieldView = $this->getMock('FSi\Component\DataSource\Field\FieldViewInterface', array(), array($field));
+
+            $field
+                ->expects($this->any())
+                ->method('getName')
+                ->will($this->returnValue("name$x"))
+            ;
+
+            $fieldView
+                ->expects($this->any())
+                ->method('getField')
+                ->will($this->returnValue($field))
+            ;
+
+            $fieldsViews[] = $fieldView;
+        }
+
+        $view = new DataSourceView($datasource);
+        $view->addField($fieldsViews[0]);
+
+        $this->assertEquals(1, count($view));
+        $this->assertTrue(isset($view['name0']));
+        $this->assertFalse(isset($view['name1']));
+
+        foreach ($view as $key => $value) {
+            $this->assertEquals('name0', $key);
+        }
+
+        $view->addField($fieldsViews[1]);
+        $view->addField($fieldsViews[2]);
+
+        $this->assertEquals('name0', $view->key());
+        $view->next();
+        $this->assertEquals('name1', $view->key());
+
+        $view->addField($fieldsViews[3]);
+        $view->addField($fieldsViews[4]);
+
+        //After adding fields iterator resets on its own.
+        $this->assertEquals('name0', $view->key());
+
+        $this->assertEquals(5, count($view));
+        $this->assertTrue(isset($view['name1']));
+
+        $view->seek(1);
+        $this->assertEquals('name1', $view->current()->getField()->getName());
+        $this->assertEquals('name1', $view->key());
+
+        $fields = array();
+        for ($view->rewind(); $view->valid(); $view->next()) {
+            $fields[] = $view->current()->getField()->getName();
+        }
+
+        $expected = array('name0', 'name1', 'name2', 'name3', 'name4');
+        $this->assertEquals($expected, $fields);
+
+        $this->assertEquals('name3', $view['name3']->getField()->getName());
+
+        //Checking fake methods.
+        $view['name0'] = 'trash';
+        $this->assertNotEquals('trash', $view['name0']);
+        unset($view['name0']);
+        $this->assertTrue(isset($view['name0']));
+    }
 }
