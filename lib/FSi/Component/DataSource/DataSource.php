@@ -3,7 +3,7 @@
 /*
  * This file is part of the FSi Component package.
  *
- * (c) Szczepan Cieślik <szczepan@fsi.pl>
+ * (c) Szczepan Cieslik <szczepan@fsi.pl>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -250,7 +250,7 @@ class DataSource implements DataSourceInterface
         //Page number.
         $page = (isset($data[$this->getName()]) && isset($data[$this->getName()][self::PAGE])) ? $data[$this->getName()][self::PAGE] : 1;
 
-        if (!is_numeric($page)) {
+        if (!is_int($page)) {
             throw new DataSourceException(sprintf('Wrong page number ("%s%")', is_scalar($page) ? $page : gettype($page)));
         }
 
