@@ -248,11 +248,7 @@ class DataSource implements DataSourceInterface
         }
 
         //Page number.
-        $page = (isset($data[$this->getName()]) && isset($data[$this->getName()][self::PAGE])) ? $data[$this->getName()][self::PAGE] : 1;
-
-        if (!is_int($page)) {
-            throw new DataSourceException(sprintf('Wrong page number ("%s%")', is_scalar($page) ? $page : gettype($page)));
-        }
+        $page = (isset($data[$this->getName()]) && isset($data[$this->getName()][self::PAGE])) ? (int) $data[$this->getName()][self::PAGE] : 1;
 
         $this->setFirstResult(($page - 1) * $this->getMaxResults());
 

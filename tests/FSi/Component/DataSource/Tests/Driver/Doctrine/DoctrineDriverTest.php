@@ -107,7 +107,6 @@ class DoctrineDriverTest extends \PHPUnit_Framework_TestCase
             $result1 = $datasource->getResult();
             $this->assertEquals(100, count($result1));
             $view1 = $datasource->createView();
-            $this->assertEquals(1, $view1->getCurrentPage());
 
             //Checking if result cache works.
             $this->assertSame($result1, $datasource->getResult());
@@ -161,7 +160,6 @@ class DoctrineDriverTest extends \PHPUnit_Framework_TestCase
             $datasource->bindParameters($parameters);
             $view = $datasource->createView();
             $result = $datasource->getResult();
-            $this->assertEquals(1, $view->countPages());
             $this->assertEquals(5, count($result));
 
             //Checking entity fields. We assume that database was created so first category and first group have ids equal to 1.

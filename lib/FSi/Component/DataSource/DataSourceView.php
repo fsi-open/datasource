@@ -57,33 +57,6 @@ class DataSourceView implements DataSourceViewInterface
     /**
      * {@inheritdoc}
      */
-    public function countPages()
-    {
-        $maxresults = $this->datasource->getMaxResults();
-        if ($maxresults == 0) {
-            return 1;
-        } else {
-            return ceil(count($this->getResult())/$maxresults);
-        }
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getCurrentPage()
-    {
-        $maxresults = $this->datasource->getMaxResults();
-        if ($maxresults == 0) {
-            return 1;
-        } else {
-            $current = $this->datasource->getFirstResult();
-            return floor($current/$maxresults) + 1;
-        }
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function getParameters()
     {
         return $this->datasource->getParameters();

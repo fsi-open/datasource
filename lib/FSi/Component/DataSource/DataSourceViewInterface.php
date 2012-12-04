@@ -18,20 +18,6 @@ namespace FSi\Component\DataSource;
 interface DataSourceViewInterface extends \ArrayAccess, \Countable, \SeekableIterator
 {
     /**
-     * Counts all available pages.
-     *
-     * @return int
-     */
-    public function countPages();
-
-    /**
-     * Returns number of current page.
-     *
-     * @return int
-     */
-    public function getCurrentPage();
-
-    /**
      * Returns parameters that were binded to datasource.
      *
      * @return array

@@ -22,9 +22,19 @@ use Symfony\Component\Form\FormFactory;
 class PaginationExtension extends DataSourceAbstractExtension
 {
     /**
-     * Page number parameter name.
+     * Page number option name.
      */
     const PAGE_PARAM_NAME_OPTION = 'page_param_name';
+
+    /**
+     * Current page option name.
+     */
+    const PAGE_CURRENT_OPTION = 'page_current';
+
+    /**
+     * Pages amount option name.
+     */
+    const PAGE_AMOUNT_OPTION = 'page_amount';
 
     /**
      * {@inheritdoc}
@@ -51,5 +61,18 @@ class PaginationExtension extends DataSourceAbstractExtension
     public function postBuildView(DataSourceInterface $datasource, DataSourceViewInterface $view)
     {
         $view->setOption(self::PAGE_PARAM_NAME_OPTION, sprintf('%s[%s]', $datasource->getName(), DataSourceInterface::PAGE));
+
+        $maxresults = $datasource->getMaxResults();
+        if ($maxresults == 0) {
+            $all = 1;
+        } else {
+            $all = ceil(count($datasource->getResult())/$maxresults);
+        }
+
+        $params = $datasource->getParameters();
+        $datasourceName = $datasource->getName();
+        $page = isset($params[$datasourceName]) && isset($params[$datasourceName][DataSourceInterface::PAGE]) ? $params[$datasourceName][DataSourceInterface::PAGE] : 1;
+        $view->setOption(self::PAGE_AMOUNT_OPTION, $all);
+        $view->setOption(self::PAGE_CURRENT_OPTION, $page);
     }
 }
