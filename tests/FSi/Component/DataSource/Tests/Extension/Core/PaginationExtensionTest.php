@@ -100,7 +100,7 @@ class PaginationExtensionTest extends \PHPUnit_Framework_TestCase
 
         $datasourceView
             ->expects($this->atLeastOnce())
-            ->method('setOption')
+            ->method('setAttribute')
         ;
 
         $extension->postBuildView($datasource, $datasourceView);

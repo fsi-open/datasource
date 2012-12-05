@@ -24,17 +24,17 @@ class PaginationExtension extends DataSourceAbstractExtension
     /**
      * Page number option name.
      */
-    const PAGE_PARAM_NAME_OPTION = 'page_param_name';
+    const PAGE_PARAM_NAME = 'page_param_name';
 
     /**
      * Current page option name.
      */
-    const PAGE_CURRENT_OPTION = 'page_current';
+    const PAGE_CURRENT = 'page_current';
 
     /**
      * Pages amount option name.
      */
-    const PAGE_AMOUNT_OPTION = 'page_amount';
+    const PAGE_AMOUNT = 'page_amount';
 
     /**
      * {@inheritdoc}
@@ -60,7 +60,7 @@ class PaginationExtension extends DataSourceAbstractExtension
      */
     public function postBuildView(DataSourceInterface $datasource, DataSourceViewInterface $view)
     {
-        $view->setOption(self::PAGE_PARAM_NAME_OPTION, sprintf('%s[%s]', $datasource->getName(), DataSourceInterface::PAGE));
+        $view->setAttribute(self::PAGE_PARAM_NAME, sprintf('%s[%s]', $datasource->getName(), DataSourceInterface::PAGE));
 
         $maxresults = $datasource->getMaxResults();
         if ($maxresults == 0) {
@@ -72,7 +72,7 @@ class PaginationExtension extends DataSourceAbstractExtension
         $params = $datasource->getParameters();
         $datasourceName = $datasource->getName();
         $page = isset($params[$datasourceName]) && isset($params[$datasourceName][DataSourceInterface::PAGE]) ? $params[$datasourceName][DataSourceInterface::PAGE] : 1;
-        $view->setOption(self::PAGE_AMOUNT_OPTION, $all);
-        $view->setOption(self::PAGE_CURRENT_OPTION, $page);
+        $view->setAttribute(self::PAGE_AMOUNT, $all);
+        $view->setAttribute(self::PAGE_CURRENT, $page);
     }
 }

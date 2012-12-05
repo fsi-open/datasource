@@ -13,11 +13,12 @@ namespace FSi\Component\DataSource\Field;
 
 use FSi\Component\DataSource\DataSourceViewInterface;
 use FSi\Component\DataSource\Field\FieldTypeInterface;
+use FSi\Component\DataSource\Util\AttributesContainerInterface;
 
 /**
  * View of field, responsible for keeping some options needed during view rendering.
  */
-interface FieldViewInterface
+interface FieldViewInterface extends AttributesContainerInterface
 {
     /**
      * Constructor.
@@ -46,41 +47,4 @@ interface FieldViewInterface
      * @return DataSourceViewInterface
      */
     public function getDataSourceView();
-
-    /**
-     * Checks whether field has option with given name.
-     *
-     * @param string $name
-     * @return bool
-     */
-    public function hasOption($name);
-
-    /**
-     * Sets option.
-     *
-     * @param string $name
-     * @param mixed $value
-     */
-    public function setOption($name, $value);
-
-    /**
-     * Returns option.
-     *
-     * @param string $name
-     */
-    public function getOption($name);
-
-    /**
-     * Returns array of options.
-     *
-     * @return array
-     */
-    public function getOptions();
-
-    /**
-     * Removes option if exists.
-     *
-     * @param string $name
-     */
-    public function removeOption($name);
 }

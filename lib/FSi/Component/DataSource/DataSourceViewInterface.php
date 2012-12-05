@@ -10,12 +10,13 @@
  */
 
 namespace FSi\Component\DataSource;
+use FSi\Component\DataSource\Util\AttributesContainerInterface;
 
 /**
  * DataSources view is responsible for keeping options needed to build view, fields view objects,
  * and proxy some requests to DataSource.
  */
-interface DataSourceViewInterface extends \ArrayAccess, \Countable, \SeekableIterator
+interface DataSourceViewInterface extends AttributesContainerInterface, \ArrayAccess, \Countable, \SeekableIterator
 {
     /**
      * Returns parameters that were binded to datasource.
@@ -37,44 +38,6 @@ interface DataSourceViewInterface extends \ArrayAccess, \Countable, \SeekableIte
      * @return array
      */
     public function getOtherParameters();
-
-    /**
-     * Checks whether view has option with $name.
-     *
-     * @param string $name
-     * @return bool
-     */
-    public function hasOption($name);
-
-    /**
-     * Sets option $name with $value.
-     *
-     * @param string $name
-     * @param mixed $value
-     */
-    public function setOption($name, $value);
-
-    /**
-     * Get option for $name.
-     *
-     * @param string $name
-     * @return mixed
-     */
-    public function getOption($name);
-
-    /**
-     * Return array of options.
-     *
-     * @return array
-     */
-    public function getOptions();
-
-    /**
-     * Removes given options.
-     *
-     * @param string $name
-     */
-    public function removeOption($name);
 
     /**
      * Checks whether view has field with given name.

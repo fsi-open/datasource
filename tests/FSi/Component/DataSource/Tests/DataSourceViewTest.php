@@ -66,26 +66,25 @@ class DataSourceViewTest extends \PHPUnit_Framework_TestCase
         $datasource = $this->getMock('FSi\Component\DataSource\DataSource', array(), array($driver));
         $view = new DataSourceView($datasource);
 
-        $this->assertFalse($view->hasOption('option1'));
-        $view->setOption('option1', 'value1');
-        $this->assertTrue($view->hasOption('option1'));
-        $this->assertEquals($view->getOption('option1'), 'value1');
-        $view->removeOption('option1');
-        $this->assertFalse($view->hasOption('option1'));
+        $this->assertFalse($view->hasAttribute('option1'));
+        $view->setAttribute('option1', 'value1');
+        $this->assertTrue($view->hasAttribute('option1'));
+        $this->assertEquals($view->getAttribute('option1'), 'value1');
+        $view->removeAttribute('option1');
+        $this->assertFalse($view->hasAttribute('option1'));
 
-        $view->setOption('option2', '');
-        $this->assertTrue($view->hasOption('option2'));
+        $view->setAttribute('option2', '');
+        $this->assertTrue($view->hasAttribute('option2'));
 
-        $view->setOption('option2', null);
-        $this->assertFalse($view->hasOption('option2'));
+        $view->setAttribute('option2', null);
+        $this->assertTrue($view->hasAttribute('option2'));
 
-        $view->setOption('option3', 'value3');
-        $view->setOption('option4', 'value4');
+        $view->setAttribute('option3', 'value3');
+        $view->setAttribute('option4', 'value4');
 
-        $this->assertEquals($view->getOptions(), array('option3' => 'value3', 'option4' => 'value4'));
+        $this->assertEquals($view->getAttributes(), array('option2' => null, 'option3' => 'value3', 'option4' => 'value4'));
 
-        $this->setExpectedException('FSi\Component\DataSource\Exception\DataSourceViewException');
-        $view->getOption('option2');
+        $this->assertEquals(null, $view->getAttribute('option2'));
     }
 
     /**

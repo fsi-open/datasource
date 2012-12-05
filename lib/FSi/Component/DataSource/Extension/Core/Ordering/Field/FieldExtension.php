@@ -43,8 +43,8 @@ class FieldExtension extends FieldAbstractExtension
         return array(
             OrderingExtension::ORDERING_IS_GIVEN, //Only for internal use.
             OrderingExtension::ORDERING_IS_DISABLED,
-            OrderingExtension::ORDERING_OPTION,
-            Orderingextension::ORDERING_PRIORITY_OPTION,
+            OrderingExtension::ORDERING,
+            Orderingextension::ORDERING_PRIORITY,
         );
     }
 
@@ -81,10 +81,10 @@ class FieldExtension extends FieldAbstractExtension
             $givenData = array();
         }
 
-        if ((isset($givenData[OrderingExtension::ORDERING_OPTION]) || isset($givenData[OrderingExtension::ORDERING_PRIORITY_OPTION]))) {
+        if ((isset($givenData[OrderingExtension::ORDERING]) || isset($givenData[OrderingExtension::ORDERING_PRIORITY]))) {
             $tmp = array();
             $options = $field->getOptions();
-            foreach (array(OrderingExtension::ORDERING_OPTION, OrderingExtension::ORDERING_PRIORITY_OPTION) as $option) {
+            foreach (array(OrderingExtension::ORDERING, OrderingExtension::ORDERING_PRIORITY) as $option) {
                 if (isset($givenData[$option])) {
                     $options[$option] = $givenData[$option];
                     $tmp[$option] = $givenData[$option];
@@ -108,16 +108,16 @@ class FieldExtension extends FieldAbstractExtension
     public function postBuildView(FieldTypeInterface $field, FieldViewInterface $view)
     {
         if ($field->hasOption(OrderingExtension::ORDERING_IS_DISABLED) && $field->getOption(OrderingExtension::ORDERING_IS_DISABLED)) {
-            $view->setOption(OrderingExtension::ORDERING_DISABLED_OPTION, true);
+            $view->setAttribute(OrderingExtension::ORDERING_DISABLED, true);
             return;
         }
 
         $enabled = !empty($this->givenData);
         $options = $field->getOptions();
 
-        $view->setOption(OrderingExtension::CURRENT_ORDERING_OPTION, isset($options[OrderingExtension::ORDERING_OPTION]) ? $options[OrderingExtension::ORDERING_OPTION] : null);
-        $view->setOption(OrderingExtension::CURRENT_PRIORITY_OPTION, isset($options[OrderingExtension::ORDERING_PRIORITY_OPTION]) ? $options[OrderingExtension::ORDERING_PRIORITY_OPTION] : null);
-        $view->setOption(OrderingExtension::IS_ENABLED_OPTION, $enabled);
+        $view->setAttribute(OrderingExtension::CURRENT_ORDERING, isset($options[OrderingExtension::ORDERING]) ? $options[OrderingExtension::ORDERING] : null);
+        $view->setAttribute(OrderingExtension::CURRENT_PRIORITY, isset($options[OrderingExtension::ORDERING_PRIORITY]) ? $options[OrderingExtension::ORDERING_PRIORITY] : null);
+        $view->setAttribute(OrderingExtension::IS_ENABLED, $enabled);
     }
 
     /**

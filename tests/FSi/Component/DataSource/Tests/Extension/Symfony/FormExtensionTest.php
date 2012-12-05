@@ -156,7 +156,7 @@ class FormExtensionTest extends \PHPUnit_Framework_TestCase
 
             $fieldView
                 ->expects($this->atLeastOnce())
-                ->method('setOption')
+                ->method('setAttribute')
             ;
 
             foreach ($extensions as $ext) {

@@ -25,49 +25,44 @@ use FSi\Component\DataSource\Field\FieldTypeInterface;
 class OrderingExtension extends DataSourceAbstractExtension
 {
     /**
-     * Key for passing data.
+     * Key for passing data and ordering attribute.
      */
     const ORDERING = 'ordering';
 
     /**
-     * Key for ordering option.
+     * Key for ordering priority attribute.
      */
-    const ORDERING_OPTION = 'ordering_type';
-
-    /**
-     * Key for ordering priority option.
-     */
-    const ORDERING_PRIORITY_OPTION = 'ordering_priority';
+    const ORDERING_PRIORITY = 'ordering_priority';
 
     /**
      * Key for ordering pattern.
      */
-    const PATTERN_ORDERING_OPTION = 'ordering_pattern';
+    const PATTERN_ORDERING = 'ordering_pattern';
 
     /**
-     * Key for ordering priority option.
+     * Key for ordering priority attribute.
      */
-    const PATTERN_PRIORITY_OPTION = 'ordering_priority_pattern';
+    const PATTERN_PRIORITY = 'ordering_priority_pattern';
 
     /**
-     * Key for next priority option.
+     * Key for next priority attribute.
      */
-    const NEXT_PRIORITY_OPTION = 'ordering_next_priority';
+    const NEXT_PRIORITY = 'ordering_next_priority';
 
     /**
-     * Key for 'is enabled' option.
+     * Key for 'is enabled' attribute.
      */
-    const IS_ENABLED_OPTION = 'ordering_enabled';
+    const IS_ENABLED = 'ordering_enabled';
 
     /**
-     * Key for current ordering.
+     * Key for current attribute.
      */
-    const CURRENT_ORDERING_OPTION = 'ordering_current';
+    const CURRENT_ORDERING = 'ordering_current';
 
     /**
-     * Key for current ordering priority.
+     * Key for current ordering priority attribute.
      */
-    const CURRENT_PRIORITY_OPTION = 'ordering_current_priority';
+    const CURRENT_PRIORITY = 'ordering_current_priority';
 
     /**
      * Pattern for names.
@@ -77,7 +72,7 @@ class OrderingExtension extends DataSourceAbstractExtension
     /**
      * Key to determine if ordering is disabled.
      */
-    const ORDERING_DISABLED_OPTION = 'ordering_disabled';
+    const ORDERING_DISABLED = 'ordering_disabled';
 
     /**
      * Key for internal use, to determine if there were parameters given for field.
@@ -92,7 +87,7 @@ class OrderingExtension extends DataSourceAbstractExtension
     /**
      * Key to reset page.
      */
-    const RESET_PAGE_OPTION = 'resetpage';
+    const RESET_PAGE = 'resetpage';
 
     /**
      * @var int
@@ -114,9 +109,9 @@ class OrderingExtension extends DataSourceAbstractExtension
         if (
             isset($data[$datasourceName])
             && isset($data[$datasourceName][self::ORDERING])
-            && isset($data[$datasourceName][self::ORDERING][self::RESET_PAGE_OPTION])
+            && isset($data[$datasourceName][self::ORDERING][self::RESET_PAGE])
         ) {
-            unset($data[$datasourceName][self::ORDERING][self::RESET_PAGE_OPTION]);
+            unset($data[$datasourceName][self::ORDERING][self::RESET_PAGE]);
             $this->resetPage = true;
         }
     }
@@ -137,12 +132,12 @@ class OrderingExtension extends DataSourceAbstractExtension
     public function postBuildView(DataSourceInterface $datasource, DataSourceViewInterface $view)
     {
         $this->countNextPriority($datasource);
-        $view->setOption(self::NEXT_PRIORITY_OPTION, $this->nextPriority);
+        $view->setAttribute(self::NEXT_PRIORITY, $this->nextPriority);
 
         $datasourceName = $datasource->getName();
-        $view->setOption(self::PATTERN_ORDERING_OPTION, sprintf(self::PATTERN, $datasourceName, self::ORDERING, '%s', self::ORDERING_OPTION));
-        $view->setOption(self::PATTERN_PRIORITY_OPTION, sprintf(self::PATTERN, $datasourceName, self::ORDERING, '%s', self::ORDERING_PRIORITY_OPTION));
-        $view->setOption(self::RESET_PAGE_OPTION, sprintf('%s[%s][%s]', $datasourceName, self::ORDERING, self::RESET_PAGE_OPTION));
+        $view->setAttribute(self::PATTERN_ORDERING, sprintf(self::PATTERN, $datasourceName, self::ORDERING, '%s', self::ORDERING));
+        $view->setAttribute(self::PATTERN_PRIORITY, sprintf(self::PATTERN, $datasourceName, self::ORDERING, '%s', self::ORDERING_PRIORITY));
+        $view->setAttribute(self::RESET_PAGE, sprintf('%s[%s][%s]', $datasourceName, self::ORDERING, self::RESET_PAGE));
     }
 
     /**
@@ -166,8 +161,8 @@ class OrderingExtension extends DataSourceAbstractExtension
             }
 
             $options = $field->getOptions();
-            if (isset($options[self::ORDERING_PRIORITY_OPTION])) {
-                $priority = (int) $options[self::ORDERING_PRIORITY_OPTION];
+            if (isset($options[self::ORDERING_PRIORITY])) {
+                $priority = (int) $options[self::ORDERING_PRIORITY];
             } else {
                 $end[] = array('field' => $field);
                 continue;
@@ -190,7 +185,7 @@ class OrderingExtension extends DataSourceAbstractExtension
         foreach ($fields as $item) {
             $field = $item['field'];
             $options = $field->getOptions();
-            $options[self::ORDERING_PRIORITY_OPTION] = $max;
+            $options[self::ORDERING_PRIORITY] = $max;
             $field->setOptions($options);
             $max--;
         }
@@ -219,8 +214,8 @@ class OrderingExtension extends DataSourceAbstractExtension
 
         $next = 0;
         foreach ($datasource->getFields() as $field) {
-            if ($field->hasOption(self::ORDERING_IS_GIVEN) && $field->getOption(self::ORDERING_IS_GIVEN) && $field->hasOption(self::ORDERING_PRIORITY_OPTION)) {
-                $tmp = (int) $field->getOption(self::ORDERING_PRIORITY_OPTION);
+            if ($field->hasOption(self::ORDERING_IS_GIVEN) && $field->getOption(self::ORDERING_IS_GIVEN) && $field->hasOption(self::ORDERING_PRIORITY)) {
+                $tmp = (int) $field->getOption(self::ORDERING_PRIORITY);
                 if ($tmp > $next) {
                     $next = $tmp;
                 }

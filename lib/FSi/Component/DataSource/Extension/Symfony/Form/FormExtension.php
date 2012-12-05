@@ -28,7 +28,7 @@ class FormExtension extends DataSourceAbstractExtension
     /**
      * Option name for form.
      */
-    const FORM_OPTION = 'form';
+    const FORM = 'form';
 
     /**
      * @var FormFactory

@@ -106,9 +106,9 @@ abstract class DoctrineAbstractField extends FieldAbstractType implements Doctri
         $options = $this->getOptions();
         $fieldName = $this->getFieldName($alias);
 
-        if (isset($options[DoctrineDriver::ORDERING_OPTION])) {
+        if (isset($options[DoctrineDriver::ORDERING])) {
             $name = $this->getName();
-            if ($options[DoctrineDriver::ORDERING_OPTION] == 'asc') {
+            if ($options[DoctrineDriver::ORDERING] == 'asc') {
                 $qb->addOrderBy($fieldName, 'asc');
             } else {
                 $qb->addOrderBy($fieldName, 'desc');

@@ -205,8 +205,8 @@ class DoctrineDriverTest extends \PHPUnit_Framework_TestCase
                 $datasource->getName() => array(
                     OrderingExtension::ORDERING => array(
                         'title' => array(
-                            OrderingExtension::ORDERING_OPTION => 'asc',
-                            OrderingExtension::ORDERING_PRIORITY_OPTION => 1,
+                            OrderingExtension::ORDERING => 'asc',
+                            OrderingExtension::ORDERING_PRIORITY => 1,
                         ),
                     ),
                 ),
@@ -223,12 +223,12 @@ class DoctrineDriverTest extends \PHPUnit_Framework_TestCase
                 $datasource->getName() => array(
                     OrderingExtension::ORDERING => array(
                         'title' => array(
-                            OrderingExtension::ORDERING_OPTION => 'desc',
-                            OrderingExtension::ORDERING_PRIORITY_OPTION => 2,
+                            OrderingExtension::ORDERING => 'desc',
+                            OrderingExtension::ORDERING_PRIORITY => 2,
                         ),
                         'author' => array(
-                            OrderingExtension::ORDERING_OPTION => 'asc',
-                            OrderingExtension::ORDERING_PRIORITY_OPTION => 1,
+                            OrderingExtension::ORDERING => 'asc',
+                            OrderingExtension::ORDERING_PRIORITY => 1,
                         ),
                     ),
                 ),

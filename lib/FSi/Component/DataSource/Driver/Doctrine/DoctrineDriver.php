@@ -31,12 +31,12 @@ class DoctrineDriver extends DriverAbstract
     /**
      * Key for ordering option.
      */
-    const ORDERING_OPTION = 'ordering_type';
+    const ORDERING = 'ordering';
 
     /**
      * Key for ordering priority.
      */
-    const ORDERING_PRIORITY_OPTION = 'ordering_priority';
+    const ORDERING_PRIORITY = 'ordering_priority';
 
     /**
      * @var EntityManager
@@ -137,8 +137,8 @@ class DoctrineDriver extends DriverAbstract
             $field->buildQuery($qb, $entityAlias);
 
             $options = $field->getOptions();
-            if (isset($options[self::ORDERING_PRIORITY_OPTION])) {
-                $ordered[$options[self::ORDERING_PRIORITY_OPTION]] = $field;
+            if (isset($options[self::ORDERING_PRIORITY])) {
+                $ordered[$options[self::ORDERING_PRIORITY]] = $field;
             } else {
                 $orderedEnd[] = $field;
             }

@@ -26,7 +26,7 @@ class OrderingExtensionTest extends \PHPUnit_Framework_TestCase
     public function testResetPage()
     {
         $datasourceName = 'datasource';
-        $data = array($datasourceName => array(OrderingExtension::ORDERING => array(OrderingExtension::RESET_PAGE_OPTION => 1)));
+        $data = array($datasourceName => array(OrderingExtension::ORDERING => array(OrderingExtension::RESET_PAGE => 1)));
         $expected = array($datasourceName => array(OrderingExtension::ORDERING => array()));
 
         $extension = new OrderingExtension();
@@ -63,7 +63,7 @@ class OrderingExtensionTest extends \PHPUnit_Framework_TestCase
 
         $view
             ->expects($this->exactly(4))
-            ->method('setOption')
+            ->method('setAttribute')
         ;
 
         $datasource
@@ -125,7 +125,7 @@ class OrderingExtensionTest extends \PHPUnit_Framework_TestCase
                     ->method('getOptions')
                     ->will($this->returnValue(array(
                         OrderingExtension::ORDERING_IS_GIVEN => $fieldData[0],
-                        OrderingExtension::ORDERING_PRIORITY_OPTION => $fieldData[1],
+                        OrderingExtension::ORDERING_PRIORITY => $fieldData[1],
                     )))
                 ;
 
@@ -144,7 +144,7 @@ class OrderingExtensionTest extends \PHPUnit_Framework_TestCase
                             case OrderingExtension::ORDERING_IS_GIVEN:
                                 return $fieldData[0];
 
-                            case OrderingExtension::ORDERING_PRIORITY_OPTION:
+                            case OrderingExtension::ORDERING_PRIORITY:
                                 return $fieldData[1];
                         }
 
@@ -154,7 +154,7 @@ class OrderingExtensionTest extends \PHPUnit_Framework_TestCase
 
                 $expected = array(
                     OrderingExtension::ORDERING_IS_GIVEN => $fieldData[0],
-                    OrderingExtension::ORDERING_PRIORITY_OPTION => $fieldData[2],
+                    OrderingExtension::ORDERING_PRIORITY => $fieldData[2],
                 );
 
                 $field
@@ -178,10 +178,10 @@ class OrderingExtensionTest extends \PHPUnit_Framework_TestCase
 
             $view
                 ->expects($this->any())
-                ->method('setOption')
+                ->method('setAttribute')
                 ->will($this->returnCallback(function () use (&$givenNextPriority) {
                     list($key, $value) = func_get_args();
-                    if ($key == OrderingExtension::NEXT_PRIORITY_OPTION) {
+                    if ($key == OrderingExtension::NEXT_PRIORITY) {
                         $givenNextPriority = $value;
                     }
                 }))
@@ -236,8 +236,8 @@ class OrderingExtensionTest extends \PHPUnit_Framework_TestCase
             ->expects($this->once())
             ->method('setOptions')
             ->with(array(
-                OrderingExtension::ORDERING_OPTION => 'asc',
-                OrderingExtension::ORDERING_PRIORITY_OPTION => 1,
+                OrderingExtension::ORDERING => 'asc',
+                OrderingExtension::ORDERING_PRIORITY => 1,
                 OrderingExtension::ORDERING_IS_GIVEN => 1,
             ))
         ;
@@ -246,8 +246,8 @@ class OrderingExtensionTest extends \PHPUnit_Framework_TestCase
             'datasource' => array(
                 OrderingExtension::ORDERING => array(
                     'field' => array(
-                        OrderingExtension::ORDERING_OPTION => 'asc',
-                        OrderingExtension::ORDERING_PRIORITY_OPTION => 1,
+                        OrderingExtension::ORDERING => 'asc',
+                        OrderingExtension::ORDERING_PRIORITY => 1,
                     ),
                 ),
             ),
@@ -263,10 +263,10 @@ class OrderingExtensionTest extends \PHPUnit_Framework_TestCase
         $fieldView = $this->getMock('FSi\Component\DataSource\Field\FieldViewInterface', array(), array($field));
         $fieldView
             ->expects($this->any())
-            ->method('setOption')
+            ->method('setAttribute')
             ->will($this->returnCallback(function () use (&$enabled) {
                 list($key, $value) = func_get_args();
-                if ($key == OrderingExtension::IS_ENABLED_OPTION) {
+                if ($key == OrderingExtension::IS_ENABLED) {
                     $enabled = $value;
                 }
             }))

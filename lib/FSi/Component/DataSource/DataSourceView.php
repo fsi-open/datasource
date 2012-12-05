@@ -12,11 +12,12 @@
 namespace FSi\Component\DataSource;
 
 use FSi\Component\DataSource\Exception\DataSourceViewException;
+use FSi\Component\DataSource\Util\AttributesContainer;
 
 /**
  * {@inheritdoc}
  */
-class DataSourceView implements DataSourceViewInterface
+class DataSourceView extends AttributesContainer implements DataSourceViewInterface
 {
     /**
      * @var DataSource
@@ -76,60 +77,6 @@ class DataSourceView implements DataSourceViewInterface
     public function getOtherParameters()
     {
         return $this->datasource->getOtherParameters();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function hasOption($name)
-    {
-        return isset($this->options[$name]);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setOption($name, $value)
-    {
-        $this->options[$name] = $value;
-
-        //Case when i.e. null was given as $value is problematic,
-        //because then you can getOption with that name, but hasOption will return false,
-        //also that key would appear in array from getOptions method.
-        if (!isset($this->options[$name])) {
-            unset($this->options[$name]);
-        }
-    }
-
-    /**
-     * {@inheritdoc}
-     *
-     * @throws DataSourceViewException
-     */
-    public function getOption($name)
-    {
-        if (!$this->hasOption($name)) {
-            throw new DataSourceViewException(sprintf('There\'s no option with name "%s"', $name));
-        }
-        return $this->options[$name];
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getOptions()
-    {
-        return $this->options;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function removeOption($name)
-    {
-        if (isset($this->options[$name])) {
-            unset($this->options[$name]);
-        }
     }
 
     /**

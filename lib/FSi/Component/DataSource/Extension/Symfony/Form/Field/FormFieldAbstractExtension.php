@@ -50,7 +50,7 @@ abstract class FormFieldAbstractExtension extends FieldAbstractExtension
     public function postBuildView(FieldTypeInterface $field, FieldViewInterface $view)
     {
         $this->createForm($field);
-        $view->setOption(FormExtension::FORM_OPTION, $this->form->createView());
+        $view->setAttribute(FormExtension::FORM, $this->form->createView());
     }
 
     /**
