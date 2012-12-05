@@ -39,40 +39,11 @@ class PaginationExtension extends DataSourceAbstractExtension
     /**
      * {@inheritdoc}
      */
-    public function preGetParameters(DataSourceInterface $datasource, &$data)
+    public function loadSubscribers()
     {
-        $datasourceName = $datasource->getName();
-        $maxresults = $datasource->getMaxResults();
-        if ($maxresults == 0) {
-            $page = 1;
-        } else {
-            $current = $datasource->getFirstResult();
-            $page = floor($current/$maxresults) + 1;
-        }
-
-        if ($page != 1) {
-            $data[$datasourceName][DataSourceInterface::PAGE] = $page;
-        }
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function postBuildView(DataSourceInterface $datasource, DataSourceViewInterface $view)
-    {
-        $view->setAttribute(self::PAGE_PARAM_NAME, sprintf('%s[%s]', $datasource->getName(), DataSourceInterface::PAGE));
-
-        $maxresults = $datasource->getMaxResults();
-        if ($maxresults == 0) {
-            $all = 1;
-        } else {
-            $all = ceil(count($datasource->getResult())/$maxresults);
-        }
-
-        $params = $datasource->getParameters();
-        $datasourceName = $datasource->getName();
-        $page = isset($params[$datasourceName]) && isset($params[$datasourceName][DataSourceInterface::PAGE]) ? $params[$datasourceName][DataSourceInterface::PAGE] : 1;
-        $view->setAttribute(self::PAGE_AMOUNT, $all);
-        $view->setAttribute(self::PAGE_CURRENT, $page);
+        return array(
+            new EventSubscriber\GetParameters(),
+            new EventSubscriber\BuildView(),
+        );
     }
 }

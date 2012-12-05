@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace FSi\Component\DataSource\Extension\Symfony;
+namespace FSi\Component\DataSource\Extension\Symfony\Core;
 
 use FSi\Component\DataSource\DataSourceAbstractExtension;
 use FSi\Component\DataSource\DataSourceInterface;
@@ -24,10 +24,10 @@ class CoreExtension extends DataSourceAbstractExtension
     /**
      * {@inheritdoc}
      */
-    public function preBindParameters(DataSourceInterface $datasource, &$data)
+    public function loadSubscribers()
     {
-        if ($data instanceof Request) {
-            $data = $data->query->all();
-        }
+        return array(
+            new EventSubscriber\BindParameters(),
+        );
     }
 }

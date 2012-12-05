@@ -15,6 +15,8 @@ use FSi\Component\DataSource\Driver\DriverInterface;
 use FSi\Component\DataSource\Exception\DataSourceException;
 use FSi\Component\DataSource\Field\FieldTypeInterface;
 use FSi\Component\DataSource\Field\FieldView;
+use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * {@inheritdoc}
@@ -103,6 +105,11 @@ class DataSource implements DataSourceInterface
     private $dirty = true;
 
     /**
+     * @var EventDispatcher
+     */
+    private $eventDispatcher;
+
+    /**
      * Constructor.
      *
      * @param DriverInterface $driver
@@ -122,6 +129,7 @@ class DataSource implements DataSourceInterface
 
         $this->driver = $driver;
         $this->name = $name;
+        $this->eventDispatcher = new EventDispatcher();
     }
 
     /**
@@ -235,9 +243,12 @@ class DataSource implements DataSourceInterface
     {
         $this->dirty = true;
 
-        foreach ($this->extensions as $extension) {
-            $extension->preBindParameters($this, $data);
-        }
+        //PreBindParameters event.
+        $event = new Event\DataSourceEvent();
+        $event->setDataSource($this);
+        $event->setData($data);
+        $this->eventDispatcher->dispatch(Event\DataSourceEvents::PRE_BIND_PARAMETERS, $event);
+        $data = $event->getData();
 
         if (!is_array($data)) {
             throw new DataSourceException('Given data must be an array.');
@@ -252,9 +263,10 @@ class DataSource implements DataSourceInterface
 
         $this->setFirstResult(($page - 1) * $this->getMaxResults());
 
-        foreach ($this->extensions as $extension) {
-            $extension->postBindParameters($this);
-        }
+        //PostBindParameters event.
+        $event = new Event\DataSourceEvent();
+        $event->setDataSource($this);
+        $this->eventDispatcher->dispatch(Event\DataSourceEvents::POST_BIND_PARAMETERS, $event);
     }
 
     /**
@@ -274,9 +286,10 @@ class DataSource implements DataSourceInterface
             return $this->cache['result']['result'];
         }
 
-        foreach ($this->extensions as $extension) {
-            $extension->preGetResult($this);
-        }
+        //PreGetResult event.
+        $event = new Event\DataSourceEvent();
+        $event->setDataSource($this);
+        $this->eventDispatcher->dispatch(Event\DataSourceEvents::PRE_GET_RESULT, $event);
 
         $result = $this->driver->getResult($this->fields, $this->getFirstResult(), $this->getMaxResults());
 
@@ -292,9 +305,11 @@ class DataSource implements DataSourceInterface
             throw new DataSourceException(sprintf('Returned result must be both Countable and IteratorAggregate, instance of "%s" given.', get_class($result)));
         }
 
-        foreach ($this->extensions as $extension) {
-            $extension->postGetResult($this, $result);
-        }
+        //PostGetResult event.
+        $event = new Event\DataSourceEvent();
+        $event->setResult($result);
+        $this->eventDispatcher->dispatch(Event\DataSourceEvents::POST_GET_RESULT, $event);
+        $result = $event->getResult();
 
         //Creating cache.
         $this->cache['result'] = array(
@@ -347,6 +362,11 @@ class DataSource implements DataSourceInterface
     {
         $this->dirty = true;
         $this->extensions[] = $extension;
+
+        foreach ($extension->loadSubscribers() as $subscriber) {
+            $this->eventDispatcher->addSubscriber($subscriber);
+        }
+
         foreach ($extension->loadDriverExtensions() as $driverExtension) {
             $this->driver->addExtension($driverExtension);
         }
@@ -366,9 +386,12 @@ class DataSource implements DataSourceInterface
     public function createView()
     {
         $view = new DataSourceView($this);
-        foreach ($this->extensions as $extension) {
-            $extension->preBuildView($this, $view);
-        }
+
+        //PreBuildView event.
+        $event = new Event\DataSourceEvent();
+        $event->setDataSource($this);
+        $event->setView($view);
+        $this->eventDispatcher->dispatch(Event\DataSourceEvents::PRE_BUILD_VIEW, $event);
 
         foreach ($this->fields as $key => $field) {
             $view->addField($field->createView());
@@ -376,9 +399,12 @@ class DataSource implements DataSourceInterface
 
         $this->view = $view;
 
-        foreach ($this->extensions as $extension) {
-            $extension->postBuildView($this, $view);
-        }
+        //PostBuildView event.
+        $event = new Event\DataSourceEvent();
+        $event->setDataSource($this);
+        $event->setView($view);
+        $this->eventDispatcher->dispatch(Event\DataSourceEvents::POST_BUILD_VIEW, $event);
+        $view = $event->getView();
 
         return $this->view;
     }
@@ -393,22 +419,25 @@ class DataSource implements DataSourceInterface
             return $this->cache['parameters'];
         }
 
-        //Fetching parameters.
         $parameters = array();
 
-        //preGetParameters event.
-        foreach ($this->extensions as $extension) {
-            $extension->preGetParameters($this, $parameters);
-        }
+        //PreGetParameters event.
+        $event = new Event\DataSourceEvent();
+        $event->setDataSource($this);
+        $event->setParameters($parameters);
+        $this->eventDispatcher->dispatch(Event\DataSourceEvents::PRE_GET_PARAMETERS, $event);
+        $parameters = $event->getParameters();
 
         foreach ($this->fields as $field) {
             $field->getParameter($parameters);
         }
 
-        //postGetParameters event.
-        foreach ($this->extensions as $extension) {
-            $extension->postGetParameters($this, $parameters);
-        }
+        //PostGetParameters event.
+        $event = new Event\DataSourceEvent();
+        $event->setDataSource($this);
+        $event->setParameters($parameters);
+        $this->eventDispatcher->dispatch(Event\DataSourceEvents::POST_GET_PARAMETERS, $event);
+        $parameters = $event->getParameters();
 
         $cleanfunc = function(&$value) use (&$cleanfunc) {
             if (is_scalar($value) && (!empty($value) || is_numeric($value))) {

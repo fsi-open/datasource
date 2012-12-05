@@ -90,108 +90,6 @@ class OrderingExtension extends DataSourceAbstractExtension
     const RESET_PAGE = 'resetpage';
 
     /**
-     * @var int
-     */
-    private $nextPriority;
-
-    /**
-     * @var bool
-     */
-    private $resetPage = false;
-
-    /**
-     * {@inheritdoc}
-     */
-    public function preBindParameters(DataSourceInterface $datasource, &$data)
-    {
-        $datasourceName = $datasource->getName();
-
-        if (
-            isset($data[$datasourceName])
-            && isset($data[$datasourceName][self::ORDERING])
-            && isset($data[$datasourceName][self::ORDERING][self::RESET_PAGE])
-        ) {
-            unset($data[$datasourceName][self::ORDERING][self::RESET_PAGE]);
-            $this->resetPage = true;
-        }
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function postBindParameters(DataSourceInterface $datasource)
-    {
-        if ($this->resetPage) {
-            $datasource->setFirstResult(0);
-        }
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function postBuildView(DataSourceInterface $datasource, DataSourceViewInterface $view)
-    {
-        $this->countNextPriority($datasource);
-        $view->setAttribute(self::NEXT_PRIORITY, $this->nextPriority);
-
-        $datasourceName = $datasource->getName();
-        $view->setAttribute(self::PATTERN_ORDERING, sprintf(self::PATTERN, $datasourceName, self::ORDERING, '%s', self::ORDERING));
-        $view->setAttribute(self::PATTERN_PRIORITY, sprintf(self::PATTERN, $datasourceName, self::ORDERING, '%s', self::ORDERING_PRIORITY));
-        $view->setAttribute(self::RESET_PAGE, sprintf('%s[%s][%s]', $datasourceName, self::ORDERING, self::RESET_PAGE));
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function preGetResult(DataSourceInterface $datasource)
-    {
-        $this->countNextPriority($datasource);
-        $resultBasic = array();
-        $endBasic = array();
-        $resultGiven = array();
-        $endGiven = array();
-
-        foreach ($datasource->getFields() as $field) {
-            if ($field->hasOption(self::ORDERING_IS_GIVEN) && $field->getOption(self::ORDERING_IS_GIVEN)) {
-                $result = &$resultGiven;
-                $end = &$endGiven;
-            } else {
-                $result = &$resultBasic;
-                $end = &$endBasic;
-            }
-
-            $options = $field->getOptions();
-            if (isset($options[self::ORDERING_PRIORITY])) {
-                $priority = (int) $options[self::ORDERING_PRIORITY];
-            } else {
-                $end[] = array('field' => $field);
-                continue;
-            }
-
-            $i = 0;
-            foreach ($result as $item) {
-                if ($item['priority'] < $priority) {
-                    break;
-                }
-                $i++;
-            }
-
-            array_splice($result, $i, 0, array(array('priority' => $priority, 'field' => $field)));
-        }
-
-        $fields = array_merge($resultGiven, $endGiven, $resultBasic, $endBasic);
-
-        $max = count($fields);
-        foreach ($fields as $item) {
-            $field = $item['field'];
-            $options = $field->getOptions();
-            $options[self::ORDERING_PRIORITY] = $max;
-            $field->setOptions($options);
-            $max--;
-        }
-    }
-
-    /**
      * {@inheritdoc}
      */
     public function loadDriverExtensions()
@@ -202,25 +100,13 @@ class OrderingExtension extends DataSourceAbstractExtension
     }
 
     /**
-     * Counts next priority for orderings.
-     *
-     * @param DataSourceInterface $datasource
+     * {@inheritdoc}
      */
-    private function countNextPriority(DataSourceInterface $datasource)
+    public function loadSubscribers()
     {
-        if (isset($this->nextPriority)) {
-            return;
-        }
-
-        $next = 0;
-        foreach ($datasource->getFields() as $field) {
-            if ($field->hasOption(self::ORDERING_IS_GIVEN) && $field->getOption(self::ORDERING_IS_GIVEN) && $field->hasOption(self::ORDERING_PRIORITY)) {
-                $tmp = (int) $field->getOption(self::ORDERING_PRIORITY);
-                if ($tmp > $next) {
-                    $next = $tmp;
-                }
-            }
-        }
-        $this->nextPriority = floor($next) + 1;
+        return array(
+            new EventSubscriber\BindParameters(),
+            new EventSubscriber\GetResultAndBuildView(),
+        );
     }
 }

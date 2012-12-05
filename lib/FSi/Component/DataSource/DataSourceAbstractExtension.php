@@ -19,65 +19,9 @@ abstract class DataSourceAbstractExtension implements DataSourceExtensionInterfa
     /**
      * {@inheritdoc}
      */
-    public function preBindParameters(DataSourceInterface $datasource, &$data)
+    public function loadSubscribers()
     {
-
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function postBindParameters(DataSourceInterface $datasource)
-    {
-
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function preGetResult(DataSourceInterface $datasource)
-    {
-
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function postGetResult(DataSourceInterface $datasource, &$result)
-    {
-
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function preBuildView(DataSourceInterface $datasource, DataSourceViewInterface $view)
-    {
-
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function postBuildView(DataSourceInterface $datasource, DataSourceViewInterface $view)
-    {
-
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function preGetParameters(DataSourceInterface $datasource, &$data)
-    {
-
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function postGetParameters(DataSourceInterface $datasource, &$data)
-    {
-
+        return array();
     }
 
     /**
