@@ -14,6 +14,9 @@ namespace FSi\Component\DataSource\Field;
 use FSi\Component\DataSource\Field\FieldViewInterface;
 use FSi\Component\DataSource\Exception\FieldException;
 use FSi\Component\DataSource\DataSourceInterface;
+use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use FSi\Component\DataSource\Event;
 
 /**
  * {@inheritdoc}
@@ -64,8 +67,8 @@ abstract class FieldAbstractType implements FieldTypeInterface
 
     /**
      * Flag to determine if inner state has changed.
-     * Enter description here ...
-     * @var unknown_type
+     *
+     * @var bool
      */
     protected $dirty = true;
 
@@ -73,6 +76,11 @@ abstract class FieldAbstractType implements FieldTypeInterface
      * @var DataSourceInterface
      */
     protected $datasource;
+
+    /**
+     * @var EventDispatcher
+     */
+    protected $eventDispatcher;
 
     /**
      * Flag to determine if from last check any new extension was added or not.
@@ -109,6 +117,14 @@ abstract class FieldAbstractType implements FieldTypeInterface
     public function getName()
     {
         return $this->name;
+    }
+
+    /**
+     * Constructor.
+     */
+    public function __construct()
+    {
+        $this->eventDispatcher = new EventDispatcher();
     }
 
     /**
@@ -206,9 +222,12 @@ abstract class FieldAbstractType implements FieldTypeInterface
     {
         $this->setDirty();
 
-        foreach ($this->extensions as $extension) {
-            $extension->preBindParameter($this, $parameter);
-        }
+        //PreBindParameter event.
+        $event = new Event\DataSourceFieldEvent();
+        $event->setField($this);
+        $event->setParameter($parameter);
+        $this->eventDispatcher->dispatch(Event\DataSourceFieldEvents::PRE_BIND_PARAMETER, $event);
+        $parameter = $event->getParameter();
 
         $datasourceName = $this->getDataSource() ? $this->getDataSource()->getName() : null;
         if (
@@ -225,9 +244,10 @@ abstract class FieldAbstractType implements FieldTypeInterface
 
         $this->parameter = $parameter;
 
-        foreach ($this->extensions as $extension) {
-            $extension->postBindParameter($this);
-        }
+        //PreBindParameter event.
+        $event = new Event\DataSourceFieldEvent();
+        $event->setField($this);
+        $this->eventDispatcher->dispatch(Event\DataSourceFieldEvents::PRE_BIND_PARAMETER, $event);
     }
 
     /**
@@ -248,13 +268,19 @@ abstract class FieldAbstractType implements FieldTypeInterface
             ),
         );
 
-        foreach ($this->extensions as $extension) {
-            $extension->preGetParameter($this, $parameter);
-        }
+        //PreGetParameter event.
+        $event = new Event\DataSourceFieldEvent();
+        $event->setField($this);
+        $event->setParameter($parameter);
+        $this->eventDispatcher->dispatch(Event\DataSourceFieldEvents::PRE_GET_PARAMETER, $event);
+        $parameter = $event->getParameter();
 
-        foreach ($this->extensions as $extension) {
-            $extension->postGetParameter($this, $parameter);
-        }
+        //PostGetParameter event.
+        $event = new Event\DataSourceFieldEvent();
+        $event->setField($this);
+        $event->setParameter($parameter);
+        $this->eventDispatcher->dispatch(Event\DataSourceFieldEvents::POST_GET_PARAMETER, $event);
+        $parameter = $event->getParameter();
 
         $parameters = array_merge_recursive($parameters, $parameter);
     }
@@ -273,6 +299,11 @@ abstract class FieldAbstractType implements FieldTypeInterface
     public function addExtension(FieldExtensionInterface $extension)
     {
         $this->extensionsDirty = true;
+
+        foreach ($extension->loadSubscribers() as $subscriber) {
+            $this->eventDispatcher->addSubscriber($subscriber);
+        }
+
         $this->extensions[] = $extension;
     }
 
@@ -283,13 +314,17 @@ abstract class FieldAbstractType implements FieldTypeInterface
     {
         $view = new FieldView($this);
 
-        foreach ($this->extensions as $extension) {
-            $extension->preBuildView($this, $view);
-        }
+        //PreBuildView event.
+        $event = new Event\DataSourceFieldEvent();
+        $event->setField($this);
+        $event->setView($view);
+        $this->eventDispatcher->dispatch(Event\DataSourceFieldEvents::PRE_BUILD_VIEW, $event);
 
-        foreach ($this->extensions as $extension) {
-            $extension->postBuildView($this, $view);
-        }
+        //PostBuildView event.
+        $event = new Event\DataSourceFieldEvent();
+        $event->setField($this);
+        $event->setView($view);
+        $this->eventDispatcher->dispatch(Event\DataSourceFieldEvents::POST_BUILD_VIEW, $event);
 
         return $view;
     }

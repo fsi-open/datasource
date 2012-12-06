@@ -55,47 +55,11 @@ interface FieldExtensionInterface
     public function getExtendedFieldTypes();
 
     /**
-     * Method called before binding parameter.
+     * Loads events subscribers.
      *
-     * @param FieldTypeInterface $field
-     * @param mixed &$data
-     */
-    public function preBindParameter(FieldTypeInterface $field, &$parameter);
-
-    /**
-     * Method called after binding parameter.
+     * Each subscriber must implements Symfony\Component\EventDispatcher\EventSubscriberInterface.
      *
-     * @param FieldTypeInterface $field
+     * @return array
      */
-    public function postBindParameter(FieldTypeInterface $field);
-
-    /**
-     * Method called before getting parameter.
-     *
-     * @param FieldTypeInterface $field
-     */
-    public function preGetParameter(FieldTypeInterface $field, &$parameter);
-
-    /**
-     * Method called after getting parameter.
-     *
-     * @param FieldTypeInterface $field
-     */
-    public function postGetParameter(FieldTypeInterface $field, &$parameter);
-
-    /**
-     * Method called before building view.
-     *
-     * @param FieldTypeInterface $field
-     * @param FieldViewInterface $view
-     */
-    public function preBuildView(FieldTypeInterface $field, FieldViewInterface $view);
-
-    /**
-     * Method called after building view.
-     *
-     * @param FieldTypeInterface $field
-     * @param FieldViewInterface $view
-     */
-    public function postBuildView(FieldTypeInterface $field, FieldViewInterface $view);
+    public function loadSubscribers();
 }

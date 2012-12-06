@@ -108,22 +108,6 @@ abstract class DriverAbstractExtension implements DriverExtensionInterface
     }
 
     /**
-     * {@inheritdoc}
-     */
-    public function preGetResult(DriverInterface $driver)
-    {
-
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function postGetResult(DriverInterface $driver)
-    {
-
-    }
-
-    /**
      * Initializes every field type in extension.
      *
      * @throws DataSourceException
@@ -169,5 +153,12 @@ abstract class DriverAbstractExtension implements DriverExtensionInterface
             }
         }
     }
-}
 
+    /**
+     * {@inheritdoc}
+     */
+    public function loadSubscribers()
+    {
+        return array();
+    }
+}

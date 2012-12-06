@@ -12,6 +12,7 @@
 namespace FSi\Component\DataSource\Driver;
 
 use FSi\Component\DataSource\Exception\DataSourceException;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 
 /**
  * {@inheritdoc}
@@ -40,6 +41,11 @@ abstract class DriverAbstract implements DriverInterface
     protected $fieldExtensions = array();
 
     /**
+     * @var EventDispatcher
+     */
+    protected $eventDispatcher;
+
+    /**
      * Constructor.
      *
      * @throws DataSourceException
@@ -58,6 +64,7 @@ abstract class DriverAbstract implements DriverInterface
         }
 
         $this->extensions = $extensions;
+        $this->eventDispatcher = new EventDispatcher();
     }
 
     /**
@@ -138,6 +145,21 @@ abstract class DriverAbstract implements DriverInterface
      */
     public function addExtension(DriverExtensionInterface $extension)
     {
+        $eventDispatcher = $this->getEventDispatcher();
+        foreach ($extension->loadSubscribers() as $subscriber) {
+            $eventDispatcher->addSubscriber($subscriber);
+        }
+
         $this->extensions[] = $extension;
+    }
+
+    /**
+     * Returns reference to EventDispatcher.
+     *
+     * @return EventDispatcher
+     */
+    protected function getEventDispatcher()
+    {
+        return $this->eventDispatcher;
     }
 }

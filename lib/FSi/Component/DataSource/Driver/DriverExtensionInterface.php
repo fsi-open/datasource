@@ -49,17 +49,12 @@ interface DriverExtensionInterface
     public function getFieldTypeExtensions($type);
 
     /**
-     * Event called by driver before getting data.
+     * Loads events subscribers.
      *
-     * @param DriverInterface $driver
-     */
-    public function preGetResult(DriverInterface $driver);
-
-    /**
-     * Event called by driver at the end of getting data.
+     * Each subscriber must implements Symfony\Component\EventDispatcher\EventSubscriberInterface.
      *
-     * @param DriverInterface $driver
+     * @return array
      */
-    public function postGetResult(DriverInterface $driver);
+    public function loadSubscribers();
 }
 

@@ -16,11 +16,14 @@ use FSi\Component\DataSource\Field\FieldTypeInterface;
 use FSi\Component\DataSource\Field\FieldViewInterface;
 use FSi\Component\DataSource\DataSourceViewInterface;
 use FSi\Component\DataSource\Extension\Core\Ordering\OrderingExtension;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use FSi\Component\DataSource\Event\DataSourceFieldEvents;
+use FSi\Component\DataSource\Event\DataSourceFieldEventInterface;
 
 /**
  * Extension for fields.
  */
-class FieldExtension extends FieldAbstractExtension
+class FieldExtension extends FieldAbstractExtension implements EventSubscriberInterface
 {
     /**
      * @var array
@@ -33,6 +36,18 @@ class FieldExtension extends FieldAbstractExtension
     public function getExtendedFieldTypes()
     {
         return array('text', 'number', 'date', 'time', 'datetime', 'entity');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function getSubscribedEvents()
+    {
+        return array(
+            DataSourceFieldEvents::PRE_BIND_PARAMETER => array('preBindParameter', 128),
+            DataSourceFieldEvents::POST_BUILD_VIEW => array('postBuildView', 128),
+            DataSourceFieldEvents::PRE_GET_PARAMETER => array('preGetParameter', 128),
+        );
     }
 
     /**
@@ -59,8 +74,11 @@ class FieldExtension extends FieldAbstractExtension
     /**
      * {@inheritdoc}
      */
-    public function preBindParameter(FieldTypeInterface $field, &$parameter)
+    public function preBindParameter(DataSourceFieldEventInterface $event)
     {
+        $field = $event->getField();
+        $parameter = $event->getParameter();
+
         $datasourceName = $field->getDataSource() ? $field->getDataSource()->getName() : null;
         if (empty($datasourceName)) {
             return;
@@ -105,8 +123,11 @@ class FieldExtension extends FieldAbstractExtension
     /**
      * {@inheritdoc}
      */
-    public function postBuildView(FieldTypeInterface $field, FieldViewInterface $view)
+    public function postBuildView(DataSourceFieldEventInterface $event)
     {
+        $field = $event->getField();
+        $view = $event->getView();
+
         if ($field->hasOption(OrderingExtension::ORDERING_IS_DISABLED) && $field->getOption(OrderingExtension::ORDERING_IS_DISABLED)) {
             $view->setAttribute(OrderingExtension::ORDERING_DISABLED, true);
             return;
@@ -123,8 +144,11 @@ class FieldExtension extends FieldAbstractExtension
     /**
      * {@inheritdoc}
      */
-    public function preGetParameter(FieldTypeInterface $field, &$parameter)
+    public function preGetParameter(DataSourceFieldEventInterface $event)
     {
+        $field = $event->getField();
+        $parameter = $event->getParameter();
+
         if (empty($this->givenData)) {
             return;
         }
@@ -135,5 +159,15 @@ class FieldExtension extends FieldAbstractExtension
         }
 
         $parameter[$datasourceName][OrderingExtension::ORDERING][$field->getName()] = $this->givenData;
+
+        $event->setParameter($parameter);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function loadSubscribers()
+    {
+        return array($this);
     }
 }

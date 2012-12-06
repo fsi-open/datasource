@@ -16,7 +16,6 @@ use FSi\Component\DataSource\Exception\DataSourceException;
 use FSi\Component\DataSource\Field\FieldTypeInterface;
 use FSi\Component\DataSource\Field\FieldView;
 use Symfony\Component\EventDispatcher\EventDispatcher;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * {@inheritdoc}
@@ -60,6 +59,7 @@ class DataSource implements DataSourceInterface
      * @var DataSourceFactoryInterface
      */
     private $factory;
+
     /**
      * Cache for given data.
      *

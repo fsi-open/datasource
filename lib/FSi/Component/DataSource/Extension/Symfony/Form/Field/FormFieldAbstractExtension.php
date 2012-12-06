@@ -18,11 +18,14 @@ use FSi\Component\DataSource\DataSourceInterface;
 use Symfony\Component\Form\FormFactory;
 use Symfony\Component\Form\FormBuilder;
 use FSi\Component\DataSource\Extension\Symfony\Form\FormExtension;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use FSi\Component\DataSource\Event\DataSourceFieldEvents;
+use FSi\Component\DataSource\Event\DataSourceFieldEventInterface;
 
 /**
  * Base extension for fields extensions.
  */
-abstract class FormFieldAbstractExtension extends FieldAbstractExtension
+abstract class FormFieldAbstractExtension extends FieldAbstractExtension implements EventSubscriberInterface
 {
     /**
      * @var FormFactory
@@ -33,6 +36,17 @@ abstract class FormFieldAbstractExtension extends FieldAbstractExtension
      * @var \Symfony\Component\Form\Form
      */
     protected $form;
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function getSubscribedEvents()
+    {
+        return array(
+            DataSourceFieldEvents::PRE_BIND_PARAMETER => array('preBindParameter', 128),
+            DataSourceFieldEvents::POST_BUILD_VIEW => array('postBuildView', 128),
+        );
+    }
 
     /**
      * Constructor.
@@ -47,8 +61,11 @@ abstract class FormFieldAbstractExtension extends FieldAbstractExtension
     /**
      * {@inheritdoc}
      */
-    public function postBuildView(FieldTypeInterface $field, FieldViewInterface $view)
+    public function postBuildView(DataSourceFieldEventInterface $event)
     {
+        $field = $event->getField();
+        $view = $event->getView();
+
         $this->createForm($field);
         $view->setAttribute(FormExtension::FORM, $this->form->createView());
     }
@@ -56,8 +73,11 @@ abstract class FormFieldAbstractExtension extends FieldAbstractExtension
     /**
      * {@inheritdoc}
      */
-    public function preBindParameter(FieldTypeInterface $field, &$parameter)
+    public function preBindParameter(DataSourceFieldEventInterface $event)
     {
+        $field = $event->getField();
+        $parameter = $event->getParameter();
+
         if ($field->hasOption('form_disabled') && $field->getOption('form_disabled')) {
             return;
         }
@@ -90,6 +110,7 @@ abstract class FormFieldAbstractExtension extends FieldAbstractExtension
 
         $this->form->bind($dataToBind);
         $parameter = $this->arrayMergeRecursive($parameter, array($datasourceName => $this->form->getData()));
+        $event->setParameter($parameter);
     }
 
     /**
@@ -168,5 +189,13 @@ abstract class FormFieldAbstractExtension extends FieldAbstractExtension
             }
         }
         return $merged;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function loadSubscribers()
+    {
+        return array($this);
     }
 }

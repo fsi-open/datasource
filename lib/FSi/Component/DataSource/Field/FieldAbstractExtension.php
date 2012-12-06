@@ -62,48 +62,8 @@ class FieldAbstractExtension implements FieldExtensionInterface
     /**
      * {@inheritdoc}
      */
-    public function preBindParameter(FieldTypeInterface $field, &$parameter)
+    public function loadSubscribers()
     {
-
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function postBindParameter(FieldTypeInterface $field)
-    {
-
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function preGetParameter(FieldTypeInterface $field, &$parameter)
-    {
-
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function postGetParameter(FieldTypeInterface $field, &$parameter)
-    {
-
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function preBuildView(FieldTypeInterface $field, FieldViewInterface $view)
-    {
-
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function postBuildView(FieldTypeInterface $field, FieldViewInterface $view)
-    {
-
+        return array();
     }
 }
