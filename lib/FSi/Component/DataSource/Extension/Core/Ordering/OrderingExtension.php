@@ -105,8 +105,7 @@ class OrderingExtension extends DataSourceAbstractExtension
     public function loadSubscribers()
     {
         return array(
-            new EventSubscriber\BindParameters(),
-            new EventSubscriber\GetResultAndBuildView(),
+            new EventSubscriber\Events(),
         );
     }
 }
