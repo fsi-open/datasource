@@ -14,21 +14,23 @@ namespace FSi\Component\DataSource\Extension\Core\Pagination\EventSubscriber;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use FSi\Component\DataSource\Event\DataSourceEvents;
 use FSi\Component\DataSource\Event\DataSourceEvent;
-use FSi\Component\DataSource\Event\DataSourceEventInterface;
 use FSi\Component\DataSource\Extension\Core\Pagination\PaginationExtension;
 use FSi\Component\DataSource\DataSourceInterface;
 
 /**
- * Class contains method called at BuildView events.
+ * Class contains method called during DataSource events.
  */
-class BuildView implements EventSubscriberInterface
+class Events implements EventSubscriberInterface
 {
     /**
      * {@inheritdoc}
      */
     public static function getSubscribedEvents()
     {
-        return array(DataSourceEvents::POST_BUILD_VIEW => array('postBuildView', 128));
+        return array(
+            DataSourceEvents::POST_BUILD_VIEW => array('postBuildView', 128),
+            DataSourceEvents::PRE_GET_PARAMETERS => array('preGetParameters', 128),
+        );
     }
 
     /**
@@ -55,5 +57,30 @@ class BuildView implements EventSubscriberInterface
         $page = isset($params[$datasourceName]) && isset($params[$datasourceName][DataSourceInterface::PAGE]) ? $params[$datasourceName][DataSourceInterface::PAGE] : 1;
         $view->setAttribute(PaginationExtension::PAGE_AMOUNT, $all);
         $view->setAttribute(PaginationExtension::PAGE_CURRENT, $page);
+    }
+
+    /**
+     * Method called at PreGetParameters event.
+     *
+     * @param DataSourceEventInterface $event
+     */
+    public function preGetParameters(DataSourceEvent\ParametersEventArgs $event)
+    {
+        $datasource = $event->getDataSource();
+        $data = $event->getParameters();
+
+        $datasourceName = $datasource->getName();
+        $maxresults = $datasource->getMaxResults();
+        if ($maxresults == 0) {
+            $page = 1;
+        } else {
+            $current = $datasource->getFirstResult();
+            $page = floor($current/$maxresults) + 1;
+        }
+
+        if ($page != 1) {
+            $data[$datasourceName][DataSourceInterface::PAGE] = $page;
+            $event->setParameters($data);
+        }
     }
 }
