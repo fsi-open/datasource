@@ -13,6 +13,7 @@ namespace FSi\Component\DataSource\Extension\Core\Pagination\EventSubscriber;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use FSi\Component\DataSource\Event\DataSourceEvents;
+use FSi\Component\DataSource\Event\DataSourceEvent;
 use FSi\Component\DataSource\Event\DataSourceEventInterface;
 use FSi\Component\DataSource\Extension\Core\Pagination\PaginationExtension;
 use FSi\Component\DataSource\DataSourceInterface;
@@ -35,7 +36,7 @@ class BuildView implements EventSubscriberInterface
      *
      * @param DataSourceEventInterface $event
      */
-    public function postBuildView(DataSourceEventInterface $event)
+    public function postBuildView(DataSourceEvent\ViewEventArgs $event)
     {
         $datasource = $event->getDataSource();
         $view = $event->getView();

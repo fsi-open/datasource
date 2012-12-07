@@ -17,7 +17,8 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use FSi\Component\DataSource\Driver\Doctrine\Exception\DoctrineDriverException;
 use Doctrine\ORM\QueryBuilder;
-use FSi\Component\DataSource\Event;
+use FSi\Component\DataSource\Event\DriverEvents;
+use FSi\Component\DataSource\Event\DriverEvent;
 
 /**
  * Driver to fetch data from databases using Doctrine.
@@ -123,9 +124,8 @@ class DoctrineDriver extends DriverAbstract
         $this->query = $qb;
 
         //preGetResult event.
-        $event = new Event\DriverEvent();
-        $event->setDriver($this);
-        $this->eventDispatcher->dispatch(Event\DriverEvents::PRE_GET_RESULT, $event);
+        $event = new DriverEvent\DriverEventArgs($this);
+        $this->eventDispatcher->dispatch(DriverEvents::PRE_GET_RESULT, $event);
 
         $ordered = array();
         $orderedEnd = array();
@@ -160,10 +160,8 @@ class DoctrineDriver extends DriverAbstract
         $result = new Paginator($qb);
 
         //postGetResult event.
-        $event = new Event\DriverEvent();
-        $event->setDriver($this);
-        $event->setResult($result);
-        $this->eventDispatcher->dispatch(Event\DriverEvents::POST_GET_RESULT, $event);
+        $event = new DriverEvent\ResultEventArgs($this, $result);
+        $this->eventDispatcher->dispatch(DriverEvents::POST_GET_RESULT, $event);
         $result = $event->getResult();
 
         //Cleaning query.

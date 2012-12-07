@@ -13,6 +13,7 @@ namespace FSi\Component\DataSource\Extension\Core\Pagination\EventSubscriber;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use FSi\Component\DataSource\Event\DataSourceEvents;
+use FSi\Component\DataSource\Event\DataSourceEvent;
 use FSi\Component\DataSource\Event\DataSourceEventInterface;
 use FSi\Component\DataSource\DataSourceInterface;
 
@@ -34,7 +35,7 @@ class GetParameters implements EventSubscriberInterface
      *
      * @param DataSourceEventInterface $event
      */
-    public function preGetParameters(DataSourceEventInterface $event)
+    public function preGetParameters(DataSourceEvent\ParametersEventArgs $event)
     {
         $datasource = $event->getDataSource();
         $data = $event->getParameters();

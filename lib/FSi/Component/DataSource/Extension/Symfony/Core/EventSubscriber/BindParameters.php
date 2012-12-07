@@ -13,6 +13,7 @@ namespace FSi\Component\DataSource\Extension\Symfony\Core\EventSubscriber;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use FSi\Component\DataSource\Event\DataSourceEvents;
+use FSi\Component\DataSource\Event\DataSourceEvent;
 use FSi\Component\DataSource\Event\DataSourceEventInterface;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -34,11 +35,11 @@ class BindParameters implements EventSubscriberInterface
      *
      * @param DataSourceEventInterface $event
      */
-    public function preBindParameters(DataSourceEventInterface $event)
+    public function preBindParameters(DataSourceEvent\ParametersEventArgs $event)
     {
-        $data = $event->getData();
-        if ($data instanceof Request) {
-            $event->setData($data->query->all());
+        $parameters = $event->getParameters();
+        if ($parameters instanceof Request) {
+            $event->setParameters($parameters->query->all());
         }
     }
 }

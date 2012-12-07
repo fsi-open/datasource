@@ -13,7 +13,7 @@ namespace FSi\Component\DataSource\Extension\Core\Ordering\EventSubscriber;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use FSi\Component\DataSource\Event\DataSourceEvents;
-use FSi\Component\DataSource\Event\DataSourceEventInterface;
+use FSi\Component\DataSource\Event\DataSourceEvent;
 use FSi\Component\DataSource\Extension\Core\Ordering\OrderingExtension;
 
 /**
@@ -42,20 +42,20 @@ class BindParameters implements EventSubscriberInterface
      *
      * @param DataSourceEventInterface $event
      */
-    public function preBindParameters(DataSourceEventInterface $event)
+    public function preBindParameters(DataSourceEvent\ParametersEventArgs $event)
     {
-        $datasource = $event->getDataSource();
-        $data = $event->getData();
+        $parameterssource = $event->getDataSource();
+        $parameters = $event->getParameters();
 
-        $datasourceName = $datasource->getName();
+        $parameterssourceName = $parameterssource->getName();
 
         if (
-            isset($data[$datasourceName])
-            && isset($data[$datasourceName][OrderingExtension::ORDERING])
-            && isset($data[$datasourceName][OrderingExtension::ORDERING][OrderingExtension::RESET_PAGE])
+            isset($parameters[$parameterssourceName])
+            && isset($parameters[$parameterssourceName][OrderingExtension::ORDERING])
+            && isset($parameters[$parameterssourceName][OrderingExtension::ORDERING][OrderingExtension::RESET_PAGE])
         ) {
-            unset($data[$datasourceName][OrderingExtension::ORDERING][OrderingExtension::RESET_PAGE]);
-            $event->setData($data);
+            unset($parameters[$parameterssourceName][OrderingExtension::ORDERING][OrderingExtension::RESET_PAGE]);
+            $event->setParameters($parameters);
             $this->resetPage = true;
         }
     }
@@ -65,7 +65,7 @@ class BindParameters implements EventSubscriberInterface
      *
      * @param DataSourceEventInterface $event
      */
-    public function postBindParameters(DataSourceEventInterface $event)
+    public function postBindParameters(DataSourceEvent\DataSourceEventArgs $event)
     {
         if ($this->resetPage) {
             $event->getDataSource()->setFirstResult(0);

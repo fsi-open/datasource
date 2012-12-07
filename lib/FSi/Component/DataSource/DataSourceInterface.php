@@ -126,9 +126,9 @@ interface DataSourceInterface
     /**
      * Binds parameters to fields.
      *
-     * @param array $data
+     * @param array $parameters
      */
-    public function bindParameters($data = array());
+    public function bindParameters($parameters = array());
 
     /**
      * Returns collection with result.

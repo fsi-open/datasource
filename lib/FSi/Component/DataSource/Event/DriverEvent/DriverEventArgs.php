@@ -9,36 +9,36 @@
  * file that was distributed with this source code.
  */
 
-namespace FSi\Component\DataSource\Event;
+namespace FSi\Component\DataSource\Event\DriverEvent;
 
 use Symfony\Component\EventDispatcher\Event;
+use FSi\Component\DataSource\Driver\DriverInterface;
 
 /**
- * Event class for DataSource.
+ * Event class for Driver.
  */
-class DriverEvent extends Event implements DataSourceEventInterface
+class DriverEventArgs extends Event
 {
+    /**
+     * @var DriverInterface
+     */
     private $driver;
 
-    private $result;
-
-    public function setDriver($driver)
+    /**
+     * Constructor.
+     *
+     * @param DriverInterface $driver
+     */
+    public function __construct(DriverInterface $driver)
     {
         $this->driver = $driver;
     }
 
+    /**
+     * @return DriverInterface
+     */
     public function getDriver()
     {
         return $this->driver;
-    }
-
-    public function setResult($result)
-    {
-        $this->result = $result;
-    }
-
-    public function getResult()
-    {
-        return $this->result;
     }
 }

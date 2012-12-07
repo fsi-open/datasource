@@ -13,6 +13,7 @@ namespace FSi\Component\DataSource\Extension\Core\Ordering\EventSubscriber;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use FSi\Component\DataSource\Event\DataSourceEvents;
+use FSi\Component\DataSource\Event\DataSourceEvent;
 use FSi\Component\DataSource\Event\DataSourceEventInterface;
 use FSi\Component\DataSource\Extension\Core\Ordering\OrderingExtension;
 
@@ -44,7 +45,7 @@ class GetResultAndBuildView implements EventSubscriberInterface
      *
      * @param DataSourceEventInterface $event
      */
-    public function preGetResult(DataSourceEventInterface $event)
+    public function preGetResult(DataSourceEvent\DataSourceEventArgs $event)
     {
         $datasource = $event->getDataSource();
         $this->countNextPriority($datasource);
@@ -98,7 +99,7 @@ class GetResultAndBuildView implements EventSubscriberInterface
      *
      * @param DataSourceEventInterface $event
      */
-    public function postBuildView(DataSourceEventInterface $event)
+    public function postBuildView(DataSourceEvent\ViewEventArgs $event)
     {
         $datasource = $event->getDataSource();
         $view = $event->getView();

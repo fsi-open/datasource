@@ -17,7 +17,8 @@ use FSi\Component\DataSource\Field\FieldViewInterface;
 use FSi\Component\DataSource\DataSourceViewInterface;
 use FSi\Component\DataSource\Extension\Core\Ordering\OrderingExtension;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use FSi\Component\DataSource\Event\DataSourceFieldEvents;
+use FSi\Component\DataSource\Event\FieldEvents;
+use FSi\Component\DataSource\Event\FieldEvent;
 use FSi\Component\DataSource\Event\DataSourceFieldEventInterface;
 
 /**
@@ -44,9 +45,9 @@ class FieldExtension extends FieldAbstractExtension implements EventSubscriberIn
     public static function getSubscribedEvents()
     {
         return array(
-            DataSourceFieldEvents::PRE_BIND_PARAMETER => array('preBindParameter', 128),
-            DataSourceFieldEvents::POST_BUILD_VIEW => array('postBuildView', 128),
-            DataSourceFieldEvents::PRE_GET_PARAMETER => array('preGetParameter', 128),
+            FieldEvents::PRE_BIND_PARAMETER => array('preBindParameter', 128),
+            FieldEvents::POST_BUILD_VIEW => array('postBuildView', 128),
+            FieldEvents::PRE_GET_PARAMETER => array('preGetParameter', 128),
         );
     }
 
@@ -74,7 +75,7 @@ class FieldExtension extends FieldAbstractExtension implements EventSubscriberIn
     /**
      * {@inheritdoc}
      */
-    public function preBindParameter(DataSourceFieldEventInterface $event)
+    public function preBindParameter(FieldEvent\ParameterEventArgs $event)
     {
         $field = $event->getField();
         $parameter = $event->getParameter();
@@ -123,7 +124,7 @@ class FieldExtension extends FieldAbstractExtension implements EventSubscriberIn
     /**
      * {@inheritdoc}
      */
-    public function postBuildView(DataSourceFieldEventInterface $event)
+    public function postBuildView(FieldEvent\ViewEventArgs $event)
     {
         $field = $event->getField();
         $view = $event->getView();
@@ -144,7 +145,7 @@ class FieldExtension extends FieldAbstractExtension implements EventSubscriberIn
     /**
      * {@inheritdoc}
      */
-    public function preGetParameter(DataSourceFieldEventInterface $event)
+    public function preGetParameter(FieldEvent\ParameterEventArgs $event)
     {
         $field = $event->getField();
         $parameter = $event->getParameter();

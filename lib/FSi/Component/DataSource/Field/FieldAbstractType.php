@@ -16,7 +16,8 @@ use FSi\Component\DataSource\Exception\FieldException;
 use FSi\Component\DataSource\DataSourceInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use FSi\Component\DataSource\Event;
+use FSi\Component\DataSource\Event\FieldEvents;
+use FSi\Component\DataSource\Event\FieldEvent;
 
 /**
  * {@inheritdoc}
@@ -223,10 +224,8 @@ abstract class FieldAbstractType implements FieldTypeInterface
         $this->setDirty();
 
         //PreBindParameter event.
-        $event = new Event\DataSourceFieldEvent();
-        $event->setField($this);
-        $event->setParameter($parameter);
-        $this->eventDispatcher->dispatch(Event\DataSourceFieldEvents::PRE_BIND_PARAMETER, $event);
+        $event = new FieldEvent\ParameterEventArgs($this, $parameter);
+        $this->eventDispatcher->dispatch(FieldEvents::PRE_BIND_PARAMETER, $event);
         $parameter = $event->getParameter();
 
         $datasourceName = $this->getDataSource() ? $this->getDataSource()->getName() : null;
@@ -245,9 +244,8 @@ abstract class FieldAbstractType implements FieldTypeInterface
         $this->parameter = $parameter;
 
         //PreBindParameter event.
-        $event = new Event\DataSourceFieldEvent();
-        $event->setField($this);
-        $this->eventDispatcher->dispatch(Event\DataSourceFieldEvents::PRE_BIND_PARAMETER, $event);
+        $event = new FieldEvent\FieldEventArgs($this);
+        $this->eventDispatcher->dispatch(FieldEvents::POST_BIND_PARAMETER, $event);
     }
 
     /**
@@ -269,17 +267,13 @@ abstract class FieldAbstractType implements FieldTypeInterface
         );
 
         //PreGetParameter event.
-        $event = new Event\DataSourceFieldEvent();
-        $event->setField($this);
-        $event->setParameter($parameter);
-        $this->eventDispatcher->dispatch(Event\DataSourceFieldEvents::PRE_GET_PARAMETER, $event);
+        $event = new FieldEvent\ParameterEventArgs($this, $parameter);
+        $this->eventDispatcher->dispatch(FieldEvents::PRE_GET_PARAMETER, $event);
         $parameter = $event->getParameter();
 
         //PostGetParameter event.
-        $event = new Event\DataSourceFieldEvent();
-        $event->setField($this);
-        $event->setParameter($parameter);
-        $this->eventDispatcher->dispatch(Event\DataSourceFieldEvents::POST_GET_PARAMETER, $event);
+        $event = new FieldEvent\ParameterEventArgs($this, $parameter);
+        $this->eventDispatcher->dispatch(FieldEvents::POST_GET_PARAMETER, $event);
         $parameter = $event->getParameter();
 
         $parameters = array_merge_recursive($parameters, $parameter);
@@ -315,16 +309,12 @@ abstract class FieldAbstractType implements FieldTypeInterface
         $view = new FieldView($this);
 
         //PreBuildView event.
-        $event = new Event\DataSourceFieldEvent();
-        $event->setField($this);
-        $event->setView($view);
-        $this->eventDispatcher->dispatch(Event\DataSourceFieldEvents::PRE_BUILD_VIEW, $event);
+        $event = new FieldEvent\ViewEventArgs($this, $view);
+        $this->eventDispatcher->dispatch(FieldEvents::PRE_BUILD_VIEW, $event);
 
         //PostBuildView event.
-        $event = new Event\DataSourceFieldEvent();
-        $event->setField($this);
-        $event->setView($view);
-        $this->eventDispatcher->dispatch(Event\DataSourceFieldEvents::POST_BUILD_VIEW, $event);
+        $event = new FieldEvent\ViewEventArgs($this, $view);
+        $this->eventDispatcher->dispatch(FieldEvents::POST_BUILD_VIEW, $event);
 
         return $view;
     }

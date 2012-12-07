@@ -19,7 +19,8 @@ use Symfony\Component\Form\FormFactory;
 use Symfony\Component\Form\FormBuilder;
 use FSi\Component\DataSource\Extension\Symfony\Form\FormExtension;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use FSi\Component\DataSource\Event\DataSourceFieldEvents;
+use FSi\Component\DataSource\Event\FieldEvents;
+use FSi\Component\DataSource\Event\FieldEvent;
 use FSi\Component\DataSource\Event\DataSourceFieldEventInterface;
 
 /**
@@ -43,8 +44,8 @@ abstract class FormFieldAbstractExtension extends FieldAbstractExtension impleme
     public static function getSubscribedEvents()
     {
         return array(
-            DataSourceFieldEvents::PRE_BIND_PARAMETER => array('preBindParameter', 128),
-            DataSourceFieldEvents::POST_BUILD_VIEW => array('postBuildView', 128),
+            FieldEvents::PRE_BIND_PARAMETER => array('preBindParameter', 128),
+            FieldEvents::POST_BUILD_VIEW => array('postBuildView', 128),
         );
     }
 
@@ -61,7 +62,7 @@ abstract class FormFieldAbstractExtension extends FieldAbstractExtension impleme
     /**
      * {@inheritdoc}
      */
-    public function postBuildView(DataSourceFieldEventInterface $event)
+    public function postBuildView(FieldEvent\ViewEventArgs $event)
     {
         $field = $event->getField();
         $view = $event->getView();
@@ -73,7 +74,7 @@ abstract class FormFieldAbstractExtension extends FieldAbstractExtension impleme
     /**
      * {@inheritdoc}
      */
-    public function preBindParameter(DataSourceFieldEventInterface $event)
+    public function preBindParameter(FieldEvent\ParameterEventArgs $event)
     {
         $field = $event->getField();
         $parameter = $event->getParameter();
