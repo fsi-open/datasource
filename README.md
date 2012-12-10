@@ -78,7 +78,7 @@ And at last we can fetch our data
 $result = $datasource->getResult();
 ```
 
-or create view helpfull during view rendering.
+or create view helpfull during view rendering (see below for more info).
 ``` php
 <?php
 
@@ -88,6 +88,49 @@ $view = $datasource->createView();
 Result that is returned always impements ``Traversable`` interface.
 
 Note, that in fact all you need to do to fetch data is create DataSource and call ``getResult`` method, other steps are optional.
+
+## View ##
+
+While view rendering you should use DataSourceView. It's main purpose is to keep some attributes given by extensions, that are needed
+to render various links, paginations, etc. For more details see documentation of extensions in ``doc`` folder.
+
+To get these attributes you can use methods ``hasAttribute``, ``setAttribute``, ``getAttribute``, ``getAttributes`` and ``removeAttribute``.
+
+View also have three methods to get parameters of current datasource, other ones on page or all of them (in case there is more
+than one DataSource on page), these methods are: ``getParameters``, ``getAllParameters`` and ``getOtherParameters``. Parameters
+you get allows you to regenerate actual state of DataSource (what means if you bind parameters you got from ``getParameters``
+DataSource will be **in the same state** it was before binding).
+
+These methods return multidimensional array, so it's up to you to transform it to state that is suitable to send as GET parameters
+(like ``name[param1][param2]``).
+
+View contains also FieldViews (one for each field, described below). You have various ways to get to them, since View implements
+``ArrayAccess``, ``Countable``, and ``SeekableIterator``. 
+
+``` php
+<?php
+
+$view = $datasource->createView(); //Main view.
+
+foreach ($view as $fieldView) {
+    // (...)
+}
+
+count($view);
+
+$view['fieldname1'].hasAttribute('foo');
+
+```
+
+**Note:** Remember you can't set anything using ``ArrayAccess`` interface, constructions like ``unset($view['field1'])`` or 
+``$view['field2'] = 'sth'`` won't work.
+
+## FieldView ##
+
+FieldView allows to set some specific attributes that relates to that specific field. You can access them by the same methods like in View: 
+``hasAttribute``, ``setAttribute``, ``getAttribute``, ``getAttributes`` and ``removeAttribute``.
+
+To see which attributes are set in which case see extensions docs.
 
 ## Extensions ##
 
@@ -104,16 +147,25 @@ Method ``loadSubscribers`` must return array of objects that (if any) must imple
 Method ``loadDriverExtensions`` must return array of objects that (if any) must be valid driver extensions (see below).
 
 Each of subscribers can subscribe to one of following events:
-(next to event names listed what kind of argument is passed to that subscribed objects method)
+(list contains key, that is const of ``FSi\Component\DataSource\Event\DataSourceEvents`` and passed argument, that is defined
+in ``FSi\Component\DataSource\Event\DataSourceEvent`` namespace)
 
-* ``FSi\Component\DataSource\Event\DataSourceEvents::PRE_BIND_PARAMETERS``: ``FSi\Component\DataSource\Event\DataSourceEvent\ParametersEventArgs``
-* ``FSi\Component\DataSource\Event\DataSourceEvents::POST_BIND_PARAMETERS``: ``FSi\Component\DataSource\Event\DataSourceEvent\DataSourceEventArgs``
-* ``FSi\Component\DataSource\Event\DataSourceEvents::PRE_GET_RESULT``: ``FSi\Component\DataSource\Event\DataSourceEvent\DataSourceEventArgs``
-* ``FSi\Component\DataSource\Event\DataSourceEvents::POST_GET_RESULT``: ``FSi\Component\DataSource\Event\DataSourceEvent\ResultEventArgs``
-* ``FSi\Component\DataSource\Event\DataSourceEvents::PRE_BUILD_VIEW``: ``FSi\Component\DataSource\Event\DataSourceEvent\ViewEventArgs``
-* ``FSi\Component\DataSource\Event\DataSourceEvents::POST_BUILD_VIEW``: ``FSi\Component\DataSource\Event\DataSourceEvent\ViewEventArgs``
-* ``FSi\Component\DataSource\Event\DataSourceEvents::PRE_GET_PARAMETERS``: ``FSi\Component\DataSource\Event\DataSourceEvent\ParametersEventArgs``
-* ``FSi\Component\DataSource\Event\DataSourceEvents::POST_GET_PARAMETERS``: ``FSi\Component\DataSource\Event\DataSourceEvent\ParametersEventArgs``
+* ``PRE_BIND_PARAMETERS``: ``ParametersEventArgs``
+* ``POST_BIND_PARAMETERS``: ``DataSourceEventArgs``
+* ``PRE_GET_RESULT``: ``DataSourceEventArgs``
+* ``POST_GET_RESULT``: ``ResultEventArgs``
+* ``PRE_BUILD_VIEW``: ``ViewEventArgs``
+* ``POST_BUILD_VIEW``: ``ViewEventArgs``
+* ``PRE_GET_PARAMETERS``: ``ParametersEventArgs``
+* ``POST_GET_PARAMETERS``: ``ParametersEventArgs``
+
+All of arguments allows to access ``DataSource`` through ``getDataSource`` method.
+
+Arguments:
+* ``DataSourceEventArgs`` - just gives access to DataSource (see above)
+* ``ParametersEventArgs`` - allows to get and set parameters through ``getParameters`` and ``setParameters`` methods
+* ``ViewEventArgs`` - allows to get view through ``getView`` method
+* ``ResultEventArgs`` - allows to get and set result through ``getResult`` and ``setResult`` methods
 
 ### Extension for Driver ###
 
@@ -125,10 +177,15 @@ where getFieldType must return field object for given type, that implements ``FS
 and already has all its extensions loaded.
 
 Each of subscribers can subscribe to one of following events:
-(next to event names listed what kind of argument is passed to that subscribed objects method)
+(list contains key, that is const of ``FSi\Component\DataSource\Event\DriverEvents`` and passed argument, that is defined
+in ``FSi\Component\DataSource\Event\DriverEvent`` namespace)
 
-* ``FSi\Component\DataSource\Event\DriverEvents::PRE_GET_RESULT``: ``FSi\Component\DataSource\Event\DriverEvent\DriverEventArgs``
-* ``FSi\Component\DataSource\Event\DriverEvents::POST_GET_RESULT``: ``FSi\Component\DataSource\Event\DriverEvent\ResultEventArgs``
+* ``PRE_GET_RESULT``: ``DriverEventArgs``
+* ``POST_GET_RESULT``: ``ResultEventArgs``
+
+Arguments:
+* ``DriverEventArgs`` - allows to access driver through ``getDriver`` method
+* ``ResultEventArgs`` - allows to access driver (like ``DriverEventArgs``) and to set and get result through ``getResult`` and ``setResult`` methods
 
 ### Extension for Field ###
 
@@ -136,11 +193,19 @@ Each extension must implement interface ``FSi\Component\DataSource\Field\FieldEx
 Method ``loadSubscribers`` must return array of objects that (if any) must implement ``Symfony\Component\EventDispatcher\EventSubscriberInterface``.
 
 Each of subscribers can subscribe to one of following events:
-(next to event names listed what kind of argument is passed to that subscribed objects method)
+(list contains key, that is const of ``FSi\Component\DataSource\Event\FieldEvents`` and passed argument, that is defined
+in ``FSi\Component\DataSource\Event\FieldEvent`` namespace)
 
-* ``FSi\Component\DataSource\Event\FieldEvents::PRE_BIND_PARAMETER``: ``FSi\Component\DataSource\Event\FieldEvent\ParameterEventArgs``
-* ``FSi\Component\DataSource\Event\FieldEvents::POST_BIND_PARAMETER``: ``FSi\Component\DataSource\Event\FieldEvent\FieldEventArgs``
-* ``FSi\Component\DataSource\Event\FieldEvents::PRE_BUILD_VIEW``: ``FSi\Component\DataSource\Event\FieldEvent\ViewEventArgs``
-* ``FSi\Component\DataSource\Event\FieldEvents::POST_BUILD_VIEW``: ``FSi\Component\DataSource\Event\FieldEvent\ViewEventArgs``
-* ``FSi\Component\DataSource\Event\FieldEvents::PRE_GET_PARAMETER``: ``FSi\Component\DataSource\Event\FieldEvent\ParameterEventArgs``
-* ``FSi\Component\DataSource\Event\FieldEvents::POST_GET_PARAMETER``: ``FSi\Component\DataSource\Event\FieldEvent\ParameterEventArgs``
+* ``PRE_BIND_PARAMETER``: ``ParameterEventArgs``
+* ``POST_BIND_PARAMETER``: ``FieldEventArgs``
+* ``PRE_BUILD_VIEW``: ``ViewEventArgs``
+* ``POST_BUILD_VIEW``: ``ViewEventArgs``
+* ``PRE_GET_PARAMETER``: ``ParameterEventArgs``
+* ``POST_GET_PARAMETER``: ``ParameterEventArgs``
+
+All of arguments allows to access ``Field`` through ``getField`` method.
+
+Arguments:
+* ``FieldEventArgs`` - just gives access to field (see above)
+* ``ParameterEventArgs`` - allows to get and set Parameter through ``getParameter`` and ``setParameter`` methods
+* ``ViewEventArgs`` - allows to get FieldView through ``getView`` method

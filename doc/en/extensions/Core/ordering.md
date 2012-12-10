@@ -34,9 +34,9 @@ $factory = new DataSourceFactory($extensions);
 ## Available field options ##
 
 * ``ordering_given`` - for internal use only, you shoudn't make any use of it
- * ``false`` by default
+** ``false`` by default
 * ``ordering_disabled`` - if true, field won't get any ordering parameters
- * ``false`` by default
+** ``false`` by default
 * ``ordering`` - default ordering (i.e. 'asc'), note: it works **even if** ``ordering_disabled`` is set to ``true``
 * ``ordering_priority`` - default ordering priority, note: it works **even if** ``ordering_disabled`` is set to ``true``
 
@@ -52,12 +52,12 @@ In ``FSi\Component\DataSource\Event\DataSourceEvents::PRE_GET_RESULT`` event ext
 * ``ordering_next_priority`` - next priority that should be given for next criterion
 * ``ordering_pattern`` - use ``sprintf($ordering_pattern, $field->getName()`` to obtain key for next ordering
 * ``ordering_priority_pattern`` - use ``sprintf($ordering_priority_pattern, $field->getName()`` to obtain key for next ordering priority
-* ``resetpage`` - key that has to be set to true to reset DataSource page to first one.
+* ``resetpage`` - key that has to be set to true to reset DataSource page to first one. (It's usefull when determining new ordering.)
 
 ## FieldView attributes ##
 
 * ``ordering_disabled`` - if true, field doesn't react for given parameters
- * ``false`` by default
+** ``false`` by default
 * ``ordering_current`` - determines if there is ``asc`` or ``desc`` ordering set (if any)
 * ``ordering_current_priority`` - determines this field current ordering priority
 * ``ordering_enabled`` - ``true`` if there is any priority or ordering given by client (even if values are same as default ones)

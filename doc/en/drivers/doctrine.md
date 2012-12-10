@@ -32,12 +32,12 @@ Doctrine driver provides some field types through ``FSi\Component\DataSource\Dri
 so remember to **always load it** as extension.
 
 Provided field types:
-* **text** - allowed comparisons: eq, neq, like.
-* **number** - allowed comparisons: eq, neq, lt, lte, gt, gte, in, notIn, between.
-* **date** - allowed comparisons: eq, neq, lt, lte, gt, gte, in, notIn, between.
-* **time** - allowed comparisons: eq, neq, lt, lte, gt, gte, in, notIn, between.
-* **datetime** - allowed comparisons: eq, neq, lt, lte, gt, gte, in, notIn, between.
-* **entity** - allowed comparisons: eq, memberof.
+* ``text`` - allowed comparisons: eq, neq, like.
+* ``number`` - allowed comparisons: eq, neq, lt, lte, gt, gte, in, notIn, between.
+* ``date`` - allowed comparisons: eq, neq, lt, lte, gt, gte, in, notIn, between.
+* ``time`` - allowed comparisons: eq, neq, lt, lte, gt, gte, in, notIn, between.
+* ``datetime`` - allowed comparisons: eq, neq, lt, lte, gt, gte, in, notIn, between.
+* ``entity`` - allowed comparisons: eq, memberof.
 
 Note: If using ``between`` comparison, you must bind parameters as array('from' => $value1, 'to' => $value2), 
 if ``entity`` you must give entity to it and if ``in``, or ``notIn`` then as array.
@@ -117,6 +117,7 @@ If you want to have conditions to fields from joined entities, or you build very
 remember to add field mapping to all of fields, otherwise they will try do refer to main entity alias.
 
 ``` php
+<?php
 
 $queryBuilder = $entityManager->createQueryBuilder();
 $queryBuilder
