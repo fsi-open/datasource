@@ -33,7 +33,7 @@ class ViewEventArgs extends DataSourceEventArgs
     public function __construct(DataSourceInterface $datasource, DataSourceViewInterface $view)
     {
         parent::__construct($datasource);
-        $this->setView($view);
+        $this->view = $view;
     }
 
     /**
@@ -42,13 +42,5 @@ class ViewEventArgs extends DataSourceEventArgs
     public function getView()
     {
         return $this->view;
-    }
-
-    /**
-     * @param DataSourceViewInterface $view
-     */
-    public function setView(DataSourceViewInterface $view)
-    {
-        $this->view = $view;
     }
 }

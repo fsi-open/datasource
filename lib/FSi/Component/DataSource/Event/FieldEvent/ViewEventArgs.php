@@ -33,7 +33,7 @@ class ViewEventArgs extends FieldEventArgs
     public function __construct(FieldTypeInterface $field, FieldViewInterface $view)
     {
         parent::__construct($field);
-        $this->setView($view);
+        $this->view = $view;
     }
 
     /**
@@ -42,13 +42,5 @@ class ViewEventArgs extends FieldEventArgs
     public function getView()
     {
         return $this->view;
-    }
-
-    /**
-     * @param FieldViewInterface $view
-     */
-    public function setView(FieldViewInterface $view)
-    {
-        $this->view = $view;
     }
 }
