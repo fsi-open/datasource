@@ -21,7 +21,6 @@ use FSi\Component\DataSource\Extension\Symfony\Form\FormExtension;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use FSi\Component\DataSource\Event\FieldEvents;
 use FSi\Component\DataSource\Event\FieldEvent;
-use FSi\Component\DataSource\Event\DataSourceFieldEventInterface;
 
 /**
  * Base extension for fields extensions.

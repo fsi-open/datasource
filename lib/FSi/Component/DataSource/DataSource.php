@@ -360,11 +360,11 @@ class DataSource implements DataSourceInterface
         $this->dirty = true;
         $this->extensions[] = $extension;
 
-        foreach ($extension->loadSubscribers() as $subscriber) {
+        foreach ((array) $extension->loadSubscribers() as $subscriber) {
             $this->eventDispatcher->addSubscriber($subscriber);
         }
 
-        foreach ($extension->loadDriverExtensions() as $driverExtension) {
+        foreach ((array) $extension->loadDriverExtensions() as $driverExtension) {
             $this->driver->addExtension($driverExtension);
         }
     }
