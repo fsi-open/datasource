@@ -15,6 +15,8 @@ use FSi\Component\DataSource\Driver\Doctrine\DoctrineAbstractField;
 use FSi\Component\DataSource\Driver\Doctrine\Exception\DoctrineDriverException;
 use Doctrine\ORM\QueryBuilder;
 use FSi\Component\DataSource\DataSourceInterface;
+use FSi\Component\DataSource\Event\FieldEvents;
+use FSi\Component\DataSource\Event\FieldEvent;
 
 /**
  * Entity field.
@@ -83,39 +85,38 @@ class Entity extends DoctrineAbstractField
     public function getParameter(&$parameters)
     {
         $datasourceName = $this->getDataSource() ? $this->getDataSource()->getName() : null;
-        if (empty($datasourceName)) {
-            return;
+        if (!empty($datasourceName)) {
+            if (isset($this->meta)) {
+                //Composite keys are not supported.
+                if (!$this->meta->isIdentifierComposite) {
+                    $id = $this->meta->getSingleIdentifierFieldName();
+                    $method = 'get'.ucfirst($id);
+                    $parameter = $this->getCleanParameter()->$method();
+
+                    $parameter = array(
+                        $datasourceName => array(
+                            DataSourceInterface::FIELDS => array(
+                                $this->getName() => $parameter,
+                            ),
+                        ),
+                    );
+                }
+            }
         }
 
-        //If there's no meta, that means no parameter was assigned, so there is nothing we need to do.
-        if (!isset($this->meta)) {
-            return;
+        if (!isset($parameter)) {
+            $parameter = array();
         }
 
-        //Composite keys are not supported.
-        if ($this->meta->isIdentifierComposite) {
-            return;
-        }
+         //PreGetParameter event.
+        $event = new FieldEvent\ParameterEventArgs($this, $parameter);
+        $this->eventDispatcher->dispatch(FieldEvents::PRE_GET_PARAMETER, $event);
+        $parameter = $event->getParameter();
 
-        $id = $this->meta->getSingleIdentifierFieldName();
-        $method = 'get'.ucfirst($id);
-        $parameter = $this->getCleanParameter()->$method();
-
-        $parameter = array(
-            $datasourceName => array(
-                DataSourceInterface::FIELDS => array(
-                    $this->getName() => $parameter,
-                ),
-            ),
-        );
-
-        foreach ($this->extensions as $extension) {
-            $extension->preGetParameter($this, $parameter);
-        }
-
-        foreach ($this->extensions as $extension) {
-            $extension->postGetParameter($this, $parameter);
-        }
+        //PostGetParameter event.
+        $event = new FieldEvent\ParameterEventArgs($this, $parameter);
+        $this->eventDispatcher->dispatch(FieldEvents::POST_GET_PARAMETER, $event);
+        $parameter = $event->getParameter();
 
         $parameters = array_merge_recursive($parameters, $parameter);
     }

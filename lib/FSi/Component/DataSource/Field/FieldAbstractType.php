@@ -262,17 +262,17 @@ abstract class FieldAbstractType implements FieldTypeInterface
     public function getParameter(&$parameters)
     {
         $datasourceName = $this->getDataSource() ? $this->getDataSource()->getName() : null;
-        if (empty($datasourceName)) {
-            return;
-        }
-
-        $parameter = array(
-            $datasourceName => array(
-                DataSourceInterface::FIELDS => array(
-                    $this->getName() => $this->getCleanParameter(),
+        if (!empty($datasourceName)) {
+            $parameter = array(
+                $datasourceName => array(
+                    DataSourceInterface::FIELDS => array(
+                        $this->getName() => $this->getCleanParameter(),
+                    ),
                 ),
-            ),
-        );
+            );
+        } else {
+            $parameter = array();
+        }
 
         //PreGetParameter event.
         $event = new FieldEvent\ParameterEventArgs($this, $parameter);

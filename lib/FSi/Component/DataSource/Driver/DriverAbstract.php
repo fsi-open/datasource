@@ -61,9 +61,9 @@ abstract class DriverAbstract implements DriverInterface
             if (!($extension instanceof DriverExtensionInterface)) {
                 throw new DataSourceException(sprintf('Instance of DriverExtensionInterface expected, "%s" given.', get_class($extension)));
             }
+            $this->addExtension($extension);
         }
 
-        $this->extensions = $extensions;
         $this->eventDispatcher = new EventDispatcher();
     }
 

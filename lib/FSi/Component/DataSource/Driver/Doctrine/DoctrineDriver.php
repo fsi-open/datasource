@@ -157,15 +157,15 @@ class DoctrineDriver extends DriverAbstract
             $qb->setFirstResult($first);
         }
 
+        //Cleaning query.
+        $this->query = null;
+
         $result = new Paginator($qb);
 
         //postGetResult event.
         $event = new DriverEvent\ResultEventArgs($this, $result);
         $this->eventDispatcher->dispatch(DriverEvents::POST_GET_RESULT, $event);
         $result = $event->getResult();
-
-        //Cleaning query.
-        $this->query = null;
 
         return $result;
     }
@@ -180,7 +180,7 @@ class DoctrineDriver extends DriverAbstract
     public function getQueryBuilder()
     {
         if (!isset($this->query)) {
-            throw new DoctrineDriverException('Query is accessible only during pre- and postGetResult events.');
+            throw new DoctrineDriverException('Query is accessible only during preGetResult event.');
         }
 
         return $this->query;
