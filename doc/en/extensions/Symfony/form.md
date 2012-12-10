@@ -37,15 +37,15 @@ $factory = new DataSourceFactory($extensions);
 ## Available field options ##
 
 * all fields
-** ``form_disabled`` - whether form rendering for this field is disabled
-*** ``false`` by default
-** ``form_label`` - label for form field(s)
-** ``form_options`` - options passed to form (see documentation for Symfony Form fields)
+    * ``form_disabled`` - whether form rendering for this field is disabled
+        * ``false`` by default
+    * ``form_label`` - label for form field(s)
+    * ``form_options`` - options passed to form (see documentation for Symfony Form fields)
  
 ## FieldView attributes ##
 
 * ``form`` - set on each fields view (unless it has ``form_disabled`` option set to true)
-** if set, instance of ``Symfony\Component\Form\FormView``
+    * if set, instance of ``Symfony\Component\Form\FormView``
 
 ## Entity field ##
 

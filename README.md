@@ -162,6 +162,7 @@ in ``FSi\Component\DataSource\Event\DataSourceEvent`` namespace)
 All of arguments allows to access ``DataSource`` through ``getDataSource`` method.
 
 Arguments:
+
 * ``DataSourceEventArgs`` - just gives access to DataSource (see above)
 * ``ParametersEventArgs`` - allows to get and set parameters through ``getParameters`` and ``setParameters`` methods
 * ``ViewEventArgs`` - allows to get view through ``getView`` method
@@ -184,6 +185,7 @@ in ``FSi\Component\DataSource\Event\DriverEvent`` namespace)
 * ``POST_GET_RESULT``: ``ResultEventArgs``
 
 Arguments:
+
 * ``DriverEventArgs`` - allows to access driver through ``getDriver`` method
 * ``ResultEventArgs`` - allows to access driver (like ``DriverEventArgs``) and to set and get result through ``getResult`` and ``setResult`` methods
 
@@ -206,6 +208,7 @@ in ``FSi\Component\DataSource\Event\FieldEvent`` namespace)
 All of arguments allows to access ``Field`` through ``getField`` method.
 
 Arguments:
+
 * ``FieldEventArgs`` - just gives access to field (see above)
 * ``ParameterEventArgs`` - allows to get and set Parameter through ``getParameter`` and ``setParameter`` methods
 * ``ViewEventArgs`` - allows to get FieldView through ``getView`` method
