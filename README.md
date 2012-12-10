@@ -150,14 +150,14 @@ Each of subscribers can subscribe to one of following events:
 (list contains key, that is const of ``FSi\Component\DataSource\Event\DataSourceEvents`` and passed argument, that is defined
 in ``FSi\Component\DataSource\Event\DataSourceEvent`` namespace)
 
-* ``PRE_BIND_PARAMETERS``: ``ParametersEventArgs``
-* ``POST_BIND_PARAMETERS``: ``DataSourceEventArgs``
-* ``PRE_GET_RESULT``: ``DataSourceEventArgs``
-* ``POST_GET_RESULT``: ``ResultEventArgs``
-* ``PRE_BUILD_VIEW``: ``ViewEventArgs``
-* ``POST_BUILD_VIEW``: ``ViewEventArgs``
-* ``PRE_GET_PARAMETERS``: ``ParametersEventArgs``
-* ``POST_GET_PARAMETERS``: ``ParametersEventArgs``
+* ``PRE_BIND_PARAMETERS`` - ``ParametersEventArgs``
+* ``POST_BIND_PARAMETERS`` - ``DataSourceEventArgs``
+* ``PRE_GET_RESULT`` - ``DataSourceEventArgs``
+* ``POST_GET_RESULT`` - ``ResultEventArgs``
+* ``PRE_BUILD_VIEW`` - ``ViewEventArgs``
+* ``POST_BUILD_VIEW`` - ``ViewEventArgs``
+* ``PRE_GET_PARAMETERS`` - ``ParametersEventArgs``
+* ``POST_GET_PARAMETERS`` - ``ParametersEventArgs``
 
 All of arguments allows to access ``DataSource`` through ``getDataSource`` method.
 
@@ -181,8 +181,8 @@ Each of subscribers can subscribe to one of following events:
 (list contains key, that is const of ``FSi\Component\DataSource\Event\DriverEvents`` and passed argument, that is defined
 in ``FSi\Component\DataSource\Event\DriverEvent`` namespace)
 
-* ``PRE_GET_RESULT``: ``DriverEventArgs``
-* ``POST_GET_RESULT``: ``ResultEventArgs``
+* ``PRE_GET_RESULT`` - ``DriverEventArgs``
+* ``POST_GET_RESULT`` - ``ResultEventArgs``
 
 Arguments:
 
@@ -198,12 +198,12 @@ Each of subscribers can subscribe to one of following events:
 (list contains key, that is const of ``FSi\Component\DataSource\Event\FieldEvents`` and passed argument, that is defined
 in ``FSi\Component\DataSource\Event\FieldEvent`` namespace)
 
-* ``PRE_BIND_PARAMETER``: ``ParameterEventArgs``
-* ``POST_BIND_PARAMETER``: ``FieldEventArgs``
-* ``PRE_BUILD_VIEW``: ``ViewEventArgs``
-* ``POST_BUILD_VIEW``: ``ViewEventArgs``
-* ``PRE_GET_PARAMETER``: ``ParameterEventArgs``
-* ``POST_GET_PARAMETER``: ``ParameterEventArgs``
+* ``PRE_BIND_PARAMETER`` - ``ParameterEventArgs``
+* ``POST_BIND_PARAMETER`` - ``FieldEventArgs``
+* ``PRE_BUILD_VIEW`` - ``ViewEventArgs``
+* ``POST_BUILD_VIEW`` - ``ViewEventArgs``
+* ``PRE_GET_PARAMETER`` - ``ParameterEventArgs``
+* ``POST_GET_PARAMETER`` - ``ParameterEventArgs``
 
 All of arguments allows to access ``Field`` through ``getField`` method.
 

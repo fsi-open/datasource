@@ -18,6 +18,7 @@ $driver = new DoctrineDriver($extensions, $entityManager, $entityName);
 or through factory
 
 ``` php
+<?php
 
 use FSi\Component\DataSource\Driver\Doctrine\DoctrineFactory;
 
