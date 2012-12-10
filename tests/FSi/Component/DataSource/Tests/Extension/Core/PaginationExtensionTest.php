@@ -13,6 +13,7 @@ namespace FSi\Component\DataSource\Tests\Extension\Core;
 
 use FSi\Component\DataSource\Extension\Core\Pagination\PaginationExtension;
 use FSi\Component\DataSource\DataSourceInterface;
+use FSi\Component\DataSource\Event\DataSourceEvent;
 
 /**
  * Tests for Pagination Extension.
@@ -47,13 +48,16 @@ class PaginationExtensionTest extends \PHPUnit_Framework_TestCase
         ;
 
         $data = array();
-        $extension->preGetParameters($datasource, $data);
+        $subscribers = $extension->loadSubscribers();
+        $subscriber = array_shift($subscribers);
+        $args = new DataSourceEvent\ParametersEventArgs($datasource, $data);
+        $subscriber->preGetParameters($args);
         $pattern = array(
             'datasource' => array(
                 DataSourceInterface::PAGE => 2
             )
         );
-        $this->assertEquals($pattern, $data);
+        $this->assertEquals($pattern, $args->getParameters());
     }
 
     /**
@@ -84,8 +88,11 @@ class PaginationExtensionTest extends \PHPUnit_Framework_TestCase
         ;
 
         $data = array();
-        $extension->preGetParameters($datasource, $data);
-        $this->assertEquals(array(), $data);
+        $subscribers = $extension->loadSubscribers();
+        $subscriber = array_shift($subscribers);
+        $args = new DataSourceEvent\ParametersEventArgs($datasource, $data);
+        $subscriber->preGetParameters($args);
+        $this->assertEquals(array(), $args->getParameters());
     }
 
     /**
@@ -103,6 +110,8 @@ class PaginationExtensionTest extends \PHPUnit_Framework_TestCase
             ->method('setAttribute')
         ;
 
-        $extension->postBuildView($datasource, $datasourceView);
+        $subscribers = $extension->loadSubscribers();
+        $subscriber = array_shift($subscribers);
+        $subscriber->postBuildView(new DataSourceEvent\ViewEventArgs($datasource, $datasourceView));
     }
 }

@@ -11,8 +11,9 @@
 
 namespace FSi\Component\DataSource\Tests\Extension\Symfony;
 
-use FSi\Component\DataSource\Extension\Symfony\CoreExtension;
+use FSi\Component\DataSource\Extension\Symfony\Core\CoreExtension;
 use Symfony\Component\HttpFoundation\Request;
+use FSi\Component\DataSource\Event\DataSourceEvent;
 
 /**
  * Tests for Symfony Core Extension.
@@ -40,11 +41,18 @@ class CoreExtensionTest extends \PHPUnit_Framework_TestCase
         $data1 = array('key1' => 'value1', 'key2' => 'value2');
         $data2 = $data1;
 
-        $extension->preBindParameters($datasource, $data2);
+        $subscribers = $extension->loadSubscribers();
+        $subscriber = array_shift($subscribers);
+
+        $args = new DataSourceEvent\ParametersEventArgs($datasource, $data2);
+        $subscriber->preBindParameters($args);
+        $data2 = $args->getParameters();
         $this->assertEquals($data1, $data2);
 
         $request = new Request($data2);
-        $extension->preBindParameters($datasource, $request);
+        $args = new DataSourceEvent\ParametersEventArgs($datasource, $request);
+        $subscriber->preBindParameters($args);
+        $request = $args->getParameters();
         $this->assertTrue(is_array($request));
         $this->assertEquals($data1, $request);
     }

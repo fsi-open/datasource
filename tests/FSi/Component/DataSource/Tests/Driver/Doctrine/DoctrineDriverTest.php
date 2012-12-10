@@ -349,6 +349,11 @@ class DoctrineDriverTest extends \PHPUnit_Framework_TestCase
         return new Form\FormFactory($registry, $typeFactory);
     }
 
+    /**
+     * Return configured DoctrinFactory.
+     *
+     * @return DoctrineFactory.
+     */
     private function getDoctrineFactory()
     {
         $extensions = array(
@@ -358,10 +363,15 @@ class DoctrineDriverTest extends \PHPUnit_Framework_TestCase
         return new DoctrineFactory($this->em, $extensions);
     }
 
+    /**
+     * Return configured DataSourceFactory.
+     *
+     * @return \FSi\Component\DataSource\DataSourceFactory
+     */
     private function getDataSourceFactory()
     {
         $extensions = array(
-            new Symfony\CoreExtension(),
+            new Symfony\Core\CoreExtension(),
             new FormExtension($this->getFormFactory()),
             new Core\Pagination\PaginationExtension(),
             new OrderingExtension(),
@@ -369,7 +379,12 @@ class DoctrineDriverTest extends \PHPUnit_Framework_TestCase
         return new \FSi\Component\DataSource\DataSourceFactory($extensions);
     }
 
-    private function load($em)
+    /**
+     * Loads test data to EntityManager
+     *
+     * @param EntityManager
+     */
+    private function load(EntityManager $em)
     {
         //Injects 5 categories.
         $categories = array();

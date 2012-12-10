@@ -14,6 +14,8 @@ namespace FSi\Component\DataSource\Tests\Extension\Core;
 use FSi\Component\DataSource\Extension\Core\Ordering\OrderingExtension;
 use FSi\Component\DataSource\Extension\Core\Ordering\Field\FieldExtension;
 use FSi\Component\DataSource\DataSourceInterface;
+use FSi\Component\DataSource\Event\DataSourceEvent;
+use FSi\Component\DataSource\Event\FieldEvent;
 
 /**
  * Tests for Ordering Extension.
@@ -39,8 +41,11 @@ class OrderingExtensionTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($datasourceName))
         ;
 
-        $extension->preBindParameters($datasource, $data);
-        $this->assertEquals($expected, $data);
+        $subscribers = $extension->loadSubscribers();
+        $subscriber = array_shift($subscribers);
+        $args = new DataSourceEvent\ParametersEventArgs($datasource, $data);
+        $subscriber->preBindParameters($args);
+        $this->assertEquals($expected, $args->getParameters());
 
         $datasource
             ->expects($this->once())
@@ -48,7 +53,7 @@ class OrderingExtensionTest extends \PHPUnit_Framework_TestCase
             ->with(0)
         ;
 
-        $extension->postBindParameters($datasource);
+        $subscriber->postBindParameters(new DataSourceEvent\DataSourceEventArgs($datasource));
     }
 
     /**
@@ -72,7 +77,9 @@ class OrderingExtensionTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue(array()))
         ;
 
-        $extension->postBuildView($datasource, $view);
+        $subscribers = $extension->loadSubscribers();
+        $subscriber = array_shift($subscribers);
+        $subscriber->postBuildView(new DataSourceEvent\ViewEventArgs($datasource, $view));
     }
 
     /**
@@ -188,8 +195,10 @@ class OrderingExtensionTest extends \PHPUnit_Framework_TestCase
             ;
 
             $extension = new OrderingExtension();
-            $extension->preGetResult($datasource);
-            $extension->postBuildView($datasource, $view);
+            $subscribers = $extension->loadSubscribers();
+            $subscriber = array_shift($subscribers);
+            $subscriber->preGetResult(new DataSourceEvent\DataSourceEventArgs($datasource));
+            $subscriber->postBuildView(new DataSourceEvent\ViewEventArgs($datasource, $view));
             $this->assertEquals($expectedNextPriority, $givenNextPriority);
         }
     }
@@ -209,8 +218,6 @@ class OrderingExtensionTest extends \PHPUnit_Framework_TestCase
         ;
 
         $extension = new FieldExtension();
-
-
 
         $field = $this->getMock('FSi\Component\DataSource\Field\FieldTypeInterface');
 
@@ -253,11 +260,12 @@ class OrderingExtensionTest extends \PHPUnit_Framework_TestCase
             ),
         );
 
-        $extension->preBindParameter($field, $parameter);
+        $extension->preBindParameter(new FieldEvent\ParameterEventArgs($field, $parameter));
 
         $parameter2 = array();
-        $extension->preGetParameter($field, $parameter2);
-        $this->assertEquals($parameter, $parameter2);
+        $args = new FieldEvent\ParameterEventArgs($field, $parameter2);
+        $extension->preGetParameter($args);
+        $this->assertEquals($parameter, $args->getParameter());
 
         $enabled = null;
         $fieldView = $this->getMock('FSi\Component\DataSource\Field\FieldViewInterface', array(), array($field));
@@ -272,7 +280,7 @@ class OrderingExtensionTest extends \PHPUnit_Framework_TestCase
             }))
         ;
 
-        $extension->postBuildView($field, $fieldView);
+        $extension->postBuildView(new FieldEvent\ViewEventArgs($field, $fieldView));
         $this->assertTrue((bool) $enabled);
     }
 }

@@ -20,6 +20,8 @@ use Symfony\Bridge\Doctrine\Form\DoctrineOrmExtension;
 use FSi\Component\DataSource\Tests\Fixtures\TestManagerRegistry;
 use Doctrine\ORM\Tools\Setup;
 use Doctrine\ORM\EntityManager;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use FSi\Component\DataSource\Event\FieldEvent;
 
 /**
  * Tests for Symfony Form Extension.
@@ -75,6 +77,9 @@ class FormExtensionEntityTest extends \PHPUnit_Framework_TestCase
         return new Form\FormFactory($registry, $typeFactory);
     }
 
+    /**
+     * Checks entity field.
+     */
     public function testEntityField()
     {
         $type = 'entity';
@@ -137,10 +142,16 @@ class FormExtensionEntityTest extends \PHPUnit_Framework_TestCase
 
         $parameters = array('datasource' => array(DataSourceInterface::FIELDS => array('name' => 'value')));
         $parameters2 = $parameters;
+        $args = new FieldEvent\ParameterEventArgs($field, $parameters);
         foreach ($extensions as $ext) {
             $this->assertTrue($ext instanceof FieldAbstractExtension);
-            $ext->preBindParameter($field, $parameters);
+            $subscribers = $ext->loadSubscribers();
+            if ($subscribers) {
+                $subscriber = array_shift($subscribers);
+                $subscriber->preBindParameter($args);
+            }
         }
+        $parameters = $args->getParameter();
         $this->assertEquals($parameters2, $parameters);
         $fieldView = $this->getMock('FSi\Component\DataSource\Field\FieldViewInterface', array(), array($field));
 
@@ -149,8 +160,13 @@ class FormExtensionEntityTest extends \PHPUnit_Framework_TestCase
             ->method('setAttribute')
         ;
 
+        $args = new FieldEvent\ViewEventArgs($field, $fieldView);
         foreach ($extensions as $ext) {
-            $ext->postBuildView($field, $fieldView);
+            $subscribers = $ext->loadSubscribers();
+            if ($subscribers) {
+                $subscriber = array_shift($subscribers);
+                $subscriber->postBuildView($args);
+            }
         }
     }
 }

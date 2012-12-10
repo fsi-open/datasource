@@ -112,7 +112,7 @@ class DoctrineDriverBasicTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * Checks basic getResult and events calls.
+     * Checks basic getResult call.
      */
     public function testGetResult()
     {
@@ -149,19 +149,7 @@ class DoctrineDriverBasicTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($qb))
         ;
 
-        $extension = $this->getMock('FSi\Component\DataSource\Driver\DriverAbstractExtension');
-
-        $extension
-            ->expects($this->atLeastOnce())
-            ->method('preGetResult')
-        ;
-
-        $extension
-            ->expects($this->atLeastOnce())
-            ->method('postGetResult')
-        ;
-
-        $driver = new DoctrineDriver(array($extension), $em, 'entity');
+        $driver = new DoctrineDriver(array(), $em, 'entity');
         $driver->getResult($fields, 0, 20);
     }
 
@@ -215,48 +203,6 @@ class DoctrineDriverBasicTest extends \PHPUnit_Framework_TestCase
         $driver = new DoctrineDriver(array(), $em, 'entity');
         $this->setExpectedException('FSi\Component\DataSource\Driver\Doctrine\Exception\DoctrineDriverException');
         $driver->getQueryBuilder();
-    }
-
-    /**
-     * Checks if query is accessible during events.
-     */
-    public function testGetQuery()
-    {
-        $em = $this->getEntityManagerMock();
-        $qb = $this->getMock('Doctrine\ORM\QueryBuilder', array(), array($em));
-
-        $em
-            ->expects($this->any())
-            ->method('createQueryBuilder')
-            ->will($this->returnValue($qb))
-        ;
-
-        $qb
-            ->expects($this->any())
-            ->method('select')
-            ->will($this->returnValue($qb))
-        ;
-
-        $extension = $this->getMock('FSi\Component\DataSource\Driver\DriverAbstractExtension');
-        $driver = new DoctrineDriver(array($extension), $em, 'entity');
-
-        $extension
-            ->expects($this->atLeastOnce())
-            ->method('preGetResult')
-            ->will($this->returnCallback(function () use (&$driver) {
-                $driver->getQueryBuilder();
-            }))
-        ;
-
-        $extension
-            ->expects($this->atLeastOnce())
-            ->method('postGetResult')
-            ->will($this->returnCallback(function () use (&$driver) {
-                $driver->getQueryBuilder();
-            }))
-        ;
-
-        $driver->getResult(array(), 0, 20);
     }
 
     /**
