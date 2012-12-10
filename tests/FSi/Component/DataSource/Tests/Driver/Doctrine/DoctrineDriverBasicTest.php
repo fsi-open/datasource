@@ -12,7 +12,10 @@
 namespace FSi\Component\DataSource\Tests\Driver\Doctrine;
 
 use FSi\Component\DataSource\Driver\Doctrine\DoctrineDriver;
+use FSi\Component\DataSource\Driver\Doctrine\Extension\Core\Field;
 use FSi\Component\DataSource\Driver\Doctrine\Extension\Core\CoreExtension;
+use FSi\Component\DataSource\Tests\Fixtures\DoctrineDriverExtension;
+use FSi\Component\DataSource\Tests\Fixtures\FieldExtension;
 
 /**
  * Basic tests for Doctrine driver.
@@ -220,6 +223,7 @@ class DoctrineDriverBasicTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($driver->hasFieldType('time'));
         $this->assertTrue($driver->hasFieldType('datetime'));
         $this->assertFalse($driver->hasFieldType('wrong'));
+        $this->assertFalse($driver->hasFieldType(null));
 
         $driver->getFieldType('text');
         $this->setExpectedException('FSi\Component\DataSource\Exception\DataSourceException');
@@ -253,5 +257,61 @@ class DoctrineDriverBasicTest extends \PHPUnit_Framework_TestCase
         $this->setExpectedException('FSi\Component\DataSource\Exception\FieldException');
         $field = $driver->getFieldType($type);
         $field->setComparison('wrong');
+    }
+
+    /**
+     * Checks extensions calls.
+     */
+    public function testExtensionsCalls()
+    {
+        $em = $this->getEntityManagerMock();
+        $extension = new DoctrineDriverExtension();
+        $driver = new DoctrineDriver(array(), $em, 'entity');
+        $driver->addExtension($extension);
+
+        $qb = $this->getMock('Doctrine\ORM\QueryBuilder', array(), array($em));
+
+        $em
+            ->expects($this->any())
+            ->method('createQueryBuilder')
+            ->will($this->returnValue($qb))
+        ;
+
+        $qb
+            ->expects($this->any())
+            ->method('select')
+            ->will($this->returnValue($qb))
+        ;
+
+        $driver->getResult(array(), 0, 20);
+        $this->assertEquals(array('preGetResult', 'postGetResult'), $extension->getCalls());
+
+        $this->setExpectedException('FSi\Component\DataSource\Driver\Doctrine\Exception\DoctrineDriverException');
+        $driver->getQueryBuilder();
+    }
+
+    /**
+     * Checks fields extensions calls.
+     */
+    public function testFieldsExtensionsCalls()
+    {
+        $extension = new FieldExtension();
+        $parameter = array();
+
+        foreach (array(new Field\Text(), new Field\Number(), new Field\Date(), new Field\Time(), new Field\DateTime(), new Field\Entity()) as $field) {
+            $field->addExtension($extension);
+
+            $field->bindParameter(array());
+            $this->assertEquals(array('preBindParameter', 'postBindParameter'), $extension->getCalls());
+            $extension->resetCalls();
+
+            $field->getParameter($parameter);
+            $this->assertEquals(array('preGetParameter', 'postGetParameter'), $extension->getCalls());
+            $extension->resetCalls();
+
+            $field->createView(array());
+            $this->assertEquals(array('preBuildView', 'postBuildView'), $extension->getCalls());
+            $extension->resetCalls();
+        }
     }
 }

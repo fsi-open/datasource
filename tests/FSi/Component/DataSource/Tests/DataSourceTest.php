@@ -14,6 +14,7 @@ namespace FSi\Component\DataSource\Tests;
 use FSi\Component\DataSource\DataSource;
 use FSi\Component\DataSource\DataSourceViewInterface;
 use FSi\Component\DataSource\Tests\Fixtures\TestResult;
+use FSi\Component\DataSource\Tests\Fixtures\DataSourceExtension;
 
 /**
  * Tests for DataSource.
@@ -474,5 +475,38 @@ class DataSourceTest extends \PHPUnit_Framework_TestCase
 
         $datasource = new DataSource($driver);
         $datasource->addExtension($extension);
+    }
+
+    /**
+     * Checks extensions calls.
+     */
+    public function testExtensionsCalls()
+    {
+        $driver = $this->getMock('FSi\Component\DataSource\Driver\DriverInterface');
+        $extension = new DataSourceExtension();
+        $datasource = new DataSource($driver);
+        $datasource->addExtension($extension);
+
+        $testResult = new TestResult();
+        $driver
+            ->expects($this->any())
+            ->method('getResult')
+            ->will($this->returnValue($testResult))
+        ;
+
+        $datasource->bindParameters(array());
+        $this->assertEquals(array('preBindParameters', 'postBindParameters'), $extension->getCalls());
+        $extension->resetCalls();
+
+        $datasource->getResult();
+        $this->assertEquals(array('preGetResult', 'postGetResult'), $extension->getCalls());
+        $extension->resetCalls();
+
+        $datasource->getParameters();
+        $this->assertEquals(array('preGetParameters', 'postGetParameters'), $extension->getCalls());
+        $extension->resetCalls();
+
+        $datasource->createView();
+        $this->assertEquals(array('preBuildView', 'postBuildView'), $extension->getCalls());
     }
 }
