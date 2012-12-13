@@ -23,9 +23,9 @@ use FSi\Component\DataSource\Event\FieldEvents;
 use FSi\Component\DataSource\Event\FieldEvent;
 
 /**
- * Base extension for fields extensions.
+ * Fields extension.
  */
-abstract class FormFieldAbstractExtension extends FieldAbstractExtension implements EventSubscriberInterface
+class FormFieldExtension extends FieldAbstractExtension implements EventSubscriberInterface
 {
     /**
      * @var FormFactory
@@ -56,6 +56,32 @@ abstract class FormFieldAbstractExtension extends FieldAbstractExtension impleme
     public function __construct(FormFactory $formFactory)
     {
         $this->formFactory = $formFactory;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getExtendedFieldTypes()
+    {
+        return array('text', 'number', 'date', 'time', 'datetime', 'entity');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getAvailableOptions()
+    {
+        return array('form_disabled', 'form_options');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getDefaultAvailableOptions()
+    {
+        return array(
+            'form_disabled' => false,
+        );
     }
 
     /**
@@ -134,7 +160,42 @@ abstract class FormFieldAbstractExtension extends FieldAbstractExtension impleme
         $form = $this->formFactory->createNamedBuilder($datasource->getName(), 'collection', array(), array('csrf_protection' => false))->getForm();
         $builder = $this->formFactory->createNamedBuilder(DataSourceInterface::FIELDS);
 
-        $this->buildForm($field, $builder, $options);
+        switch ($field->getComparison()) {
+            case 'between':
+                $form2 = $this->getFormFactory()->createNamedBuilder($field->getName());
+
+                //Options assignment, allows to specify different options for each of fields.
+                $fromOptions = isset($options[0]) ? $options[0] : null;
+                $toOptions = isset($options[1]) ? $options[1] : null;
+                if (!$fromOptions) {
+                    $fromOptions = isset($options['from']) ? $options['from'] : null;
+                }
+                if (!$toOptions) {
+                    $toOptions = isset($options['to']) ? $options['to'] : null;
+                }
+
+                unset($options[0], $options[1], $options['from'], $options['to']);
+
+                //Checking and merging (if need) with general options (needed to pass some arbitrary options, like 'required').
+                if (!$fromOptions) {
+                    $fromOptions = $options;
+                } else {
+                    $fromOptions = array_merge($fromOptions, $options);
+                }
+                if (!$toOptions) {
+                    $toOptions = $options;
+                } else {
+                    $toOptions = array_merge($toOptions, $options);
+                }
+
+                $form2->add('from', $field->getType(), $fromOptions);
+                $form2->add('to', $field->getType(), $toOptions);
+                $builder->add($form2);
+                break;
+
+            default:
+                $builder->add($field->getName(), $field->getType(), $options);
+        }
 
         $form->add($builder->getForm());
         $this->form = $form;
@@ -147,15 +208,6 @@ abstract class FormFieldAbstractExtension extends FieldAbstractExtension impleme
     {
         return $this->formFactory;
     }
-
-    /**
-     * Method that has to handle field addition.
-     *
-     * @param FieldTypeInterface $field
-     * @param FormBuilder $builder
-     * @param array $options
-     */
-    abstract protected function buildForm(FieldTypeInterface $field, FormBuilder $builder, $options);
 
     /**
      * Method for mergin arrays in a little bit different way than standard PHP function.

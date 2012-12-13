@@ -115,6 +115,12 @@ class FormExtensionEntityTest extends \PHPUnit_Framework_TestCase
 
         $field
             ->expects($this->any())
+            ->method('getType')
+            ->will($this->returnValue('entity'))
+        ;
+
+        $field
+            ->expects($this->any())
             ->method('hasOption')
             ->will($this->returnCallback(function () {
                 $args = func_get_args();

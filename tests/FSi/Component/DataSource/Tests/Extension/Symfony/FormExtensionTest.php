@@ -27,6 +27,22 @@ use FSi\Component\DataSource\Event\FieldEvent;
 class FormExtensionTest extends \PHPUnit_Framework_TestCase
 {
     /**
+     * Provides types.
+     *
+     * @return array
+     */
+    public static function typesProvider()
+    {
+        return array(
+            array('text'),
+            array('number'),
+            array('date'),
+            array('time'),
+            array('datetime'),
+        );
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function setUp()
@@ -108,70 +124,103 @@ class FormExtensionTest extends \PHPUnit_Framework_TestCase
 
     /**
      * Checks fields behaviour.
+     *
+     * @dataProvider typesProvider
      */
-    public function testFields()
+    public function testFields($type)
     {
-        foreach (array('text', 'number', 'date', 'time', 'datetime') as $type) {
-            $formFactory = $this->getFormFactory();
-            $extension = new DriverExtension($formFactory);
-            $text = $extension->getFieldTypeExtensions('text');
-            $field = $this->getMock('FSi\Component\DataSource\Field\FieldTypeInterface');
-            $driver = $this->getMock('FSi\Component\DataSource\Driver\DriverInterface');
-            $datasource = $this->getMock('FSi\Component\DataSource\DataSource', array(), array($driver));
+        $formFactory = $this->getFormFactory();
+        $extension = new DriverExtension($formFactory);
+        $field = $this->getMock('FSi\Component\DataSource\Field\FieldTypeInterface');
+        $driver = $this->getMock('FSi\Component\DataSource\Driver\DriverInterface');
+        $datasource = $this->getMock('FSi\Component\DataSource\DataSource', array(), array($driver));
 
-            $datasource
-                ->expects($this->any())
-                ->method('getName')
-                ->will($this->returnValue('datasource'))
-            ;
+        $datasource
+            ->expects($this->any())
+            ->method('getName')
+            ->will($this->returnValue('datasource'))
+        ;
 
-            $field
-                ->expects($this->atLeastOnce())
-                ->method('getName')
-                ->will($this->returnValue('name'))
-            ;
+        $field
+            ->expects($this->atLeastOnce())
+            ->method('getName')
+            ->will($this->returnValue('name'))
+        ;
 
-            $field
-                ->expects($this->any())
-                ->method('getDataSource')
-                ->will($this->returnValue($datasource))
-            ;
+        $field
+            ->expects($this->any())
+            ->method('getDataSource')
+            ->will($this->returnValue($datasource))
+        ;
 
-            $field
-                ->expects($this->any())
-                ->method('getName')
-                ->will($this->returnValue('name'))
-            ;
+        $field
+            ->expects($this->any())
+            ->method('getName')
+            ->will($this->returnValue('name'))
+        ;
 
-            $extensions = $extension->getFieldTypeExtensions($type);
+        $field
+            ->expects($this->any())
+            ->method('getType')
+            ->will($this->returnValue($type))
+        ;
 
+        $extensions = $extension->getFieldTypeExtensions($type);
+
+        if ($type == 'datetime') {
+            $parameters = array('datasource' => array(DataSourceInterface::FIELDS => array('name' =>
+                array(
+                    'date' => array('year' => 2012, 'month' => 12, 'day' => 12),
+                    'time' => array('hour' => 12, 'minute' => 12),
+                ),
+            )));
+            $parameters2 = array('datasource' => array(DataSourceInterface::FIELDS => array('name' => new \DateTime('2012-12-12 12:12:00'))));
+        } elseif ($type == 'time') {
+            $parameters = array('datasource' => array(DataSourceInterface::FIELDS => array('name' =>
+                array(
+                    'hour' => 12,
+                    'minute' => 12,
+                ),
+            )));
+            $parameters2 = array('datasource' => array(DataSourceInterface::FIELDS => array('name' => new \DateTime(date('Y-m-d', 0).' 12:12:00'))));
+        } elseif ($type == 'date') {
+            $parameters = array('datasource' => array(DataSourceInterface::FIELDS => array('name' =>
+                array(
+                    'year' => 2012,
+                    'month' => 12,
+                    'day' => 12,
+                ),
+            )));
+            $parameters2 = array('datasource' => array(DataSourceInterface::FIELDS => array('name' => new \DateTime('2012-12-12'))));
+        } else {
             $parameters = array('datasource' => array(DataSourceInterface::FIELDS => array('name' => 'value')));
             $parameters2 = $parameters;
-            $args = new FieldEvent\ParameterEventArgs($field, $parameters);
-            foreach ($extensions as $ext) {
-                $this->assertTrue($ext instanceof FieldAbstractExtension);
-                $subscribers = $ext->loadSubscribers();
-                if ($subscribers) {
-                    $subscriber = array_shift($subscribers);
-                    $subscriber->preBindParameter($args);
-                }
+        }
+
+        $args = new FieldEvent\ParameterEventArgs($field, $parameters);
+        foreach ($extensions as $ext) {
+            $this->assertTrue($ext instanceof FieldAbstractExtension);
+            $subscribers = $ext->loadSubscribers();
+            if ($subscribers) {
+                $subscriber = array_shift($subscribers);
+                $subscriber->preBindParameter($args);
             }
-            $parameters = $args->getParameter();
-            $this->assertEquals($parameters2, $parameters);
-            $fieldView = $this->getMock('FSi\Component\DataSource\Field\FieldViewInterface', array(), array($field));
+        }
+        $parameters = $args->getParameter();
+        $this->assertEquals($parameters2, $parameters);
+        $fieldView = $this->getMock('FSi\Component\DataSource\Field\FieldViewInterface', array(), array($field));
 
-            $fieldView
-                ->expects($this->atLeastOnce())
-                ->method('setAttribute')
-            ;
+        $fieldView
+            ->expects($this->atLeastOnce())
+            ->method('setAttribute')
+        ;
 
-            $args = new FieldEvent\ViewEventArgs($field, $fieldView);
-            foreach ($extensions as $ext) {
-                $subscribers = $ext->loadSubscribers();
-                if ($subscribers) {
-                    $subscriber = array_shift($subscribers);
-                    $subscriber->postBuildView($args);
-                }
+        $args = new FieldEvent\ViewEventArgs($field, $fieldView);
+        foreach ($extensions as $ext) {
+            $subscribers = $ext->loadSubscribers();
+            if ($subscribers) {
+                $subscriber = array_shift($subscribers);
+                $subscriber->postBuildView($args);
             }
         }
     }

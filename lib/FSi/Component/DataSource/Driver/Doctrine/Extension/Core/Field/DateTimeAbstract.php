@@ -50,6 +50,8 @@ abstract class DateTimeAbstract extends DoctrineAbstractField
             throw new DoctrineDriverException(sprintf('Unexpected comparison type ("%s").', $comparison));
         }
 
+        $fieldName = $this->getFieldName($alias);
+
         if ($comparison == 'between') {
             if (!is_array($data)) {
                 throw new DoctrineDriverException('Given data must be an array.');
@@ -77,9 +79,11 @@ abstract class DateTimeAbstract extends DoctrineAbstractField
             } else {
                 $from = $this->parseValue($from);
                 $to = $this->parseValue($to);
-                $qb->andWhere($qb->expr()->between("$alias.$name", ":{$name}_from", ":{$name}_to"));
-                $qb->setParameter("{$name}_from", $from->format($this->getFormat()));
-                $qb->setParameter("{$name}_to", $to->format($this->getFormat()));
+                if ($from && $to) {
+                    $qb->andWhere($qb->expr()->between($fieldName, ":{$name}_from", ":{$name}_to"));
+                    $qb->setParameter("{$name}_from", $from->format($this->getFormat()));
+                    $qb->setParameter("{$name}_to", $to->format($this->getFormat()));
+                }
                 return;
             }
         }
@@ -95,8 +99,10 @@ abstract class DateTimeAbstract extends DoctrineAbstractField
                     $tmp = $this->parseValue($value);
                 }
                 $data = $tmp;
+                array_filter($tmp);
+
             default:
-                $qb->andWhere($qb->expr()->$comparison("$alias.$name", ":$name"));
+                $qb->andWhere($qb->expr()->$comparison($fieldName, ":$name"));
                 $qb->setParameter($name, $data);
         }
     }
@@ -111,8 +117,10 @@ abstract class DateTimeAbstract extends DoctrineAbstractField
     {
         if ($value instanceof \DateTime) {
             return $value;
+        } elseif (is_scalar($value)) {
+            return new \DateTime((string) $value);
         } else {
-            return new \DateTime($value);
+            return false;
         }
     }
 }

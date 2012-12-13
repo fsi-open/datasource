@@ -42,11 +42,7 @@ class DriverExtension extends DriverAbstractExtension
     protected function loadFieldTypesExtensions()
     {
         return array(
-            new Field\BaseFieldExtension(),
-            new Field\TextFieldExtension($this->formFactory),
-            new Field\NumberFieldExtension($this->formFactory),
-            new Field\DateTimeFieldExtension($this->formFactory),
-            new Field\EntityFieldExtension($this->formFactory),
+            new Field\FormFieldExtension($this->formFactory),
         );
     }
 }

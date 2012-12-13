@@ -39,8 +39,10 @@ $factory = new DataSourceFactory($extensions);
 * all fields
     * ``form_disabled`` - whether form rendering for this field is disabled
         * ``false`` by default
-    * ``form_label`` - label for form field(s)
-    * ``form_options`` - options passed to form (see documentation for Symfony Form fields)
+    * ``form_options`` - options passed to form (see documentation for Symfony Form fields). When you set
+    ``between`` comparison, you can pass specific options for each field by passing two arrays in this option
+    (extension will also search for specific options under ``from`` and ``to`` keys). If you pass also some
+    general options, they will be merged to specific options. Note, that general options have higher precedence.
  
 ## FieldView attributes ##
 
