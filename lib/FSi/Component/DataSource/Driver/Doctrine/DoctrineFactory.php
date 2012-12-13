@@ -12,6 +12,7 @@
 namespace FSi\Component\DataSource\Driver\Doctrine;
 
 use Doctrine\ORM\EntityManager;
+use Doctrine\Common\Persistence\ManagerRegistry;
 
 /**
  * {@inheritdoc}
@@ -19,9 +20,9 @@ use Doctrine\ORM\EntityManager;
 class DoctrineFactory implements DoctrineFactoryInterface
 {
     /**
-     * @var EntityManager
+     * @var ManagerRegistry
      */
-    private $em;
+    private $registry;
 
     /**
      * Array of extensions.
@@ -31,22 +32,25 @@ class DoctrineFactory implements DoctrineFactoryInterface
     private $extensions;
 
     /**
-     * Constructor.
-     *
-     * @param EntityManager $em
-     * @param array $extensions array of extensions
+     * {@inheritdoc}
      */
-    public function __construct(EntityManager $em, $extensions = array())
+    public function __construct(ManagerRegistry $registry, $extensions = array())
     {
-        $this->em = $em;
+        $this->registry = $registry;
         $this->extensions = $extensions;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function createDriver($entity, $alias = null)
+    public function createDriver($entity, $alias = null, $entityManager = null)
     {
-        return new DoctrineDriver($this->extensions, $this->em, $entity, $alias);
+        $entityManager = (string) $entityManager;
+        if (empty($entityManager)) {
+            $em = $this->registry->getManager($this->registry->getDefaultManagerName());
+        } else {
+            $em = $this->registry->getManager($entityManager);
+        }
+        return new DoctrineDriver($this->extensions, $em, $entity, $alias);
     }
 }

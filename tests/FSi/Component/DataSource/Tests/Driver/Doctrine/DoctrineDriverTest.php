@@ -361,7 +361,7 @@ class DoctrineDriverTest extends \PHPUnit_Framework_TestCase
             new CoreExtension(),
         );
 
-        return new DoctrineFactory($this->em, $extensions);
+        return new DoctrineFactory(new TestManagerRegistry($this->em), $extensions);
     }
 
     /**
