@@ -85,11 +85,6 @@ class OrderingExtension extends DataSourceAbstractExtension
     const ORDERING_IS_DISABLED = 'ordering_disabled';
 
     /**
-     * Key to reset page.
-     */
-    const RESET_PAGE = 'resetpage';
-
-    /**
      * {@inheritdoc}
      */
     public function loadDriverExtensions()

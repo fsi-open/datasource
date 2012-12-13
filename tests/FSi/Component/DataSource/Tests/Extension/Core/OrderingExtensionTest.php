@@ -23,40 +23,6 @@ use FSi\Component\DataSource\Event\FieldEvent;
 class OrderingExtensionTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * Checks if extension resets page during pre- and postBindParameters events.
-     */
-    public function testResetPage()
-    {
-        $datasourceName = 'datasource';
-        $data = array($datasourceName => array(OrderingExtension::ORDERING => array(OrderingExtension::RESET_PAGE => 1)));
-        $expected = array($datasourceName => array(OrderingExtension::ORDERING => array()));
-
-        $extension = new OrderingExtension();
-        $driver = $this->getMock('FSi\Component\DataSource\Driver\DriverInterface');
-        $datasource = $this->getMock('FSi\Component\DataSource\DataSource', array(), array($driver));
-
-        $datasource
-            ->expects($this->any())
-            ->method('getName')
-            ->will($this->returnValue($datasourceName))
-        ;
-
-        $subscribers = $extension->loadSubscribers();
-        $subscriber = array_shift($subscribers);
-        $args = new DataSourceEvent\ParametersEventArgs($datasource, $data);
-        $subscriber->preBindParameters($args);
-        $this->assertEquals($expected, $args->getParameters());
-
-        $datasource
-            ->expects($this->once())
-            ->method('setFirstResult')
-            ->with(0)
-        ;
-
-        $subscriber->postBindParameters(new DataSourceEvent\DataSourceEventArgs($datasource));
-    }
-
-    /**
      * Checks postBuildView event.
      */
     public function testPostBuildView()
@@ -67,7 +33,7 @@ class OrderingExtensionTest extends \PHPUnit_Framework_TestCase
         $view = $this->getMock('FSi\Component\DataSource\DataSourceViewInterface', array(), array($datasource));
 
         $view
-            ->expects($this->exactly(4))
+            ->expects($this->exactly(3))
             ->method('setAttribute')
         ;
 

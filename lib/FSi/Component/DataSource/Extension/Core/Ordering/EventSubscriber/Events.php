@@ -22,11 +22,6 @@ use FSi\Component\DataSource\Extension\Core\Ordering\OrderingExtension;
 class Events implements EventSubscriberInterface
 {
     /**
-     * @var bool
-     */
-    private $resetPage = false;
-
-    /**
      * @var int
      */
     private $nextPriority;
@@ -38,7 +33,6 @@ class Events implements EventSubscriberInterface
     {
         return array(
             DataSourceEvents::PRE_BIND_PARAMETERS => array('preBindParameters', 128),
-            DataSourceEvents::POST_BIND_PARAMETERS => array('postBindParameters', 128),
             DataSourceEvents::PRE_GET_RESULT => array('preGetResult', 128),
             DataSourceEvents::POST_BUILD_VIEW => array('postBuildView', 128),
         );
@@ -55,24 +49,6 @@ class Events implements EventSubscriberInterface
         $parameters = $event->getParameters();
 
         $parameterssourceName = $parameterssource->getName();
-
-        if (isset($parameters[$parameterssourceName][OrderingExtension::ORDERING][OrderingExtension::RESET_PAGE])) {
-            unset($parameters[$parameterssourceName][OrderingExtension::ORDERING][OrderingExtension::RESET_PAGE]);
-            $event->setParameters($parameters);
-            $this->resetPage = true;
-        }
-    }
-
-    /**
-     * Method called at PostBindParameters event.
-     *
-     * @param DataSourceEvent\DataSourceEventArgs $event
-     */
-    public function postBindParameters(DataSourceEvent\DataSourceEventArgs $event)
-    {
-        if ($this->resetPage) {
-            $event->getDataSource()->setFirstResult(0);
-        }
     }
 
     /**
@@ -145,7 +121,6 @@ class Events implements EventSubscriberInterface
         $datasourceName = $datasource->getName();
         $view->setAttribute(OrderingExtension::PATTERN_ORDERING, sprintf(OrderingExtension::PATTERN, $datasourceName, OrderingExtension::ORDERING, '%s', OrderingExtension::ORDERING));
         $view->setAttribute(OrderingExtension::PATTERN_PRIORITY, sprintf(OrderingExtension::PATTERN, $datasourceName, OrderingExtension::ORDERING, '%s', OrderingExtension::ORDERING_PRIORITY));
-        $view->setAttribute(OrderingExtension::RESET_PAGE, sprintf('%s[%s][%s]', $datasourceName, OrderingExtension::ORDERING, OrderingExtension::RESET_PAGE));
     }
 
     /**
