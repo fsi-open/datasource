@@ -192,6 +192,9 @@ class FormExtensionTest extends \PHPUnit_Framework_TestCase
                 ),
             )));
             $parameters2 = array('datasource' => array(DataSourceInterface::FIELDS => array('name' => new \DateTime('2012-12-12'))));
+        } elseif ($type == 'number') {
+            $parameters = array('datasource' => array(DataSourceInterface::FIELDS => array('name' => 123)));
+            $parameters2 = $parameters;
         } else {
             $parameters = array('datasource' => array(DataSourceInterface::FIELDS => array('name' => 'value')));
             $parameters2 = $parameters;

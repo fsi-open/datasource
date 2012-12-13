@@ -147,7 +147,8 @@ class FormExtensionEntityTest extends \PHPUnit_Framework_TestCase
         $extensions = $extension->getFieldTypeExtensions($type);
 
         $parameters = array('datasource' => array(DataSourceInterface::FIELDS => array('name' => 'value')));
-        $parameters2 = $parameters;
+        //Form extension will remove 'name' => 'value' since this is not valid entity id (since we have no entities at all).
+        $parameters2 = array('datasource' => array(DataSourceInterface::FIELDS => array()));
         $args = new FieldEvent\ParameterEventArgs($field, $parameters);
         foreach ($extensions as $ext) {
             $this->assertTrue($ext instanceof FieldAbstractExtension);

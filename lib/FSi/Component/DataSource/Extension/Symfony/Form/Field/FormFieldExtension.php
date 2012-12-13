@@ -130,7 +130,12 @@ class FormFieldExtension extends FieldAbstractExtension implements EventSubscrib
         }
 
         $this->form->bind($dataToBind);
-        $parameter = $this->arrayMergeRecursive($parameter, array($datasourceName => $this->form->getData()));
+        $data = $this->form->getData();
+        if (isset($data[DataSourceInterface::FIELDS][$field->getName()])) {
+            $parameter[$datasourceName][DataSourceInterface::FIELDS][$field->getName()] = $data[DataSourceInterface::FIELDS][$field->getName()];
+        } else {
+            unset($parameter[$datasourceName][DataSourceInterface::FIELDS][$field->getName()]);
+        }
         $event->setParameter($parameter);
     }
 
@@ -202,40 +207,6 @@ class FormFieldExtension extends FieldAbstractExtension implements EventSubscrib
     protected function getFormFactory()
     {
         return $this->formFactory;
-    }
-
-    /**
-     * Method for mergin arrays in a little bit different way than standard PHP function.
-     *
-     * @param array $array
-     * @return array
-     */
-    private function arrayMergeRecursive()
-    {
-        $arrays = func_get_args();
-        $merged = array();
-        while ($arrays) {
-            $array = array_shift($arrays);
-            if (!is_array($array)) {
-                $array = (array) $array;
-            }
-            if (!$array) {
-                continue;
-            }
-
-            foreach ($array as $key => $value) {
-                if (is_string($key)) {
-                    if (is_array($value) && array_key_exists($key, $merged) && is_array($merged[$key])) {
-                        $merged[$key] = $this->arrayMergeRecursive($merged[$key], $value);
-                    } else {
-                        $merged[$key] = $value;
-                    }
-                } else {
-                    $merged[] = $value;
-                }
-            }
-        }
-        return $merged;
     }
 
     /**
