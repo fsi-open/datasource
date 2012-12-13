@@ -131,8 +131,6 @@ class DoctrineDriver extends DriverAbstract
             $options = $field->getOptions();
             if (isset($options[OrderingExtension::ORDERING_PRIORITY])) {
                 $ordered[$options[OrderingExtension::ORDERING_PRIORITY]] = $field;
-            } else {
-                $orderedEnd[] = $field;
             }
         }
 

@@ -12,6 +12,7 @@
 namespace FSi\Component\DataSource\Driver;
 
 use FSi\Component\DataSource\Exception\DataSourceException;
+use FSi\Component\DataSource\DataSourceInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
 /**
@@ -65,6 +66,22 @@ abstract class DriverAbstract implements DriverInterface
         }
 
         $this->eventDispatcher = new EventDispatcher();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setDataSource(DataSourceInterface $datasource)
+    {
+        $this->datasource = $datasource;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getDataSource()
+    {
+        return $this->datasource;
     }
 
     /**

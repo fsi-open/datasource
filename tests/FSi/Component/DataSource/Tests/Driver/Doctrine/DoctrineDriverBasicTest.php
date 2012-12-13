@@ -129,11 +129,6 @@ class DoctrineDriverBasicTest extends \PHPUnit_Framework_TestCase
                 ->method('buildQuery')
             ;
 
-            $field
-                ->expects($this->atLeastOnce())
-                ->method('setOrder')
-            ;
-
             $fields[] = $field;
         }
 

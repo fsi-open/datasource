@@ -132,6 +132,7 @@ class DataSource implements DataSourceInterface
         $this->driver = $driver;
         $this->name = $name;
         $this->eventDispatcher = new EventDispatcher();
+        $driver->setDataSource($this);
     }
 
     /**

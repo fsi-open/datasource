@@ -11,11 +11,27 @@
 
 namespace FSi\Component\DataSource\Driver;
 
+use FSi\Component\DataSource\DataSourceInterface;
+
 /**
  * Driver is responsible for fetching data based on passed fields and data.
  */
 interface DriverInterface
 {
+    /**
+     * Sets reference to DataSource.
+     *
+     * @param DataSourceInterface $datasource
+     */
+    public function setDataSource(DataSourceInterface $datasource);
+
+    /**
+     * Return reference to assigned DataSource.
+     *
+     * @return DataSourceInterface
+     */
+    public function getDataSource();
+
     /**
      * Checks if driver has field for given type.
      *
