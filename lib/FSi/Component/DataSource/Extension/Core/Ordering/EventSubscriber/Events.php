@@ -47,7 +47,7 @@ class Events implements EventSubscriberInterface
     /**
      * Method called at PreBindParameters event.
      *
-     * @param DataSourceEventInterface $event
+     * @param DataSourceEvent\ParametersEventArgs $event
      */
     public function preBindParameters(DataSourceEvent\ParametersEventArgs $event)
     {
@@ -56,11 +56,7 @@ class Events implements EventSubscriberInterface
 
         $parameterssourceName = $parameterssource->getName();
 
-        if (
-            isset($parameters[$parameterssourceName])
-            && isset($parameters[$parameterssourceName][OrderingExtension::ORDERING])
-            && isset($parameters[$parameterssourceName][OrderingExtension::ORDERING][OrderingExtension::RESET_PAGE])
-        ) {
+        if (isset($parameters[$parameterssourceName][OrderingExtension::ORDERING][OrderingExtension::RESET_PAGE])) {
             unset($parameters[$parameterssourceName][OrderingExtension::ORDERING][OrderingExtension::RESET_PAGE]);
             $event->setParameters($parameters);
             $this->resetPage = true;
@@ -70,7 +66,7 @@ class Events implements EventSubscriberInterface
     /**
      * Method called at PostBindParameters event.
      *
-     * @param DataSourceEventInterface $event
+     * @param DataSourceEvent\DataSourceEventArgs $event
      */
     public function postBindParameters(DataSourceEvent\DataSourceEventArgs $event)
     {
@@ -82,7 +78,7 @@ class Events implements EventSubscriberInterface
     /**
      * Method called at PreGetResult event.
      *
-     * @param DataSourceEventInterface $event
+     * @param DataSourceEvent\DataSourceEventArgs $event
      */
     public function preGetResult(DataSourceEvent\DataSourceEventArgs $event)
     {
@@ -136,7 +132,7 @@ class Events implements EventSubscriberInterface
     /**
      * Method called at PostBuildView event.
      *
-     * @param DataSourceEventInterface $event
+     * @param DataSourceEvent\ViewEventArgs $event
      */
     public function postBuildView(DataSourceEvent\ViewEventArgs $event)
     {

@@ -26,6 +26,7 @@ use FSi\Component\DataSource\Extension\Core;
 use FSi\Component\DataSource\Extension\Core\Ordering\OrderingExtension;
 use Symfony\Component\Form;
 use Symfony\Bridge\Doctrine\Form\DoctrineOrmExtension;
+use FSi\Component\DataSource\Extension\Core\Pagination\PaginationExtension;
 
 /**
  * Tests for Doctrine driver.
@@ -134,7 +135,7 @@ class DoctrineDriverTest extends \PHPUnit_Framework_TestCase
             $datasource->setMaxResults(20);
             $parameters = array(
                 $datasource->getName() => array(
-                    DataSourceInterface::PAGE => 1,
+                    PaginationExtension::PAGE => 1,
                 ),
             );
 

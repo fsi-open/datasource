@@ -28,22 +28,39 @@ class Events implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return array(
+            DataSourceEvents::PRE_BIND_PARAMETERS => array('preBindParameters', 128),
             DataSourceEvents::POST_BUILD_VIEW => array('postBuildView', 128),
             DataSourceEvents::PRE_GET_PARAMETERS => array('preGetParameters', 128),
         );
     }
 
     /**
+     * Method called at PreBindParameters event.
+     *
+     * Sets proper page.
+     *
+     * @param DataSourceEvent\ParametersEventArgs $event
+     */
+    public function preBindParameters(DataSourceEvent\ParametersEventArgs $event)
+    {
+        $datasource = $event->getDataSource();
+        $parameters = $event->getParameters();
+
+        $page = isset($parameters[$datasource->getName()][PaginationExtension::PAGE]) ? (int) $parameters[$datasource->getName()][PaginationExtension::PAGE] : 1;
+        $datasource->setFirstResult(($page - 1) * $datasource->getMaxResults());
+    }
+
+    /**
      * Method called at PostBuildView event.
      *
-     * @param DataSourceEventInterface $event
+     * @param DataSourceEvent\ViewEventArgs $event
      */
     public function postBuildView(DataSourceEvent\ViewEventArgs $event)
     {
         $datasource = $event->getDataSource();
         $view = $event->getView();
 
-        $view->setAttribute(PaginationExtension::PAGE_PARAM_NAME, sprintf('%s[%s]', $datasource->getName(), DataSourceInterface::PAGE));
+        $view->setAttribute(PaginationExtension::PAGE_PARAM_NAME, sprintf('%s[%s]', $datasource->getName(), PaginationExtension::PAGE));
 
         $maxresults = $datasource->getMaxResults();
         if ($maxresults == 0) {
@@ -54,7 +71,7 @@ class Events implements EventSubscriberInterface
 
         $params = $datasource->getParameters();
         $datasourceName = $datasource->getName();
-        $page = isset($params[$datasourceName]) && isset($params[$datasourceName][DataSourceInterface::PAGE]) ? $params[$datasourceName][DataSourceInterface::PAGE] : 1;
+        $page = isset($params[$datasourceName][PaginationExtension::PAGE]) ? $params[$datasourceName][PaginationExtension::PAGE] : 1;
         $view->setAttribute(PaginationExtension::PAGE_AMOUNT, $all);
         $view->setAttribute(PaginationExtension::PAGE_CURRENT, $page);
     }
@@ -62,7 +79,7 @@ class Events implements EventSubscriberInterface
     /**
      * Method called at PreGetParameters event.
      *
-     * @param DataSourceEventInterface $event
+     * @param DataSourceEvent\ParametersEventArgs $event
      */
     public function preGetParameters(DataSourceEvent\ParametersEventArgs $event)
     {
@@ -79,7 +96,7 @@ class Events implements EventSubscriberInterface
         }
 
         if ($page != 1) {
-            $data[$datasourceName][DataSourceInterface::PAGE] = $page;
+            $data[$datasourceName][PaginationExtension::PAGE] = $page;
             $event->setParameters($data);
         }
     }

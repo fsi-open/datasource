@@ -22,6 +22,11 @@ use Symfony\Component\Form\FormFactory;
 class PaginationExtension extends DataSourceAbstractExtension
 {
     /**
+     * Key for page info.
+     */
+    const PAGE = 'page';
+
+    /**
      * Page number option name.
      */
     const PAGE_PARAM_NAME = 'page_param_name';

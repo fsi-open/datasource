@@ -258,11 +258,6 @@ class DataSource implements DataSourceInterface
             $field->bindParameter($parameters);
         }
 
-        //Page number.
-        $page = (isset($parameters[$this->getName()]) && isset($parameters[$this->getName()][self::PAGE])) ? (int) $parameters[$this->getName()][self::PAGE] : 1;
-
-        $this->setFirstResult(($page - 1) * $this->getMaxResults());
-
         //PostBindParameters event.
         $event = new DataSourceEvent\DataSourceEventArgs($this);
         $this->eventDispatcher->dispatch(DataSourceEvents::POST_BIND_PARAMETERS, $event);

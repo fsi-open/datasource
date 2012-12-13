@@ -25,11 +25,6 @@ interface DataSourceInterface
     const FIELDS = 'fields';
 
     /**
-     * Key for page info.
-     */
-    const PAGE = 'page';
-
-    /**
      * Returns name of the DataSource.
      *
      * @return string

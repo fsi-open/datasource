@@ -89,12 +89,7 @@ class FieldExtension extends FieldAbstractExtension implements EventSubscriberIn
             return;
         }
 
-        if (
-            is_array($parameter)
-            && isset($parameter[$datasourceName])
-            && isset($parameter[$datasourceName][OrderingExtension::ORDERING])
-            && isset($parameter[$datasourceName][OrderingExtension::ORDERING][$field->getName()])
-        ) {
+        if (isset($parameter[$datasourceName][OrderingExtension::ORDERING][$field->getName()])) {
             $givenData = $parameter[$datasourceName][OrderingExtension::ORDERING][$field->getName()];
         } else {
             $givenData = array();

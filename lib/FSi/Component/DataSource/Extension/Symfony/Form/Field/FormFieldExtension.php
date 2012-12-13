@@ -119,12 +119,7 @@ class FormFieldExtension extends FieldAbstractExtension implements EventSubscrib
             return;
         }
 
-        if (
-            is_array($parameter)
-            && isset($parameter[$datasourceName])
-            && isset($parameter[$datasourceName][DataSourceInterface::FIELDS])
-            && isset($parameter[$datasourceName][DataSourceInterface::FIELDS][$field->getName()])
-        ) {
+        if (isset($parameter[$datasourceName][DataSourceInterface::FIELDS][$field->getName()])) {
             $dataToBind = array(
                 DataSourceInterface::FIELDS => array(
                     $field->getName() => $parameter[$datasourceName][DataSourceInterface::FIELDS][$field->getName()],

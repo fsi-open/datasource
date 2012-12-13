@@ -54,7 +54,7 @@ class PaginationExtensionTest extends \PHPUnit_Framework_TestCase
         $subscriber->preGetParameters($args);
         $pattern = array(
             'datasource' => array(
-                DataSourceInterface::PAGE => 2
+                PaginationExtension::PAGE => 2
             )
         );
         $this->assertEquals($pattern, $args->getParameters());
