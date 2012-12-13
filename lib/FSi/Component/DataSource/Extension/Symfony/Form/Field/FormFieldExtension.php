@@ -176,16 +176,16 @@ class FormFieldExtension extends FieldAbstractExtension implements EventSubscrib
 
                 unset($options[0], $options[1], $options['from'], $options['to']);
 
-                //Checking and merging (if need) with general options (needed to pass some arbitrary options, like 'required').
+                //Checking and merging (if need) with general options.
                 if (!$fromOptions) {
                     $fromOptions = $options;
                 } else {
-                    $fromOptions = array_merge($fromOptions, $options);
+                    $fromOptions = array_merge($options, $fromOptions);
                 }
                 if (!$toOptions) {
                     $toOptions = $options;
                 } else {
-                    $toOptions = array_merge($toOptions, $options);
+                    $toOptions = array_merge($options, $toOptions);
                 }
 
                 $form2->add('from', $field->getType(), $fromOptions);
