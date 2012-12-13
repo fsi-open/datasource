@@ -14,12 +14,16 @@ namespace FSi\Component\DataSource\Driver\Doctrine;
 use FSi\Component\DataSource\Field\FieldAbstractType;
 use FSi\Component\DataSource\Driver\Doctrine\Exception\DoctrineDriverException;
 use Doctrine\ORM\QueryBuilder;
+use FSi\Component\DataSource\Extension\Core\Ordering\OrderingExtension;
 
 /**
  * {@inheritdoc}
  */
 abstract class DoctrineAbstractField extends FieldAbstractType implements DoctrineFieldInterface
 {
+    /**
+     * Field mapping option name.
+     */
     const FIELD_MAPPING = 'field_mapping';
 
     /**
@@ -106,9 +110,9 @@ abstract class DoctrineAbstractField extends FieldAbstractType implements Doctri
         $options = $this->getOptions();
         $fieldName = $this->getFieldName($alias);
 
-        if (isset($options[DoctrineDriver::ORDERING])) {
+        if (isset($options[OrderingExtension::ORDERING])) {
             $name = $this->getName();
-            if ($options[DoctrineDriver::ORDERING] == 'asc') {
+            if ($options[OrderingExtension::ORDERING] == 'asc') {
                 $qb->addOrderBy($fieldName, 'asc');
             } else {
                 $qb->addOrderBy($fieldName, 'desc');

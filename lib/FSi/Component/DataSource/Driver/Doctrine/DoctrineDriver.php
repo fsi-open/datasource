@@ -19,6 +19,7 @@ use FSi\Component\DataSource\Driver\Doctrine\Exception\DoctrineDriverException;
 use Doctrine\ORM\QueryBuilder;
 use FSi\Component\DataSource\Event\DriverEvents;
 use FSi\Component\DataSource\Event\DriverEvent;
+use FSi\Component\DataSource\Extension\Core\Ordering\OrderingExtension;
 
 /**
  * Driver to fetch data from databases using Doctrine.
@@ -29,16 +30,6 @@ class DoctrineDriver extends DriverAbstract
      * Arbitrary alias for entity during building query.
      */
     const ENTITY_ALIAS = 'e';
-
-    /**
-     * Key for ordering option.
-     */
-    const ORDERING = 'ordering';
-
-    /**
-     * Key for ordering priority.
-     */
-    const ORDERING_PRIORITY = 'ordering_priority';
 
     /**
      * @var EntityManager
@@ -138,8 +129,8 @@ class DoctrineDriver extends DriverAbstract
             $field->buildQuery($qb, $entityAlias);
 
             $options = $field->getOptions();
-            if (isset($options[self::ORDERING_PRIORITY])) {
-                $ordered[$options[self::ORDERING_PRIORITY]] = $field;
+            if (isset($options[OrderingExtension::ORDERING_PRIORITY])) {
+                $ordered[$options[OrderingExtension::ORDERING_PRIORITY]] = $field;
             } else {
                 $orderedEnd[] = $field;
             }
