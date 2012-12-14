@@ -60,7 +60,7 @@ class Events implements EventSubscriberInterface
         $datasource = $event->getDataSource();
         $view = $event->getView();
 
-        $view->setAttribute(PaginationExtension::PAGE_PARAM_NAME, sprintf('%s[%s]', $datasource->getName(), PaginationExtension::PAGE));
+        $view->setAttribute(PaginationExtension::VIEW_PAGE_PARAM_NAME, sprintf('%s[%s]', $datasource->getName(), PaginationExtension::PAGE));
 
         $maxresults = $datasource->getMaxResults();
         if ($maxresults == 0) {
@@ -72,8 +72,8 @@ class Events implements EventSubscriberInterface
         $params = $datasource->getParameters();
         $datasourceName = $datasource->getName();
         $page = isset($params[$datasourceName][PaginationExtension::PAGE]) ? $params[$datasourceName][PaginationExtension::PAGE] : 1;
-        $view->setAttribute(PaginationExtension::PAGE_AMOUNT, $all);
-        $view->setAttribute(PaginationExtension::PAGE_CURRENT, $page);
+        $view->setAttribute(PaginationExtension::VIEW_PAGE_AMOUNT, $all);
+        $view->setAttribute(PaginationExtension::VIEW_PAGE_CURRENT, $page);
     }
 
     /**

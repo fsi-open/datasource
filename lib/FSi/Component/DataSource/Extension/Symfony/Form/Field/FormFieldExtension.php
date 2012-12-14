@@ -84,7 +84,7 @@ class FormFieldExtension extends FieldAbstractExtension implements EventSubscrib
         $view = $event->getView();
 
         $this->createForm($field);
-        $view->setAttribute(FormExtension::FORM, $this->form->createView());
+        $view->setAttribute(FormExtension::VIEW_FORM, $this->form->createView());
     }
 
     /**

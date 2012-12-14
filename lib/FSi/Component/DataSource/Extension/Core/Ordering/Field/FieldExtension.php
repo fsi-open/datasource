@@ -122,16 +122,16 @@ class FieldExtension extends FieldAbstractExtension implements EventSubscriberIn
         $view = $event->getView();
 
         if ($field->hasOption(OrderingExtension::ORDERING_IS_DISABLED) && $field->getOption(OrderingExtension::ORDERING_IS_DISABLED)) {
-            $view->setAttribute(OrderingExtension::ORDERING_DISABLED, true);
+            $view->setAttribute(OrderingExtension::VIEW_ORDERING_DISABLED, true);
             return;
         }
 
         $enabled = !empty($this->givenData);
         $options = $field->getOptions();
 
-        $view->setAttribute(OrderingExtension::CURRENT_ORDERING, isset($options[OrderingExtension::ORDERING]) ? $options[OrderingExtension::ORDERING] : null);
+        $view->setAttribute(OrderingExtension::VIEW_CURRENT_ORDERING, isset($options[OrderingExtension::ORDERING]) ? $options[OrderingExtension::ORDERING] : null);
         $view->setAttribute(OrderingExtension::CURRENT_PRIORITY, isset($options[OrderingExtension::ORDERING_PRIORITY]) ? $options[OrderingExtension::ORDERING_PRIORITY] : null);
-        $view->setAttribute(OrderingExtension::IS_ENABLED, $enabled);
+        $view->setAttribute(OrderingExtension::VIEW_IS_ENABLED, $enabled);
     }
 
     /**

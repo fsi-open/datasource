@@ -116,11 +116,11 @@ class Events implements EventSubscriberInterface
         $view = $event->getView();
 
         $this->countNextPriority($datasource);
-        $view->setAttribute(OrderingExtension::NEXT_PRIORITY, $this->nextPriority);
+        $view->setAttribute(OrderingExtension::VIEW_NEXT_PRIORITY, $this->nextPriority);
 
         $datasourceName = $datasource->getName();
-        $view->setAttribute(OrderingExtension::PATTERN_ORDERING, sprintf(OrderingExtension::PATTERN, $datasourceName, OrderingExtension::ORDERING, '%s', OrderingExtension::ORDERING));
-        $view->setAttribute(OrderingExtension::PATTERN_PRIORITY, sprintf(OrderingExtension::PATTERN, $datasourceName, OrderingExtension::ORDERING, '%s', OrderingExtension::ORDERING_PRIORITY));
+        $view->setAttribute(OrderingExtension::VIEW_PATTERN_ORDERING, sprintf(OrderingExtension::PATTERN, $datasourceName, OrderingExtension::ORDERING, '%s', OrderingExtension::ORDERING));
+        $view->setAttribute(OrderingExtension::VIEW_PATTERN_PRIORITY, sprintf(OrderingExtension::PATTERN, $datasourceName, OrderingExtension::ORDERING, '%s', OrderingExtension::ORDERING_PRIORITY));
     }
 
     /**

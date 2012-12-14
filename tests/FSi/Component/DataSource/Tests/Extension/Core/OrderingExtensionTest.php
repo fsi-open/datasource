@@ -154,7 +154,7 @@ class OrderingExtensionTest extends \PHPUnit_Framework_TestCase
                 ->method('setAttribute')
                 ->will($this->returnCallback(function () use (&$givenNextPriority) {
                     list($key, $value) = func_get_args();
-                    if ($key == OrderingExtension::NEXT_PRIORITY) {
+                    if ($key == OrderingExtension::VIEW_NEXT_PRIORITY) {
                         $givenNextPriority = $value;
                     }
                 }))
@@ -240,7 +240,7 @@ class OrderingExtensionTest extends \PHPUnit_Framework_TestCase
             ->method('setAttribute')
             ->will($this->returnCallback(function () use (&$enabled) {
                 list($key, $value) = func_get_args();
-                if ($key == OrderingExtension::IS_ENABLED) {
+                if ($key == OrderingExtension::VIEW_IS_ENABLED) {
                     $enabled = $value;
                 }
             }))

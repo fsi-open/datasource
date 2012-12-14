@@ -27,19 +27,19 @@ class PaginationExtension extends DataSourceAbstractExtension
     const PAGE = 'page';
 
     /**
-     * Page number option name.
+     * Page number attribute name.
      */
-    const PAGE_PARAM_NAME = 'page_param_name';
+    const VIEW_PAGE_PARAM_NAME = 'page_param_name';
 
     /**
-     * Current page option name.
+     * Current page attribute name.
      */
-    const PAGE_CURRENT = 'page_current';
+    const VIEW_PAGE_CURRENT = 'page_current';
 
     /**
-     * Pages amount option name.
+     * Pages amount attribute name.
      */
-    const PAGE_AMOUNT = 'page_amount';
+    const VIEW_PAGE_AMOUNT = 'page_amount';
 
     /**
      * {@inheritdoc}
