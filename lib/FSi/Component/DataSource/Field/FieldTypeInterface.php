@@ -163,11 +163,6 @@ interface FieldTypeInterface
     public function getDataSource();
 
     /**
-     * Removes reference to datasource.
-     */
-    public function removeDataSource();
-
-    /**
      * Allows to load options constraints.
      *
      * @param OptionsResolverInterface $optionsResolver

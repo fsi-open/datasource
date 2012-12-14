@@ -52,7 +52,7 @@ abstract class FieldAbstractType implements FieldTypeInterface
      *
      * @var array
      */
-    protected $options = array();
+    private $options = array();
 
     /**
      * Given parameter.
@@ -66,7 +66,7 @@ abstract class FieldAbstractType implements FieldTypeInterface
      *
      * @var array
      */
-    protected $extensions = array();
+    private $extensions = array();
 
     /**
      * Flag to determine if inner state has changed.
@@ -89,27 +89,6 @@ abstract class FieldAbstractType implements FieldTypeInterface
      * @var OptionsResolver
      */
     private $optionsResolver;
-
-    /**
-     * Flag to determine if from last check any new extension was added or not.
-     *
-     * @var bool
-     */
-    private $extensionsDirty = true;
-
-    /**
-     * Cache for available options keys.
-     *
-     * @var array
-     */
-    private $availableOptions;
-
-    /**
-     * Cache for required options keys.
-     *
-     * @var array
-     */
-    private $requiredOptions;
 
     /**
      * {@inheritdoc}
@@ -303,8 +282,6 @@ abstract class FieldAbstractType implements FieldTypeInterface
      */
     public function addExtension(FieldExtensionInterface $extension)
     {
-        $this->extensionsDirty = true;
-
         foreach ($extension->loadSubscribers() as $subscriber) {
             $this->eventDispatcher->addSubscriber($subscriber);
         }
@@ -372,14 +349,6 @@ abstract class FieldAbstractType implements FieldTypeInterface
     public function getDataSource()
     {
         return $this->datasource;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function removeDataSource()
-    {
-        unset($this->datasource);
     }
 
     /**

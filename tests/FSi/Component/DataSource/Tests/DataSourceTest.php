@@ -215,11 +215,6 @@ class DataSourceTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue('name'))
         ;
 
-        $field
-            ->expects($this->exactly(2))
-            ->method('removeDataSource')
-        ;
-
         $driver
             ->expects($this->once())
             ->method('getFieldType')

@@ -196,7 +196,6 @@ class DataSource implements DataSourceInterface
     public function removeField($name)
     {
         if (isset($this->fields[$name])) {
-            $this->fields[$name]->removeDataSource();
             unset($this->fields[$name]);
             $this->dirty = true;
             return true;
@@ -231,9 +230,6 @@ class DataSource implements DataSourceInterface
      */
     public function clearFields()
     {
-        foreach ($this->fields as $field) {
-            $field->removeDataSource();
-        }
         $this->fields = array();
         $this->dirty = true;
         return $this;
