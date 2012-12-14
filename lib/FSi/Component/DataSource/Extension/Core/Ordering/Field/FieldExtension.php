@@ -20,6 +20,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use FSi\Component\DataSource\Event\FieldEvents;
 use FSi\Component\DataSource\Event\FieldEvent;
 use FSi\Component\DataSource\Event\DataSourceFieldEventInterface;
+use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 /**
  * Extension for fields.
@@ -54,22 +55,18 @@ class FieldExtension extends FieldAbstractExtension implements EventSubscriberIn
     /**
      * {@inheritdoc}
      */
-    public function getAvailableOptions()
+    public function loadOptionsConstraints(OptionsResolverInterface $optionsResolver)
     {
-        return array(
-            OrderingExtension::ORDERING_IS_GIVEN, //Only for internal use.
-            OrderingExtension::ORDERING_IS_DISABLED,
-            OrderingExtension::ORDERING,
-            Orderingextension::ORDERING_PRIORITY,
-        );
-    }
-
-    public function getDefaultAvailableOptions()
-    {
-        return array(
-            OrderingExtension::ORDERING_IS_GIVEN => false,
+        $optionsResolver->setDefaults(array(
+            OrderingExtension::ORDERING_IS_GIVEN => false, //Only for internal use.
             OrderingExtension::ORDERING_IS_DISABLED => false,
-        );
+            OrderingExtension::ORDERING => null,
+            Orderingextension::ORDERING_PRIORITY => null,
+        ));
+
+        $optionsResolver->setAllowedValues(array(
+            OrderingExtension::ORDERING => array(null, 'asc', 'desc'),
+        ));
     }
 
     /**

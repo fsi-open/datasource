@@ -18,6 +18,8 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use FSi\Component\DataSource\Event\FieldEvents;
 use FSi\Component\DataSource\Event\FieldEvent;
+use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 /**
  * {@inheritdoc}
@@ -84,6 +86,11 @@ abstract class FieldAbstractType implements FieldTypeInterface
     protected $eventDispatcher;
 
     /**
+     * @var OptionsResolver
+     */
+    private $optionsResolver;
+
+    /**
      * Flag to determine if from last check any new extension was added or not.
      *
      * @var bool
@@ -126,6 +133,8 @@ abstract class FieldAbstractType implements FieldTypeInterface
     public function __construct()
     {
         $this->eventDispatcher = new EventDispatcher();
+        $this->optionsResolver = new OptionsResolver();
+        $this->loadOptionsConstraints($this->optionsResolver);
     }
 
     /**
@@ -134,6 +143,7 @@ abstract class FieldAbstractType implements FieldTypeInterface
     public function __clone()
     {
         $this->eventDispatcher = clone $this->eventDispatcher;
+        $this->optionsResolver = clone $this->optionsResolver;
     }
 
     /**
@@ -171,28 +181,23 @@ abstract class FieldAbstractType implements FieldTypeInterface
      */
     public function setOptions($options)
     {
-        if ($this->options === $options) {
-            return;
+        foreach ($options as $key => $option) {
+            $this->setOption($key, $option);
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @throws FieldException
+     */
+    public function setOption($name, $value)
+    {
+        if (!$this->optionsResolver->isKnown($name)) {
+            throw new FieldException(sprintf('Unknown option "%s".', is_scalar($name) ? $name : gettype($name)));
         }
 
-        $this->setDirty();
-        $options = array_merge($this->getCachedDefaultAvailableOptions(), $this->getCachedDefaultRequiredOptions(), (array) $options);
-
-        $this->checkExtensionsClarity();
-
-        $available = $this->getCachedAvailableOptions();
-        $required = $this->getCachedRequiredOptions();
-        $keys = array_keys($options);
-
-        if ($rkeys = array_diff($required, $keys)) {
-            throw new FieldException(sprintf('Missing some required fields (%s).', implode(', ', $rkeys)));
-        }
-
-        if ($akeys = array_diff($keys, $available)) {
-            throw new FieldException(sprintf('Some of given options (%s) are not available for this field.', implode(', ', $akeys)));
-        }
-
-        $this->options = $options;
+        $this->options[$name] = $value;
     }
 
     /**
@@ -200,7 +205,7 @@ abstract class FieldAbstractType implements FieldTypeInterface
      */
     public function hasOption($name)
     {
-        return isset($this->options[$name]);
+        return isset($this->options[$name]) && !empty($this->options[$name]);
     }
 
     /**
@@ -248,6 +253,8 @@ abstract class FieldAbstractType implements FieldTypeInterface
         //PreBindParameter event.
         $event = new FieldEvent\FieldEventArgs($this);
         $this->eventDispatcher->dispatch(FieldEvents::POST_BIND_PARAMETER, $event);
+
+        $this->options = $this->optionsResolver->resolve($this->options);
     }
 
     /**
@@ -279,6 +286,8 @@ abstract class FieldAbstractType implements FieldTypeInterface
         $parameter = $event->getParameter();
 
         $parameters = array_merge_recursive($parameters, $parameter);
+
+        $this->options = $this->optionsResolver->resolve($this->options);
     }
 
     /**
@@ -300,6 +309,8 @@ abstract class FieldAbstractType implements FieldTypeInterface
             $this->eventDispatcher->addSubscriber($subscriber);
         }
 
+        $extension->loadOptionsConstraints($this->optionsResolver);
+
         $this->extensions[] = $extension;
     }
 
@@ -317,6 +328,8 @@ abstract class FieldAbstractType implements FieldTypeInterface
         //PostBuildView event.
         $event = new FieldEvent\ViewEventArgs($this, $view);
         $this->eventDispatcher->dispatch(FieldEvents::POST_BUILD_VIEW, $event);
+
+        $this->options = $this->optionsResolver->resolve($this->options);
 
         return $view;
     }
@@ -370,127 +383,10 @@ abstract class FieldAbstractType implements FieldTypeInterface
     }
 
     /**
-     * Checks if any extension was added recently, and if did, clears options cache.
-     */
-    private function checkExtensionsClarity()
-    {
-        if ($this->extensionsDirty) {
-            unset($this->availableOptions);
-            unset($this->requiredOptions);
-            unset($this->defaultAvailableOptions);
-            unset($this->defaultRequiredOptions);
-        }
-        $this->extensionsDirty = false;
-    }
-
-    /**
-     * Returns available options keys names.
-     *
-     * @return array
-     */
-    private function getCachedAvailableOptions()
-    {
-        if (!isset($this->availableOptions)) {
-            $available = $this->getAvailableOptions();
-
-            foreach ($this->extensions as $extension) {
-                $available = array_merge($available, (array) $extension->getAvailableOptions());
-            }
-
-            //Available options need to have required keys too.
-            $this->availableOptions = array_merge($available, $this->getCachedRequiredOptions());
-        }
-        return $this->availableOptions;
-    }
-
-    /**
-     * Return required options keys names.
-     *
-     * @return array
-     */
-    private function getCachedRequiredOptions()
-    {
-        if (!isset($this->requiredOptions)) {
-            $required = $this->getRequiredOptions();
-
-            foreach ($this->extensions as $extension) {
-                $required = array_merge($required, (array) $extension->getRequiredOptions());
-            }
-            $this->requiredOptions = $required;
-        }
-
-        return $this->requiredOptions;
-    }
-
-    /**
-     * Returns array of default available options.
-     *
-     * @return array
-     */
-    private function getCachedDefaultAvailableOptions()
-    {
-        if (!isset($this->defaultAvailableOptions)) {
-            $options = $this->getDefaultAvailableOptions();
-
-            foreach ($this->extensions as $extension) {
-                $options = array_merge($options, (array) $extension->getDefaultAvailableOptions());
-            }
-
-            $this->defaultAvailableOptions = $options;
-        }
-
-        return $this->defaultAvailableOptions;
-    }
-
-    /**
-     * Returns array of default required options.
-     *
-     * @return array
-     */
-    private function getCachedDefaultRequiredOptions()
-    {
-        if (!isset($this->defaultRequiredOptions)) {
-            $options = $this->getDefaultRequiredOptions();
-
-            foreach ($this->extensions as $extension) {
-                $options = array_merge($options, (array) $extension->getDefaultRequiredOptions());
-            }
-
-            $this->defaultRequiredOptions = $options;
-        }
-
-        return $this->defaultRequiredOptions;
-    }
-
-    /**
      * {@inheritdoc}
      */
-    public function getAvailableOptions()
+    public function loadOptionsConstraints(OptionsResolverInterface $optionsResolver)
     {
-        return array();
-    }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getDefaultAvailableOptions()
-    {
-        return array();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getRequiredOptions()
-    {
-        return array();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getDefaultRequiredOptions()
-    {
-        return array();
     }
 }

@@ -13,44 +13,13 @@ namespace FSi\Component\DataSource\Field;
 
 use FSi\Component\DataSource\DataSourceInterface;
 use FSi\Component\DataSource\DataSourceViewInterface;
+use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 /**
  * {@inheritdoc}
  */
 class FieldAbstractExtension implements FieldExtensionInterface
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function getAvailableOptions()
-    {
-        return array();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getDefaultAvailableOptions()
-    {
-        return array();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getRequiredOptions()
-    {
-        return array();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getDefaultRequiredOptions()
-    {
-        return array();
-    }
-
     /**
      * {@inheritdoc}
      */
@@ -65,5 +34,13 @@ class FieldAbstractExtension implements FieldExtensionInterface
     public function loadSubscribers()
     {
         return array();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function loadOptionsConstraints(OptionsResolverInterface $optionsResolver)
+    {
+
     }
 }

@@ -13,6 +13,7 @@ namespace FSi\Component\DataSource\Field;
 
 use FSi\Component\DataSource\Field\FieldViewInterface;
 use FSi\Component\DataSource\DataSourceInterface;
+use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 /**
  * Field of DataSource.
@@ -167,30 +168,9 @@ interface FieldTypeInterface
     public function removeDataSource();
 
     /**
-     * Returns array of available options.
+     * Allows to load options constraints.
      *
-     * @return array
+     * @param OptionsResolverInterface $optionsResolver
      */
-    public function getAvailableOptions();
-
-    /**
-     * Returns array of default available options.
-     *
-     * @return array
-     */
-    public function getDefaultAvailableOptions();
-
-    /**
-     * Returns array of required options.
-     *
-     * @return array
-     */
-    public function getRequiredOptions();
-
-    /**
-     * Returns array of default required options.
-     *
-     * @return array
-     */
-    public function getDefaultRequiredOptions();
+    public function loadOptionsConstraints(OptionsResolverInterface $optionsResolver);
 }

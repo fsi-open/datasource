@@ -13,40 +13,13 @@ namespace FSi\Component\DataSource\Field;
 
 use FSi\Component\DataSource\DataSourceInterface;
 use FSi\Component\DataSource\DataSourceViewInterface;
+use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 /**
  * Extension of DataSources field.
  */
 interface FieldExtensionInterface
 {
-    /**
-     * Returns array of available options.
-     *
-     * @return array
-     */
-    public function getAvailableOptions();
-
-    /**
-     * Returns array of default available options.
-     *
-     * @return array
-     */
-    public function getDefaultAvailableOptions();
-
-    /**
-     * Returns array of required options.
-     *
-     * @return array
-     */
-    public function getRequiredOptions();
-
-    /**
-     * Returns array of default required options.
-     *
-     * @return array
-     */
-    public function getDefaultRequiredOptions();
-
     /**
      * Returns array of extended types.
      *
@@ -62,4 +35,11 @@ interface FieldExtensionInterface
      * @return array
      */
     public function loadSubscribers();
+
+    /**
+     * Allows extension to load constraints to fields OptionsResolver. Called by field.
+     *
+     * @param OptionsResolverInterface $optionsResolver
+     */
+    public function loadOptionsConstraints(OptionsResolverInterface $optionsResolver);
 }

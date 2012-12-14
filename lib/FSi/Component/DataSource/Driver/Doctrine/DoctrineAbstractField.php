@@ -15,6 +15,7 @@ use FSi\Component\DataSource\Field\FieldAbstractType;
 use FSi\Component\DataSource\Driver\Doctrine\Exception\DoctrineDriverException;
 use Doctrine\ORM\QueryBuilder;
 use FSi\Component\DataSource\Extension\Core\Ordering\OrderingExtension;
+use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 /**
  * {@inheritdoc}
@@ -123,9 +124,11 @@ abstract class DoctrineAbstractField extends FieldAbstractType implements Doctri
     /**
      * {@inheritdoc}
      */
-    public function getAvailableOptions()
+    public function loadOptionsConstraints(OptionsResolverInterface $optionsResolver)
     {
-        return array(self::FIELD_MAPPING);
+        $optionsResolver->setDefaults(array(
+            self::FIELD_MAPPING => null,
+        ));
     }
 
     /**

@@ -21,6 +21,7 @@ use FSi\Component\DataSource\Extension\Symfony\Form\FormExtension;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use FSi\Component\DataSource\Event\FieldEvents;
 use FSi\Component\DataSource\Event\FieldEvent;
+use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 /**
  * Fields extension.
@@ -69,19 +70,9 @@ class FormFieldExtension extends FieldAbstractExtension implements EventSubscrib
     /**
      * {@inheritdoc}
      */
-    public function getAvailableOptions()
+    public function loadOptionsConstraints(OptionsResolverInterface $optionsResolver)
     {
-        return array('form_disabled', 'form_options');
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getDefaultAvailableOptions()
-    {
-        return array(
-            'form_disabled' => false,
-        );
+        $optionsResolver->setDefaults(array('form_disabled' => false, 'form_options' => array()));
     }
 
     /**
