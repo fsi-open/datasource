@@ -17,8 +17,6 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use FSi\Component\DataSource\Driver\Doctrine\Exception\DoctrineDriverException;
 use Doctrine\ORM\QueryBuilder;
-use FSi\Component\DataSource\Event\DriverEvents;
-use FSi\Component\DataSource\Event\DriverEvent;
 use FSi\Component\DataSource\Extension\Core\Ordering\OrderingExtension;
 
 /**
@@ -96,7 +94,7 @@ class DoctrineDriver extends DriverAbstract
     /**
      * {@inheritdoc}
      */
-    public function getResult($fields, $first, $max)
+    public function initResult()
     {
         $entityAlias = self::ENTITY_ALIAS;
         if (isset($this->givenQuery)) {
@@ -107,26 +105,29 @@ class DoctrineDriver extends DriverAbstract
         } else {
             $qb = $this->em->createQueryBuilder();
             $qb
-                ->select($entityAlias)
-                ->from($this->entity, $entityAlias)
+            ->select($entityAlias)
+            ->from($this->entity, $entityAlias)
             ;
         }
 
         $this->query = $qb;
+    }
 
-        //preGetResult event.
-        $event = new DriverEvent\DriverEventArgs($this);
-        $this->eventDispatcher->dispatch(DriverEvents::PRE_GET_RESULT, $event);
-
+    /**
+     * {@inheritdoc}
+     */
+    public function buildResult($fields, $first, $max)
+    {
         $ordered = array();
         $orderedEnd = array();
+        $entityAlias = isset($this->givenAlias)?$this->givenAlias:self::ENTITY_ALIAS;
 
         foreach ($fields as $field) {
             if (!$field instanceof DoctrineFieldInterface) {
                 throw new DoctrineDriverException(sprintf('All fields must be instances of FSi\Component\DataSource\Driver\Doctrine\DoctrineFieldInterface.'));
             }
 
-            $field->buildQuery($qb, $entityAlias);
+            $field->buildQuery($this->query, $entityAlias);
 
             $options = $field->getOptions();
             if (isset($options[OrderingExtension::ORDERING_PRIORITY])) {
@@ -138,23 +139,18 @@ class DoctrineDriver extends DriverAbstract
         $ordered = array_reverse($ordered);
         $fields = array_merge($ordered, $orderedEnd);
         foreach ($fields as $field) {
-            $field->setOrder($qb, $entityAlias);
+            $field->setOrder($this->query, $entityAlias);
         }
 
         if ($max > 0) {
-            $qb->setMaxResults($max);
-            $qb->setFirstResult($first);
+            $this->query->setMaxResults($max);
+            $this->query->setFirstResult($first);
         }
+
+        $result = new Paginator($this->query);
 
         //Cleaning query.
         $this->query = null;
-
-        $result = new Paginator($qb);
-
-        //postGetResult event.
-        $event = new DriverEvent\ResultEventArgs($this, $result);
-        $this->eventDispatcher->dispatch(DriverEvents::POST_GET_RESULT, $event);
-        $result = $event->getResult();
 
         return $result;
     }
