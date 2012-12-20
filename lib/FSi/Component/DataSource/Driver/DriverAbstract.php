@@ -14,6 +14,8 @@ namespace FSi\Component\DataSource\Driver;
 use FSi\Component\DataSource\Exception\DataSourceException;
 use FSi\Component\DataSource\DataSourceInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
+use FSi\Component\DataSource\Event\DriverEvents;
+use FSi\Component\DataSource\Event\DriverEvent;
 
 /**
  * {@inheritdoc}
@@ -178,5 +180,41 @@ abstract class DriverAbstract implements DriverInterface
     protected function getEventDispatcher()
     {
         return $this->eventDispatcher;
+    }
+
+    /**
+     * Initialize building results i.e. prepare DQL query or initial XPath expression object
+     */
+    abstract protected function initResult();
+
+    /**
+     * Build result that will be returned by getResult
+     *
+     * @param array $fields
+     * @param int $first
+     * @param int $max
+     * @return Countable, IteratorAggregate
+     */
+    abstract protected function buildResult($fields, $first, $max);
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getResult($fields, $first, $max)
+    {
+        $this->initResult();
+
+        //preGetResult event.
+        $event = new DriverEvent\DriverEventArgs($this);
+        $this->eventDispatcher->dispatch(DriverEvents::PRE_GET_RESULT, $event);
+
+        $result = $this->buildResult($fields, $first, $max);
+
+        //postGetResult event.
+        $event = new DriverEvent\ResultEventArgs($this, $result);
+        $this->eventDispatcher->dispatch(DriverEvents::POST_GET_RESULT, $event);
+        $result = $event->getResult();
+
+        return $result;
     }
 }
