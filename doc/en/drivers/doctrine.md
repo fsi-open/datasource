@@ -10,6 +10,9 @@ You can create driver manually
 <?php
 
 use FSi\Component\DataSource\Driver\Doctrine\DoctrineDriver;
+use FSi\Component\DataSource\Driver\Doctrine\Extension\Core\CoreExtension;
+
+$extensions = array(new CoreExtension());
 
 $driver = new DoctrineDriver($extensions, $entityManager, $entityName);
 
@@ -21,6 +24,9 @@ or through factory
 <?php
 
 use FSi\Component\DataSource\Driver\Doctrine\DoctrineFactory;
+use FSi\Component\DataSource\Driver\Doctrine\Extension\Core\CoreExtension;
+
+$extensions = array(new CoreExtension());
 
 $factory = new DoctrineFactory($entityManager, $extensions);
 $driver = $factory->createDriver($entityName); //All drivers created this way will have same set of $extensions loaded.
@@ -30,9 +36,10 @@ $driver = $factory->createDriver($entityName); //All drivers created this way wi
 ## Provided fields ##
 
 Doctrine driver provides some field types through ``FSi\Component\DataSource\Driver\Doctrine\Extension\Core\CoreExtension``
-so remember to **always load it** as extension.
+so remember to **always load it** to driver.
 
 Provided field types:
+
 * ``text`` - allowed comparisons: eq, neq, like.
 * ``number`` - allowed comparisons: eq, neq, lt, lte, gt, gte, in, notIn, between.
 * ``date`` - allowed comparisons: eq, neq, lt, lte, gt, gte, in, notIn, between.
