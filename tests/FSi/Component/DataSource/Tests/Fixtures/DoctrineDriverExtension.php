@@ -25,6 +25,11 @@ class DoctrineDriverExtension extends DriverAbstractExtension implements EventSu
      */
     private $calls = array();
 
+    public function getExtendedDriverTypes()
+    {
+        return array('doctrine');
+    }
+
     /**
      * {@inheritdoc}
      */

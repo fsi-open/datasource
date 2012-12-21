@@ -462,6 +462,18 @@ class DataSourceTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue(array($driverExtension)))
         ;
 
+        $driverExtension
+            ->expects($this->once())
+            ->method('getExtendedDriverTypes')
+            ->will($this->returnValue(array('fake')))
+        ;
+
+        $driver
+            ->expects($this->once())
+            ->method('getType')
+            ->will($this->returnValue('fake'))
+        ;
+
         $driver
             ->expects($this->once())
             ->method('addExtension')

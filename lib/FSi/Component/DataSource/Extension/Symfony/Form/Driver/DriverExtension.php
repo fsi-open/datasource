@@ -39,6 +39,14 @@ class DriverExtension extends DriverAbstractExtension
     /**
      * {@inheritdoc}
      */
+    public function getExtendedDriverTypes()
+    {
+        return array('doctrine');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     protected function loadFieldTypesExtensions()
     {
         return array(

@@ -94,6 +94,14 @@ class DoctrineDriver extends DriverAbstract
     /**
      * {@inheritdoc}
      */
+    public function getType()
+    {
+        return 'doctrine';
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function initResult()
     {
         $entityAlias = self::ENTITY_ALIAS;

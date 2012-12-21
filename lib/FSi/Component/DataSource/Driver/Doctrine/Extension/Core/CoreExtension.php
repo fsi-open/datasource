@@ -21,6 +21,14 @@ class CoreExtension extends DriverAbstractExtension
     /**
      * {@inheritdoc}
      */
+    public function getExtendedDriverTypes()
+    {
+        return array('doctrine');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     protected function loadFieldTypes()
     {
         return array(

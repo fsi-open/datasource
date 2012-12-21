@@ -107,7 +107,7 @@ abstract class DriverAbstract implements DriverInterface
         $field = clone $this->fieldTypes[$type];
 
         foreach ($this->fieldExtensions[$type] as $extension) {
-            $field->addExtension(clone $extension);
+            $field->addExtension($extension);
         }
 
         return $field;
@@ -164,6 +164,9 @@ abstract class DriverAbstract implements DriverInterface
      */
     public function addExtension(DriverExtensionInterface $extension)
     {
+        if (!in_array($this->getType(), $extension->getExtendedDriverTypes()))
+            throw new DataSourceException(sprintf('DataSource driver extension of class %s does not support %s driver', get_class($extension), $this->getType()));
+
         $eventDispatcher = $this->getEventDispatcher();
         foreach ($extension->loadSubscribers() as $subscriber) {
             $eventDispatcher->addSubscriber($subscriber);

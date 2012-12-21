@@ -357,7 +357,9 @@ class DataSource implements DataSourceInterface
         }
 
         foreach ((array) $extension->loadDriverExtensions() as $driverExtension) {
-            $this->driver->addExtension($driverExtension);
+            if (in_array($this->driver->getType(), $driverExtension->getExtendedDriverTypes())) {
+                $this->driver->addExtension($driverExtension);
+            }
         }
     }
 
