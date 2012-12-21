@@ -127,7 +127,6 @@ class DoctrineDriver extends DriverAbstract
     public function buildResult($fields, $first, $max)
     {
         $ordered = array();
-        $orderedEnd = array();
         $entityAlias = isset($this->givenAlias)?$this->givenAlias:self::ENTITY_ALIAS;
 
         foreach ($fields as $field) {
@@ -144,8 +143,7 @@ class DoctrineDriver extends DriverAbstract
         }
 
         ksort($ordered);
-        $ordered = array_reverse($ordered);
-        $fields = array_merge($ordered, $orderedEnd);
+        $fields = array_reverse($ordered);
         foreach ($fields as $field) {
             $field->setOrder($this->query, $entityAlias);
         }
