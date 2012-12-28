@@ -34,9 +34,9 @@ class FormFieldExtension extends FieldAbstractExtension implements EventSubscrib
     protected $formFactory;
 
     /**
-     * @var \Symfony\Component\Form\Form
+     * @var array
      */
-    protected $form;
+    protected $forms = array();
 
     /**
      * {@inheritdoc}
@@ -83,8 +83,8 @@ class FormFieldExtension extends FieldAbstractExtension implements EventSubscrib
         $field = $event->getField();
         $view = $event->getView();
 
-        $this->createForm($field);
-        $view->setAttribute(FormExtension::VIEW_FORM, $this->form->createView());
+        $form = $this->getForm($field);
+        $view->setAttribute(FormExtension::VIEW_FORM, $form->createView());
     }
 
     /**
@@ -99,10 +99,9 @@ class FormFieldExtension extends FieldAbstractExtension implements EventSubscrib
             return;
         }
 
-        $this->createForm($field);
-        if ($this->form->isBound()) {
-            unset($this->form);
-            $this->createForm($field);
+        $form = $this->getForm($field);
+        if ($form->isBound()) {
+            $form = $this->getForm($field, true);
         }
 
         $datasourceName = $field->getDataSource() ? $field->getDataSource()->getName() : null;
@@ -120,8 +119,8 @@ class FormFieldExtension extends FieldAbstractExtension implements EventSubscrib
             $dataToBind = array();
         }
 
-        $this->form->bind($dataToBind);
-        $data = $this->form->getData();
+        $form->bind($dataToBind);
+        $data = $form->getData();
         if (isset($data[DataSourceInterface::FIELDS][$field->getName()])) {
             $parameter[$datasourceName][DataSourceInterface::FIELDS][$field->getName()] = $data[DataSourceInterface::FIELDS][$field->getName()];
         } else {
@@ -134,15 +133,19 @@ class FormFieldExtension extends FieldAbstractExtension implements EventSubscrib
      * Builds form.
      *
      * @param FieldTypeInterface $field
+     * @param bool $force
+     * @return \Symfony\Component\Form\Form
      */
-    protected function createForm(FieldTypeInterface $field)
+    protected function getForm(FieldTypeInterface $field, $force = false)
     {
-        if (isset($this->form)) {
+        if (!$datasource = $field->getDataSource()) {
             return;
         }
 
-        if (!$datasource = $field->getDataSource()) {
-            return;
+        $field_oid = spl_object_hash($field);
+
+        if (isset($this->forms[$field_oid]) && !$force) {
+            return $this->forms[$field_oid];
         }
 
         $options = $field->hasOption('form_options') ? (array) $field->getOption('form_options') : array();
@@ -189,7 +192,8 @@ class FormFieldExtension extends FieldAbstractExtension implements EventSubscrib
         }
 
         $form->add($builder->getForm());
-        $this->form = $form;
+        $this->forms[$field_oid] = $form;
+        return $form;
     }
 
     /**
