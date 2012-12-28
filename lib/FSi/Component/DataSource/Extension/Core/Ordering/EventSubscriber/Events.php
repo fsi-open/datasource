@@ -24,7 +24,7 @@ class Events implements EventSubscriberInterface
     /**
      * @var int
      */
-    private $nextPriority;
+    private $nextPriority = array();
 
     /**
      * {@inheritdoc}
@@ -45,7 +45,6 @@ class Events implements EventSubscriberInterface
     public function preGetResult(DataSourceEvent\DataSourceEventArgs $event)
     {
         $datasource = $event->getDataSource();
-        $this->countNextPriority($datasource);
         $resultBasic = array();
         $endBasic = array();
         $resultGiven = array();
@@ -101,8 +100,7 @@ class Events implements EventSubscriberInterface
         $datasource = $event->getDataSource();
         $view = $event->getView();
 
-        $this->countNextPriority($datasource);
-        $view->setAttribute(OrderingExtension::VIEW_NEXT_PRIORITY, $this->nextPriority);
+        $view->setAttribute(OrderingExtension::VIEW_NEXT_PRIORITY, $this->getNextPriority($datasource));
 
         $datasourceName = $datasource->getName();
         $view->setAttribute(OrderingExtension::VIEW_PATTERN_ORDERING, sprintf(OrderingExtension::PATTERN, $datasourceName, OrderingExtension::ORDERING, '%s', OrderingExtension::ORDERING));
@@ -114,21 +112,25 @@ class Events implements EventSubscriberInterface
      *
      * @param DataSourceInterface $datasource
      */
-    private function countNextPriority($datasource)
+    private function getNextPriority($datasource)
     {
-        if (isset($this->nextPriority)) {
-            return;
-        }
+        $oid = spl_object_hash($datasource);
 
-        $next = 0;
-        foreach ($datasource->getFields() as $field) {
-            if ($field->hasOption(OrderingExtension::ORDERING_IS_GIVEN) && $field->getOption(OrderingExtension::ORDERING_IS_GIVEN) && $field->hasOption(OrderingExtension::ORDERING_PRIORITY)) {
-                $tmp = (int) $field->getOption(OrderingExtension::ORDERING_PRIORITY);
-                if ($tmp > $next) {
-                    $next = $tmp;
+        if (!isset($this->nextPriority[$oid])) {
+            $next = 0;
+
+            foreach ($datasource->getFields() as $field) {
+                if ($field->hasOption(OrderingExtension::ORDERING_IS_GIVEN) && $field->getOption(OrderingExtension::ORDERING_IS_GIVEN) && $field->hasOption(OrderingExtension::ORDERING_PRIORITY)) {
+                    $tmp = (int) $field->getOption(OrderingExtension::ORDERING_PRIORITY);
+                    if ($tmp > $next) {
+                        $next = $tmp;
+                    }
                 }
             }
+
+            $this->nextPriority[$oid] = floor($next) + 1;
         }
-        $this->nextPriority = floor($next) + 1;
+
+        return $this->nextPriority[$oid];
     }
 }

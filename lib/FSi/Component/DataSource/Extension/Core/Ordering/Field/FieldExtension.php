@@ -30,7 +30,7 @@ class FieldExtension extends FieldAbstractExtension implements EventSubscriberIn
     /**
      * @var array
      */
-    private $givenData;
+    private $givenData = array();
 
     /**
      * {@inheritdoc}
@@ -75,6 +75,7 @@ class FieldExtension extends FieldAbstractExtension implements EventSubscriberIn
     public function preBindParameter(FieldEvent\ParameterEventArgs $event)
     {
         $field = $event->getField();
+        $field_oid = spl_object_hash($field);
         $parameter = $event->getParameter();
 
         $datasourceName = $field->getDataSource() ? $field->getDataSource()->getName() : null;
@@ -104,12 +105,12 @@ class FieldExtension extends FieldAbstractExtension implements EventSubscriberIn
             if ($tmp) {
                 $options[OrderingExtension::ORDERING_IS_GIVEN] = true;
                 $field->setOptions($options);
-                $this->givenData = $tmp;
+                $this->givenData[$field_oid] = $tmp;
             } else {
-                $this->givenData = array();
+                unset($this->givenData[$field_oid]);
             }
         } else {
-            $this->givenData = array();
+            unset($this->givenData[$field_oid]);
         }
     }
 
@@ -119,6 +120,7 @@ class FieldExtension extends FieldAbstractExtension implements EventSubscriberIn
     public function postBuildView(FieldEvent\ViewEventArgs $event)
     {
         $field = $event->getField();
+        $field_oid = spl_object_hash($field);
         $view = $event->getView();
 
         if ($field->hasOption(OrderingExtension::ORDERING_IS_DISABLED) && $field->getOption(OrderingExtension::ORDERING_IS_DISABLED)) {
@@ -126,7 +128,7 @@ class FieldExtension extends FieldAbstractExtension implements EventSubscriberIn
             return;
         }
 
-        $enabled = !empty($this->givenData);
+        $enabled = isset($this->givenData[$field_oid]);
         $options = $field->getOptions();
 
         $view->setAttribute(OrderingExtension::VIEW_CURRENT_ORDERING, isset($options[OrderingExtension::ORDERING]) ? $options[OrderingExtension::ORDERING] : null);
@@ -140,9 +142,10 @@ class FieldExtension extends FieldAbstractExtension implements EventSubscriberIn
     public function preGetParameter(FieldEvent\ParameterEventArgs $event)
     {
         $field = $event->getField();
+        $field_oid = spl_object_hash($field);
         $parameter = $event->getParameter();
 
-        if (empty($this->givenData)) {
+        if (!isset($this->givenData[$field_oid])) {
             return;
         }
 
@@ -151,7 +154,7 @@ class FieldExtension extends FieldAbstractExtension implements EventSubscriberIn
             return;
         }
 
-        $parameter[$datasourceName][OrderingExtension::ORDERING][$field->getName()] = $this->givenData;
+        $parameter[$datasourceName][OrderingExtension::ORDERING][$field->getName()] = $this->givenData[$field_oid];
 
         $event->setParameter($parameter);
     }
