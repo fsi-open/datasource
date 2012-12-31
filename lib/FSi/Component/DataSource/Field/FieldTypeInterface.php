@@ -142,13 +142,6 @@ interface FieldTypeInterface
     public function setDirty($dirty = true);
 
     /**
-     * Returns all extensions.
-     *
-     * @return array
-     */
-    public function getExtensions();
-
-    /**
      * Sets reference to datasource.
      *
      * @param DataSourceInterface $datasource

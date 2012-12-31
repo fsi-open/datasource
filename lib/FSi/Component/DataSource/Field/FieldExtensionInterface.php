@@ -13,12 +13,13 @@ namespace FSi\Component\DataSource\Field;
 
 use FSi\Component\DataSource\DataSourceInterface;
 use FSi\Component\DataSource\DataSourceViewInterface;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 /**
  * Extension of DataSources field.
  */
-interface FieldExtensionInterface
+interface FieldExtensionInterface extends EventSubscriberInterface
 {
     /**
      * Returns array of extended types.
@@ -26,15 +27,6 @@ interface FieldExtensionInterface
      * @return array
      */
     public function getExtendedFieldTypes();
-
-    /**
-     * Loads events subscribers.
-     *
-     * Each subscriber must implements Symfony\Component\EventDispatcher\EventSubscriberInterface.
-     *
-     * @return array
-     */
-    public function loadSubscribers();
 
     /**
      * Allows extension to load constraints to fields OptionsResolver. Called by field.

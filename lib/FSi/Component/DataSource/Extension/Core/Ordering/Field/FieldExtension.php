@@ -16,7 +16,6 @@ use FSi\Component\DataSource\Field\FieldTypeInterface;
 use FSi\Component\DataSource\Field\FieldViewInterface;
 use FSi\Component\DataSource\DataSourceViewInterface;
 use FSi\Component\DataSource\Extension\Core\Ordering\OrderingExtension;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use FSi\Component\DataSource\Event\FieldEvents;
 use FSi\Component\DataSource\Event\FieldEvent;
 use FSi\Component\DataSource\Event\DataSourceFieldEventInterface;
@@ -25,7 +24,7 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 /**
  * Extension for fields.
  */
-class FieldExtension extends FieldAbstractExtension implements EventSubscriberInterface
+class FieldExtension extends FieldAbstractExtension
 {
     /**
      * @var array
@@ -157,13 +156,5 @@ class FieldExtension extends FieldAbstractExtension implements EventSubscriberIn
         $parameter[$datasourceName][OrderingExtension::ORDERING][$field->getName()] = $this->givenData[$field_oid];
 
         $event->setParameter($parameter);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function loadSubscribers()
-    {
-        return array($this);
     }
 }

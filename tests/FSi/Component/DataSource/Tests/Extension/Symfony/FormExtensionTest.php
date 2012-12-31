@@ -203,11 +203,7 @@ class FormExtensionTest extends \PHPUnit_Framework_TestCase
         $args = new FieldEvent\ParameterEventArgs($field, $parameters);
         foreach ($extensions as $ext) {
             $this->assertTrue($ext instanceof FieldAbstractExtension);
-            $subscribers = $ext->loadSubscribers();
-            if ($subscribers) {
-                $subscriber = array_shift($subscribers);
-                $subscriber->preBindParameter($args);
-            }
+            $ext->preBindParameter($args);
         }
         $parameters = $args->getParameter();
         $this->assertEquals($parameters2, $parameters);
@@ -220,11 +216,7 @@ class FormExtensionTest extends \PHPUnit_Framework_TestCase
 
         $args = new FieldEvent\ViewEventArgs($field, $fieldView);
         foreach ($extensions as $ext) {
-            $subscribers = $ext->loadSubscribers();
-            if ($subscribers) {
-                $subscriber = array_shift($subscribers);
-                $subscriber->postBuildView($args);
-            }
+            $ext->postBuildView($args);
         }
     }
 }

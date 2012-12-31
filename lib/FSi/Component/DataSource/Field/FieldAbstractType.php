@@ -62,13 +62,6 @@ abstract class FieldAbstractType implements FieldTypeInterface
     protected $parameter;
 
     /**
-     * Array of loaded extensions.
-     *
-     * @var array
-     */
-    private $extensions = array();
-
-    /**
      * Flag to determine if inner state has changed.
      *
      * @var bool
@@ -282,13 +275,8 @@ abstract class FieldAbstractType implements FieldTypeInterface
      */
     public function addExtension(FieldExtensionInterface $extension)
     {
-        foreach ($extension->loadSubscribers() as $subscriber) {
-            $this->eventDispatcher->addSubscriber($subscriber);
-        }
-
+        $this->eventDispatcher->addSubscriber($extension);
         $extension->loadOptionsConstraints($this->optionsResolver);
-
-        $this->extensions[] = $extension;
     }
 
     /**
@@ -325,14 +313,6 @@ abstract class FieldAbstractType implements FieldTypeInterface
     public function setDirty($dirty = true)
     {
         $this->dirty = (bool) $dirty;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getExtensions()
-    {
-        return $this->extensions;
     }
 
     /**

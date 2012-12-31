@@ -26,7 +26,7 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 /**
  * Fields extension.
  */
-class FormFieldExtension extends FieldAbstractExtension implements EventSubscriberInterface
+class FormFieldExtension extends FieldAbstractExtension
 {
     /**
      * @var FormFactory
@@ -202,13 +202,5 @@ class FormFieldExtension extends FieldAbstractExtension implements EventSubscrib
     protected function getFormFactory()
     {
         return $this->formFactory;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function loadSubscribers()
-    {
-        return array($this);
     }
 }

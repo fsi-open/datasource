@@ -13,6 +13,7 @@ namespace FSi\Component\DataSource\Field;
 
 use FSi\Component\DataSource\DataSourceInterface;
 use FSi\Component\DataSource\DataSourceViewInterface;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 /**
@@ -23,7 +24,7 @@ class FieldAbstractExtension implements FieldExtensionInterface
     /**
      * {@inheritdoc}
      */
-    public function getExtendedFieldTypes()
+    public static function getSubscribedEvents()
     {
         return array();
     }
@@ -31,7 +32,7 @@ class FieldAbstractExtension implements FieldExtensionInterface
     /**
      * {@inheritdoc}
      */
-    public function loadSubscribers()
+    public function getExtendedFieldTypes()
     {
         return array();
     }
