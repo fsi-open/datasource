@@ -83,6 +83,11 @@ abstract class FieldAbstractType implements FieldTypeInterface
      */
     private $optionsResolver;
 
+    /*
+     * @var array
+     */
+    private $extensions;
+
     /**
      * {@inheritdoc}
      */
@@ -106,7 +111,16 @@ abstract class FieldAbstractType implements FieldTypeInterface
     {
         $this->eventDispatcher = new EventDispatcher();
         $this->optionsResolver = new OptionsResolver();
+        $this->extensions = array();
         $this->loadOptionsConstraints($this->optionsResolver);
+    }
+
+    /**
+     * Cloning.
+     */
+    public function __clone()
+    {
+        $this->eventDispatcher = new EventDispatcher();
     }
 
     /**
@@ -266,8 +280,13 @@ abstract class FieldAbstractType implements FieldTypeInterface
      */
     public function addExtension(FieldExtensionInterface $extension)
     {
+        if (in_array($extension, $this->extensions, true)) {
+            return;
+        }
+
         $this->eventDispatcher->addSubscriber($extension);
         $extension->loadOptionsConstraints($this->optionsResolver);
+        $this->extensions[] = $extension;
     }
 
     /**
