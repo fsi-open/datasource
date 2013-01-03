@@ -30,7 +30,6 @@ class Events implements EventSubscriberInterface
         return array(
             DataSourceEvents::PRE_BIND_PARAMETERS => 'preBindParameters',
             DataSourceEvents::POST_BUILD_VIEW => 'postBuildView',
-            DataSourceEvents::PRE_GET_PARAMETERS => 'preGetParameters',
         );
     }
 
@@ -69,22 +68,7 @@ class Events implements EventSubscriberInterface
             $all = ceil(count($datasource->getResult())/$maxresults);
         }
 
-        $params = $datasource->getParameters();
-        $datasourceName = $datasource->getName();
-        $page = isset($params[$datasourceName][PaginationExtension::PAGE]) ? $params[$datasourceName][PaginationExtension::PAGE] : 1;
         $view->setAttribute(PaginationExtension::VIEW_PAGE_AMOUNT, $all);
-        $view->setAttribute(PaginationExtension::VIEW_PAGE_CURRENT, $page);
-    }
-
-    /**
-     * Method called at PreGetParameters event.
-     *
-     * @param DataSourceEvent\ParametersEventArgs $event
-     */
-    public function preGetParameters(DataSourceEvent\ParametersEventArgs $event)
-    {
-        $datasource = $event->getDataSource();
-        $data = $event->getParameters();
 
         $datasourceName = $datasource->getName();
         $maxresults = $datasource->getMaxResults();
@@ -95,9 +79,6 @@ class Events implements EventSubscriberInterface
             $page = floor($current/$maxresults) + 1;
         }
 
-        if ($page != 1) {
-            $data[$datasourceName][PaginationExtension::PAGE] = $page;
-            $event->setParameters($data);
-        }
+        $view->setAttribute(PaginationExtension::VIEW_PAGE_CURRENT, $page);
     }
 }
