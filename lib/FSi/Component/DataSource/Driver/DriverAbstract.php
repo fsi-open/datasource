@@ -169,6 +169,9 @@ abstract class DriverAbstract implements DriverInterface
         if (!in_array($this->getType(), $extension->getExtendedDriverTypes()))
             throw new DataSourceException(sprintf('DataSource driver extension of class %s does not support %s driver', get_class($extension), $this->getType()));
 
+        if (in_array($extension, $this->extensions, true))
+            return;
+
         $eventDispatcher = $this->getEventDispatcher();
         foreach ($extension->loadSubscribers() as $subscriber) {
             $eventDispatcher->addSubscriber($subscriber);

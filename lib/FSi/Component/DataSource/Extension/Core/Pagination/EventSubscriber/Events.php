@@ -28,9 +28,9 @@ class Events implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return array(
-            DataSourceEvents::PRE_BIND_PARAMETERS => array('preBindParameters', 128),
-            DataSourceEvents::POST_BUILD_VIEW => array('postBuildView', 128),
-            DataSourceEvents::PRE_GET_PARAMETERS => array('preGetParameters', 128),
+            DataSourceEvents::PRE_BIND_PARAMETERS => 'preBindParameters',
+            DataSourceEvents::POST_BUILD_VIEW => 'postBuildView',
+            DataSourceEvents::PRE_GET_PARAMETERS => 'preGetParameters',
         );
     }
 

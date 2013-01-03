@@ -110,15 +110,6 @@ abstract class FieldAbstractType implements FieldTypeInterface
     }
 
     /**
-     * Cloning.
-     */
-    public function __clone()
-    {
-        $this->eventDispatcher = clone $this->eventDispatcher;
-        $this->optionsResolver = clone $this->optionsResolver;
-    }
-
-    /**
      * {@inheritdoc}
      */
     public function setComparison($comparison)

@@ -45,9 +45,9 @@ class FieldExtension extends FieldAbstractExtension
     public static function getSubscribedEvents()
     {
         return array(
-            FieldEvents::PRE_BIND_PARAMETER => array('preBindParameter', 128),
-            FieldEvents::POST_BUILD_VIEW => array('postBuildView', 128),
-            FieldEvents::PRE_GET_PARAMETER => array('preGetParameter', 128),
+            FieldEvents::PRE_BIND_PARAMETER => array('preBindParameter'),
+            FieldEvents::POST_BUILD_VIEW => array('postBuildView'),
+            FieldEvents::PRE_GET_PARAMETER => array('preGetParameter'),
         );
     }
 
