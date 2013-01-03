@@ -24,14 +24,9 @@ use FSi\Component\DataSource\Event\FieldEvent;
 class Entity extends DoctrineAbstractField
 {
     /**
-     * @var \Doctrine\ORM\Mapping\ClassMetadata
-     */
-    private $meta;
-
-    /**
      * {@inheritdoc}
      */
-    protected $comparisons = array('eq', 'memberof');
+    protected $comparisons = array('eq', 'memberof', 'in');
 
     /**
      * {@inheritdoc}
@@ -59,10 +54,6 @@ class Entity extends DoctrineAbstractField
             throw new DoctrineDriverException(sprintf('Unexpected comparison type ("%s").', $comparison));
         }
 
-        $em = $qb->getEntityManager();
-        $meta = $em->getClassMetadata(get_class($data));
-        $this->meta = $meta;
-
         switch ($comparison) {
             case 'eq':
                 $qb->andWhere($qb->expr()->eq($fieldName, ":$name"));
@@ -74,50 +65,13 @@ class Entity extends DoctrineAbstractField
                 $qb->setParameter($name, $data);
                 break;
 
+            case 'in':
+                $qb->andWhere("$fieldName IN (:$name)");
+                $qb->setParameter($name, $data);
+                break;
+
             default:
                 throw new DoctrineDriverException(sprintf('Unexpected comparison type ("%s").', $comparison));
         }
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getParameter(&$parameters)
-    {
-        $datasourceName = $this->getDataSource() ? $this->getDataSource()->getName() : null;
-        if (!empty($datasourceName)) {
-            if (isset($this->meta)) {
-                //Composite keys are not supported.
-                if (!$this->meta->isIdentifierComposite) {
-                    $id = $this->meta->getSingleIdentifierFieldName();
-                    $method = 'get'.ucfirst($id);
-                    $parameter = $this->getCleanParameter()->$method();
-
-                    $parameter = array(
-                        $datasourceName => array(
-                            DataSourceInterface::FIELDS => array(
-                                $this->getName() => $parameter,
-                            ),
-                        ),
-                    );
-                }
-            }
-        }
-
-        if (!isset($parameter)) {
-            $parameter = array();
-        }
-
-         //PreGetParameter event.
-        $event = new FieldEvent\ParameterEventArgs($this, $parameter);
-        $this->eventDispatcher->dispatch(FieldEvents::PRE_GET_PARAMETER, $event);
-        $parameter = $event->getParameter();
-
-        //PostGetParameter event.
-        $event = new FieldEvent\ParameterEventArgs($this, $parameter);
-        $this->eventDispatcher->dispatch(FieldEvents::POST_GET_PARAMETER, $event);
-        $parameter = $event->getParameter();
-
-        $parameters = array_merge_recursive($parameters, $parameter);
     }
 }
