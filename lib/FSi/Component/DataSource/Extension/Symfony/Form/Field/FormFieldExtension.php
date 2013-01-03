@@ -39,6 +39,13 @@ class FormFieldExtension extends FieldAbstractExtension
     protected $forms = array();
 
     /**
+     * Original values of input parameters for each supported field
+     *
+     * @var array
+     */
+    protected $parameters = array();
+
+    /**
      * {@inheritdoc}
      */
     public static function getSubscribedEvents()
@@ -46,6 +53,7 @@ class FormFieldExtension extends FieldAbstractExtension
         return array(
             FieldEvents::PRE_BIND_PARAMETER => array('preBindParameter'),
             FieldEvents::POST_BUILD_VIEW => array('postBuildView'),
+            FieldEvents::PRE_GET_PARAMETER => array('preGetParameter'),
         );
     }
 
@@ -93,6 +101,7 @@ class FormFieldExtension extends FieldAbstractExtension
     public function preBindParameter(FieldEvent\ParameterEventArgs $event)
     {
         $field = $event->getField();
+        $field_oid = spl_object_hash($field);
         $parameter = $event->getParameter();
 
         if ($field->hasOption('form_disabled') && $field->getOption('form_disabled')) {
@@ -115,18 +124,42 @@ class FormFieldExtension extends FieldAbstractExtension
                     $field->getName() => $parameter[$datasourceName][DataSourceInterface::FIELDS][$field->getName()],
                 ),
             );
+            $this->parameters[$field_oid] = $parameter[$datasourceName][DataSourceInterface::FIELDS][$field->getName()];
         } else {
             $dataToBind = array();
         }
 
         $form->bind($dataToBind);
         $data = $form->getData();
+
         if (isset($data[DataSourceInterface::FIELDS][$field->getName()])) {
             $parameter[$datasourceName][DataSourceInterface::FIELDS][$field->getName()] = $data[DataSourceInterface::FIELDS][$field->getName()];
         } else {
             unset($parameter[$datasourceName][DataSourceInterface::FIELDS][$field->getName()]);
         }
+
         $event->setParameter($parameter);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function preGetParameter(FieldEvent\ParameterEventArgs $event)
+    {
+        $field = $event->getField();
+        $field_oid = spl_object_hash($field);
+
+        $datasourceName = $field->getDataSource() ? $field->getDataSource()->getName() : null;
+        if (isset($this->parameters[$field_oid])) {
+            $parameters = array(
+                $datasourceName => array(
+                    DataSourceInterface::FIELDS => array(
+                        $field->getName() => $this->parameters[$field_oid]
+                    )
+                )
+            );
+            $event->setParameter($parameters);
+        }
     }
 
     /**
