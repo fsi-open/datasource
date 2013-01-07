@@ -77,7 +77,7 @@ class Events implements EventSubscriberInterface
         $datasource = $event->getDataSource();
         $datasourceName = $datasource->getName();
         $view = $event->getView();
-        $parameters = $datasource->getParameters();
+        $parameters = $datasource->getAllParameters();
 
         $maxresults = $datasource->getMaxResults();
         if ($maxresults == 0) {
