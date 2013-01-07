@@ -106,24 +106,6 @@ abstract class DoctrineAbstractField extends FieldAbstractType implements Doctri
     /**
      * {@inheritdoc}
      */
-    public function setOrder(QueryBuilder $qb, $alias)
-    {
-        $options = $this->getOptions();
-        $fieldName = $this->getFieldName($alias);
-
-        if (isset($options[OrderingExtension::ORDERING])) {
-            $name = $this->getName();
-            if ($options[OrderingExtension::ORDERING] == 'asc') {
-                $qb->addOrderBy($fieldName, 'asc');
-            } else {
-                $qb->addOrderBy($fieldName, 'desc');
-            }
-        }
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function loadOptionsConstraints(OptionsResolverInterface $optionsResolver)
     {
         $optionsResolver->setDefaults(array(

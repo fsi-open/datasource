@@ -25,12 +25,4 @@ interface DoctrineFieldInterface
      * @param string $alias
      */
     public function buildQuery(QueryBuilder $qb, $alias);
-
-    /**
-     * Adds ordering to query.
-     *
-     * @param QueryBuilder $qb
-     * @param string $alias
-     */
-    public function setOrder(QueryBuilder $qb, $alias);
 }

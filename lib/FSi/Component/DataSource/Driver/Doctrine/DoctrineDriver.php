@@ -100,6 +100,11 @@ class DoctrineDriver extends DriverAbstract
         return 'doctrine';
     }
 
+    public function getAlias()
+    {
+        return $this->alias;
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -121,17 +126,6 @@ class DoctrineDriver extends DriverAbstract
             }
 
             $field->buildQuery($this->currentQuery, $this->alias);
-
-            $options = $field->getOptions();
-            if (isset($options[OrderingExtension::ORDERING_PRIORITY])) {
-                $ordered[$options[OrderingExtension::ORDERING_PRIORITY]] = $field;
-            }
-        }
-
-        ksort($ordered);
-        $fields = array_reverse($ordered);
-        foreach ($fields as $field) {
-            $field->setOrder($this->currentQuery, $this->alias);
         }
 
         if ($max > 0) {
