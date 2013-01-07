@@ -35,44 +35,9 @@ class OrderingExtension extends DataSourceAbstractExtension
     const ORDERING_PRIORITY = 'ordering_priority';
 
     /**
-     * Key for current ordering priority attribute.
-     */
-    const CURRENT_PRIORITY = 'ordering_current_priority';
-
-    /**
-     * Pattern for names.
-     */
-    const PATTERN = '%s[%s][%s][%s]';
-
-    /**
-     * Key for internal use, to determine if there were parameters given for field.
-     */
-    const ORDERING_IS_GIVEN = 'ordering_given';
-
-    /**
      * Key for ordering disabled option.
      */
     const ORDERING_IS_DISABLED = 'ordering_disabled';
-
-    /**
-     * Key for ordering pattern.
-     */
-    const VIEW_PATTERN_ORDERING = 'ordering_pattern';
-
-    /**
-     * Key for ordering priority attribute.
-     */
-    const VIEW_PATTERN_PRIORITY = 'ordering_priority_pattern';
-
-    /**
-     * Key for next priority attribute.
-     */
-    const VIEW_NEXT_PRIORITY = 'ordering_next_priority';
-
-    /**
-     * Key for 'is enabled' attribute.
-     */
-    const VIEW_IS_ENABLED = 'ordering_enabled';
 
     /**
      * Key for current attribute.
@@ -85,12 +50,22 @@ class OrderingExtension extends DataSourceAbstractExtension
     const VIEW_ORDERING_DISABLED = 'ordering_disabled';
 
     /**
+     * Key containing parameters for ascending sort
+     */
+    const VIEW_ASCENDING_PARAMETERS = 'ordering_ascending';
+
+    /**
+     * Key containing parameters for descending sorting
+     */
+    const VIEW_DESCENDING_PARAMETERS = 'ordering_descending';
+
+    /**
      * {@inheritdoc}
      */
     public function loadDriverExtensions()
     {
         return array(
-            new Driver\DriverExtension(),
+            new Driver\DoctrineExtension(),
         );
     }
 

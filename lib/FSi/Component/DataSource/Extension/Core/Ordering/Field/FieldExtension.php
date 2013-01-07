@@ -16,6 +16,7 @@ use FSi\Component\DataSource\Field\FieldTypeInterface;
 use FSi\Component\DataSource\Field\FieldViewInterface;
 use FSi\Component\DataSource\DataSourceViewInterface;
 use FSi\Component\DataSource\Extension\Core\Ordering\OrderingExtension;
+use FSi\Component\DataSource\Event\DataSourceEvents;
 use FSi\Component\DataSource\Event\FieldEvents;
 use FSi\Component\DataSource\Event\FieldEvent;
 use FSi\Component\DataSource\Event\DataSourceFieldEventInterface;
@@ -29,7 +30,7 @@ class FieldExtension extends FieldAbstractExtension
     /**
      * @var array
      */
-    private $givenData = array();
+    private $ordering = array();
 
     /**
      * {@inheritdoc}
@@ -45,9 +46,7 @@ class FieldExtension extends FieldAbstractExtension
     public static function getSubscribedEvents()
     {
         return array(
-            FieldEvents::PRE_BIND_PARAMETER => array('preBindParameter'),
-            FieldEvents::POST_BUILD_VIEW => array('postBuildView'),
-            FieldEvents::PRE_GET_PARAMETER => array('preGetParameter'),
+            FieldEvents::POST_BUILD_VIEW => array('postBuildView')
         );
     }
 
@@ -57,7 +56,6 @@ class FieldExtension extends FieldAbstractExtension
     public function loadOptionsConstraints(OptionsResolverInterface $optionsResolver)
     {
         $optionsResolver->setDefaults(array(
-            OrderingExtension::ORDERING_IS_GIVEN => false, //Only for internal use.
             OrderingExtension::ORDERING_IS_DISABLED => false,
             OrderingExtension::ORDERING => null,
             Orderingextension::ORDERING_PRIORITY => null,
@@ -68,49 +66,19 @@ class FieldExtension extends FieldAbstractExtension
         ));
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function preBindParameter(FieldEvent\ParameterEventArgs $event)
+    public function setOrdering(FieldTypeInterface $field, $ordering)
     {
-        $field = $event->getField();
         $field_oid = spl_object_hash($field);
-        $parameter = $event->getParameter();
+        $this->ordering[$field_oid] = $ordering;
+    }
 
-        $datasourceName = $field->getDataSource() ? $field->getDataSource()->getName() : null;
-        if (empty($datasourceName)) {
-            return;
-        }
-
-        if ($field->hasOption(OrderingExtension::ORDERING_IS_DISABLED) && $field->getOption(OrderingExtension::ORDERING_IS_DISABLED)) {
-            return;
-        }
-
-        if (isset($parameter[$datasourceName][OrderingExtension::ORDERING][$field->getName()])) {
-            $givenData = $parameter[$datasourceName][OrderingExtension::ORDERING][$field->getName()];
-        } else {
-            $givenData = array();
-        }
-
-        if ((isset($givenData[OrderingExtension::ORDERING]) || isset($givenData[OrderingExtension::ORDERING_PRIORITY]))) {
-            $tmp = array();
-            $options = $field->getOptions();
-            foreach (array(OrderingExtension::ORDERING, OrderingExtension::ORDERING_PRIORITY) as $option) {
-                if (isset($givenData[$option])) {
-                    $options[$option] = $givenData[$option];
-                    $tmp[$option] = $givenData[$option];
-                }
-            }
-            if ($tmp) {
-                $options[OrderingExtension::ORDERING_IS_GIVEN] = true;
-                $field->setOptions($options);
-                $this->givenData[$field_oid] = $tmp;
-            } else {
-                unset($this->givenData[$field_oid]);
-            }
-        } else {
-            unset($this->givenData[$field_oid]);
-        }
+    public function getOrdering(FieldTypeInterface $field)
+    {
+        $field_oid = spl_object_hash($field);
+        if (isset($this->ordering[$field_oid]))
+            return $this->ordering[$field_oid];
+        else
+            return null;
     }
 
     /**
@@ -127,34 +95,32 @@ class FieldExtension extends FieldAbstractExtension
             return;
         }
 
-        $enabled = isset($this->givenData[$field_oid]);
-        $options = $field->getOptions();
+        $parameters = $field->getDataSource()->getAllParameters();
+        $dataSourceName = $field->getDataSource()->getName();
 
-        $view->setAttribute(OrderingExtension::VIEW_CURRENT_ORDERING, isset($options[OrderingExtension::ORDERING]) ? $options[OrderingExtension::ORDERING] : null);
-        $view->setAttribute(OrderingExtension::CURRENT_PRIORITY, isset($options[OrderingExtension::ORDERING_PRIORITY]) ? $options[OrderingExtension::ORDERING_PRIORITY] : null);
-        $view->setAttribute(OrderingExtension::VIEW_IS_ENABLED, $enabled);
-    }
+        if (isset($this->ordering[$field_oid]['direction']) && (key($parameters[$dataSourceName]['ordering']) == $field->getName()))
+            $view->setAttribute(OrderingExtension::VIEW_CURRENT_ORDERING, $this->ordering[$field_oid]['direction']);
+        else
+            $view->setAttribute(OrderingExtension::VIEW_CURRENT_ORDERING, '');
 
-    /**
-     * {@inheritdoc}
-     */
-    public function preGetParameter(FieldEvent\ParameterEventArgs $event)
-    {
-        $field = $event->getField();
-        $field_oid = spl_object_hash($field);
-        $parameter = $event->getParameter();
+        if (isset($parameters[$dataSourceName][OrderingExtension::ORDERING][$field->getName()]))
+            unset($parameters[$dataSourceName][OrderingExtension::ORDERING][$field->getName()]);
+        if (!isset($parameters[$dataSourceName][OrderingExtension::ORDERING]))
+            $parameters[$dataSourceName][OrderingExtension::ORDERING] = array();
+        $fields = array_keys($parameters[$dataSourceName]['ordering']);
+        array_unshift($fields, $field->getName());
+        $directions = array_values($parameters[$dataSourceName][OrderingExtension::ORDERING]);
 
-        if (!isset($this->givenData[$field_oid])) {
-            return;
-        }
+        $parametersAsc = $parameters;
+        $directionsAsc = $directions;
+        array_unshift($directionsAsc, 'asc');
+        $parametersAsc[$dataSourceName][OrderingExtension::ORDERING] = array_combine($fields, $directionsAsc);
+        $view->setAttribute(OrderingExtension::VIEW_ASCENDING_PARAMETERS, $parametersAsc);
 
-        $datasourceName = $field->getDataSource() ? $field->getDataSource()->getName() : null;
-        if (empty($datasourceName)) {
-            return;
-        }
-
-        $parameter[$datasourceName][OrderingExtension::ORDERING][$field->getName()] = $this->givenData[$field_oid];
-
-        $event->setParameter($parameter);
+        $parametersDesc = $parameters;
+        $directionsDesc = $directions;
+        array_unshift($directionsDesc, 'desc');
+        $parametersDesc[$dataSourceName][OrderingExtension::ORDERING] = array_combine($fields, $directionsDesc);
+        $view->setAttribute(OrderingExtension::VIEW_DESCENDING_PARAMETERS, $parametersDesc);
     }
 }

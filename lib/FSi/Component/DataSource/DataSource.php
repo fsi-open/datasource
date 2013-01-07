@@ -63,22 +63,6 @@ class DataSource implements DataSourceInterface
     private $factory;
 
     /**
-     * Cache for given data.
-     *
-     * Helpful when determining if criterions have any changes.
-     *
-     * @var null|array
-     */
-    private $criterions;
-
-    /**
-     * Cache for result.
-     *
-     * @var null|mixed
-     */
-    private $result;
-
-    /**
      * Max results fetched at once.
      *
      * @var int
