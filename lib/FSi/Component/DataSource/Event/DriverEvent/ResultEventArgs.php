@@ -27,11 +27,12 @@ class ResultEventArgs extends DriverEventArgs
      * Constructor.
      *
      * @param DriverInterface $driver
+     * @param array $fields
      * @param mixed $result
      */
-    public function __construct(DriverInterface $driver, $result)
+    public function __construct(DriverInterface $driver, array $fields, $result)
     {
-        parent::__construct($driver);
+        parent::__construct($driver, $fields);
         $this->setResult($result);
     }
 
