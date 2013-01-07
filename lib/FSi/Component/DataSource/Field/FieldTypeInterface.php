@@ -121,6 +121,13 @@ interface FieldTypeInterface
     public function addExtension(FieldExtensionInterface $extension);
 
     /**
+     * Returns array of registered extensions.
+     *
+     * @return array
+     */
+    public function getExtensions();
+
+    /**
      * Builds view.
      *
      * @return FieldViewInterface

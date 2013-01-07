@@ -292,6 +292,14 @@ abstract class FieldAbstractType implements FieldTypeInterface
     /**
      * {@inheritdoc}
      */
+    public function getExtensions()
+    {
+        return $this->extensions;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function createView()
     {
         $view = new FieldView($this);
