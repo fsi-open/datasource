@@ -25,7 +25,7 @@ use FSi\Component\DataSource\Event\DriverEvent;
 /**
  * Driver extension for ordering that loads fields extension.
  */
-class DoctrineExtension extends DriverAbstractExtension implements EventSubscriberInterface
+class DoctrineExtension extends DriverExtension implements EventSubscriberInterface
 {
     /**
      * {@inheritdoc}
@@ -60,17 +60,6 @@ class DoctrineExtension extends DriverAbstractExtension implements EventSubscrib
         );
     }
 
-    protected function getFieldExtension(DoctrineAbstractField $field)
-    {
-        $extensions = $field->getExtensions();
-        foreach ($extensions as $extension) {
-            if ($extension instanceof FieldExtension) {
-                return $extension;
-            }
-        }
-        throw new DataSourceException('In order to use ' . __CLASS__ . ' there must be FSi\Component\DataSource\Extension\Core\Ordering\Field\FieldExtension registered in all fields');
-    }
-
     protected function getFieldName(DoctrineAbstractField $field, $alias)
     {
         if ($field->hasOption(DoctrineAbstractField::FIELD_MAPPING)) {
@@ -89,65 +78,13 @@ class DoctrineExtension extends DriverAbstractExtension implements EventSubscrib
     public function preGetResult(DriverEvent\DriverEventArgs $event)
     {
         $fields = $event->getFields();
-        $orderByFields = array();
-        $orderingDirection = array();
-
-        $tmpFields = array();
-        foreach ($fields as $field) {
-            $fieldExtension = $this->getFieldExtension($field);
-            $fieldOrdering = $fieldExtension->getOrdering($field);
-            if (isset($fieldOrdering)) {
-                $tmpFields[$fieldOrdering['priority']] = $field;
-                $orderingDirection[$field->getName()] = $fieldOrdering['direction'];
-            }
-        }
-        ksort($tmpFields);
-        foreach ($tmpFields as $field) {
-            $orderByFields[$field->getName()] = $field;
-        }
-
-        usort($fields, function(FieldTypeInterface $a, FieldTypeInterface $b) {
-            switch (true) {
-                case $a->hasOption(OrderingExtension::ORDERING) && !$b->hasOption(OrderingExtension::ORDERING):
-                    return -1;
-                case !$a->hasOption(OrderingExtension::ORDERING) && $b->hasOption(OrderingExtension::ORDERING):
-                    return 1;
-                case $a->hasOption(OrderingExtension::ORDERING) && $b->hasOption(OrderingExtension::ORDERING):
-                    switch (true) {
-                        case $a->hasOption(OrderingExtension::ORDERING_PRIORITY) && !$b->hasOption(OrderingExtension::ORDERING_PRIORITY):
-                            return -1;
-                        case !$a->hasOption(OrderingExtension::ORDERING_PRIORITY) && $b->hasOption(OrderingExtension::ORDERING_PRIORITY):
-                            return 1;
-                        case $a->hasOption(OrderingExtension::ORDERING_PRIORITY) && $b->hasOption(OrderingExtension::ORDERING_PRIORITY):
-                            $aPriority = $a->getOption(OrderingExtension::ORDERING_PRIORITY);
-                            $bPriority = $b->getOption(OrderingExtension::ORDERING_PRIORITY);
-                            return ($aPriority != $bPriority) ? (($aPriority > $bPriority) ? -1 : 1) : 0;
-                    }
-                default:
-                    return 0;
-            }
-        });
-
-        foreach ($fields as $field) {
-            if ($field->hasOption(OrderingExtension::ORDERING) && !isset($orderByFields[$field->getName()])) {
-                $orderByFields[$field->getName()] = $field;
-            }
-        }
+        $sortedFields = $this->sortFields($fields);
 
         $driver = $event->getDriver();
         $qb = $driver->getQueryBuilder();
-        foreach ($orderByFields as $field) {
-            $fieldName = $field->getName();
-            if (isset($orderingDirection[$fieldName])) {
-                $direction = $orderingDirection[$fieldName];
-            } elseif ($field->hasOption(OrderingExtension::ORDERING)) {
-                $direction = $field->getOption(OrderingExtension::ORDERING);
-            } else {
-                unset($direction);
-            }
-            if (isset($direction))
-                $qb->addOrderBy($this->getFieldName($field, $driver->getAlias()), $direction);
+        foreach ($sortedFields as $fieldName => $direction) {
+            $field = $fields[$fieldName];
+            $qb->addOrderBy($this->getFieldName($field, $driver->getAlias()), $direction);
         }
-
     }
 }
