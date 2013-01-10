@@ -29,6 +29,7 @@ class Events implements EventSubscriberInterface
     {
         return array(
             DataSourceEvents::PRE_BIND_PARAMETERS => 'preBindParameters',
+            DataSourceEvents::POST_GET_PARAMETERS => array('postGetParameters', -1024),
             DataSourceEvents::POST_BUILD_VIEW => 'postBuildView',
         );
     }
@@ -61,9 +62,11 @@ class Events implements EventSubscriberInterface
             $page = 1;
         } else {
             $current = $datasource->getFirstResult();
-            $page = floor($current/$maxresults) + 1;
+            $page = (int) floor($current/$maxresults) + 1;
         }
-        $parameters[$datasourceName][PaginationExtension::PAGE] = $page;
+        unset($parameters[$datasourceName][PaginationExtension::PAGE]);
+        if ($page > 1)
+            $parameters[$datasourceName][PaginationExtension::PAGE] = $page;
         $event->setParameters($parameters);
     }
 
@@ -84,14 +87,16 @@ class Events implements EventSubscriberInterface
             $all = 1;
             $page = 1;
         } else {
-            $all = ceil(count($datasource->getResult())/$maxresults);
+            $all = (int) ceil(count($datasource->getResult())/$maxresults);
             $current = $datasource->getFirstResult();
-            $page = floor($current/$maxresults) + 1;
+            $page = (int) floor($current/$maxresults) + 1;
         }
 
+        unset($parameters[$datasourceName][PaginationExtension::PAGE]);
         $pages = array();
         for ($i = 1; $i <= $all; $i++) {
-            $parameters[$datasourceName][PaginationExtension::PAGE] = $i;
+            if ($i > 1)
+                $parameters[$datasourceName][PaginationExtension::PAGE] = $i;
             $pages[$i] = $parameters;
         }
 
