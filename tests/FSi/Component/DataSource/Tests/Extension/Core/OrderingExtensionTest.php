@@ -13,7 +13,9 @@ namespace FSi\Component\DataSource\Tests\Extension\Core;
 
 use FSi\Component\DataSource\Extension\Core\Ordering\OrderingExtension;
 use FSi\Component\DataSource\Extension\Core\Ordering\Field\FieldExtension;
+use FSi\Component\DataSource\Extension\Core\Ordering\Driver\DriverExtension;
 use FSi\Component\DataSource\DataSourceInterface;
+use FSi\Component\DataSource\Field\FieldAbstractType;
 use FSi\Component\DataSource\Event\DataSourceEvent;
 use FSi\Component\DataSource\Event\FieldEvent;
 
@@ -23,125 +25,324 @@ use FSi\Component\DataSource\Event\FieldEvent;
 class OrderingExtensionTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * Checks postBuildView event.
+     * Checks DataSource subscriber and storing of passed parameters.
      */
-    public function testPostBuildView()
+    public function testStoringParameters()
     {
         $extension = new OrderingExtension();
         $driver = $this->getMock('FSi\Component\DataSource\Driver\DriverInterface');
         $datasource = $this->getMock('FSi\Component\DataSource\DataSourceInterface', array(), array($driver));
-        $view = $this->getMock('FSi\Component\DataSource\DataSourceViewInterface', array(), array($datasource));
+        $field = $this->getMock('FSi\Component\DataSource\Field\FieldTypeInterface');
+        $fieldExtension = new FieldExtension();
 
-        $view
-            ->expects($this->exactly(3))
-            ->method('setAttribute')
+        $field
+            ->expects($this->atLeastOnce())
+            ->method('getExtensions')
+            ->will($this->returnValue(array($fieldExtension)))
         ;
 
         $datasource
             ->expects($this->any())
             ->method('getFields')
-            ->will($this->returnValue(array()))
+            ->will($this->returnValue(array('test' => $field)))
+        ;
+
+        $datasource
+            ->expects($this->any())
+            ->method('getField')
+            ->with('test')
+            ->will($this->returnValue($field))
+        ;
+
+        $datasource
+            ->expects($this->any())
+            ->method('getName')
+            ->will($this->returnValue('ds'))
         ;
 
         $subscribers = $extension->loadSubscribers();
         $subscriber = array_shift($subscribers);
-        $subscriber->postBuildView(new DataSourceEvent\ViewEventArgs($datasource, $view));
-    }
 
-    /**
-     * Checks if passed values are correct.
-     */
-    public function testOrderingCount()
-    {
-        /**
-         * Each position of input means: expected priority passed to view and then
-         * arrays of fields values (if values have been set, given priority and expected priority passed to driver)
-         */
-        $input = array(
-            array(
-                4,
-                array(true, 1, 5),
-                array(true, 3, 6),
-                array(false, 1, 2),
-                array(false, 10, 3),
-                array(true, null, 4),
-                array(false, null, 1),
-            ),
-            array(
-                5,
-                array(true, 4, 7),
-                array(true, 4, 6),
-                array(false, null, 2),
-                array(true, null, 4),
-                array(false, 4, 3),
-                array(false, null, 1),
-                array(true, 3, 5),
-            ),
-            array(
-                1,
-                array(false, null, 5),
-                array(false, null, 4),
-                array(false, null, 3),
-                array(false, null, 2),
-                array(false, null, 1),
+        $parameters = array(
+            'ds'    => array(
+                'ordering'    => array(
+                    'test'    => 'asc'
+                )
             )
         );
 
+        $subscriber->preBindParameters(new DataSourceEvent\ParametersEventArgs($datasource, $parameters));
+
+        // assert that request parameters are properly stored in FieldExtension
+        $this->assertEquals(
+            array(
+                'priority'    => 0,
+                'direction'   => 'asc'
+            ),
+            $fieldExtension->getOrdering($field)
+        );
+
+        $event = new DataSourceEvent\ParametersEventArgs($datasource, array());
+        $subscriber->postGetParameters($event);
+
+        $this->assertEquals(
+            $parameters,
+            $event->getParameters()
+        );
+    }
+
+    /**
+     * Checks if sort order is properly calculated from default sorting options and parameters passed from user request.
+     */
+    public function testOrdering()
+    {
+        /**
+         * Each test case consists of fields options definition, ordering parameters passed to datasource and expected fields
+         * array which should be sorted in terms of priority of sorting results. Expected array contain sorting passed in
+         * parameters first and then default sorting passed in options.
+         */
+        $input = array(
+            array(
+                'fields' => array(
+                    array(
+                        'name'        => 'field1'
+                    ),
+                    array(
+                        'name'        => 'field2'
+                    ),
+                    array(
+                        'name'        => 'field3'
+                    ),
+                ),
+                'parameters'  => array(
+                    'field1' => 'asc'
+                ),
+                'expected_ordering' => array(
+                    'field1' => 'asc'
+                ),
+                'expected_parameters' => array(
+                    'field1' => array(
+                        'ordering_ascending' => array(
+                            'field1'    => 'asc'
+                        ),
+                        'ordering_descending' => array(
+                            'field1'    => 'desc'
+                        )
+                    ),
+                    'field2' => array(
+                        'ordering_ascending' => array(
+                            'field2'    => 'asc',
+                            'field1'    => 'asc'
+                        ),
+                        'ordering_descending' => array(
+                            'field2'    => 'desc',
+                            'field1'    => 'asc'
+                        )
+                    ),
+                    'field3' => array(
+                        'ordering_ascending' => array(
+                            'field3'    => 'asc',
+                            'field1'    => 'asc'
+                        ),
+                        'ordering_descending' => array(
+                            'field3'    => 'desc',
+                            'field1'    => 'asc'
+                        )
+                    ),
+                )
+            ),
+            array(
+                'fields' => array(
+                    array(
+                        'name'        => 'field1'
+                    ),
+                    array(
+                        'name'        => 'field2'
+                    ),
+                    array(
+                        'name'        => 'field3'
+                    ),
+                ),
+                'parameters'  => array(
+                    'field2' => 'asc',
+                    'field1' => 'desc'
+                ),
+                'expected_ordering' => array(
+                    'field2' => 'asc',
+                    'field1' => 'desc'
+                ),
+                'expected_parameters' => array(
+                    'field1' => array(
+                        'ordering_ascending' => array(
+                            'field1'    => 'asc',
+                            'field2'    => 'asc'
+                        ),
+                        'ordering_descending' => array(
+                            'field1'    => 'desc',
+                            'field2'    => 'asc'
+                        )
+                    ),
+                    'field2' => array(
+                        'ordering_ascending' => array(
+                            'field2'    => 'asc',
+                            'field1'    => 'desc'
+                        ),
+                        'ordering_descending' => array(
+                            'field2'    => 'desc',
+                            'field1'    => 'desc'
+                        )
+                    ),
+                    'field3' => array(
+                        'ordering_ascending' => array(
+                            'field3'    => 'asc',
+                            'field2'    => 'asc',
+                            'field1'    => 'desc'
+                        ),
+                        'ordering_descending' => array(
+                            'field3'    => 'desc',
+                            'field2'    => 'asc',
+                            'field1'    => 'desc'
+                        )
+                    ),
+                )
+            ),
+            array(
+                'fields' => array(
+                    array(
+                        'name'        => 'field1',
+                        'options'     => array('ordering' => 'asc', 'ordering_priority' => 1)
+                    ),
+                    array(
+                        'name'        => 'field2',
+                        'options'     => array('ordering' => 'desc', 'ordering_priority' => 2)
+                    ),
+                    array(
+                        'name'        => 'field3',
+                        'options'     => array('ordering' => 'asc')
+                    ),
+                ),
+                'parameters'  => array(
+                    'field3' => 'desc'
+                ),
+                'expected_ordering' => array(
+                    'field3' => 'desc',
+                    'field2' => 'desc',
+                    'field1' => 'asc'
+                ),
+                'expected_parameters' => array(
+                    'field1' => array(
+                        'ordering_ascending' => array(
+                            'field1'    => 'asc',
+                            'field3'    => 'desc'
+                        ),
+                        'ordering_descending' => array(
+                            'field1'    => 'desc',
+                            'field3'    => 'desc'
+                        )
+                    ),
+                    'field2' => array(
+                        'ordering_ascending' => array(
+                            'field2'    => 'asc',
+                            'field3'    => 'desc'
+                        ),
+                        'ordering_descending' => array(
+                            'field2'    => 'desc',
+                            'field3'    => 'desc'
+                        )
+                    ),
+                    'field3' => array(
+                        'ordering_ascending' => array(
+                            'field3'    => 'asc'
+                        ),
+                        'ordering_descending' => array(
+                            'field3'    => 'desc'
+                        )
+                    ),
+                )
+            ),
+            array(
+                'fields' => array(
+                    array(
+                        'name'        => 'field1',
+                        'options'     => array('ordering' => 'asc', 'ordering_priority' => 1)
+                    ),
+                    array(
+                        'name'        => 'field2',
+                        'options'     => array('ordering' => 'desc', 'ordering_priority' => 2)
+                    ),
+                    array(
+                        'name'        => 'field3',
+                        'options'     => array('ordering' => 'asc')
+                    ),
+                ),
+                'parameters'  => array(
+                    'field1' => 'asc',
+                    'field3' => 'desc'
+                ),
+                'expected_ordering' => array(
+                    'field1' => 'asc',
+                    'field3' => 'desc',
+                    'field2' => 'desc'
+                ),
+                'expected_parameters' => array(
+                    'field1' => array(
+                        'ordering_ascending' => array(
+                            'field1'    => 'asc',
+                            'field3'    => 'desc'
+                        ),
+                        'ordering_descending' => array(
+                            'field1'    => 'desc',
+                            'field3'    => 'desc'
+                        )
+                    ),
+                    'field2' => array(
+                        'ordering_ascending' => array(
+                            'field2'    => 'asc',
+                            'field1'    => 'asc',
+                            'field3'    => 'desc'
+                        ),
+                        'ordering_descending' => array(
+                            'field2'    => 'desc',
+                            'field1'    => 'asc',
+                            'field3'    => 'desc'
+                        )
+                    ),
+                    'field3' => array(
+                        'ordering_ascending' => array(
+                            'field3'    => 'asc',
+                            'field1'    => 'asc'
+                        ),
+                        'ordering_descending' => array(
+                            'field3'    => 'desc',
+                            'field1'    => 'asc'
+                        )
+                    ),
+                )
+            ),
+        );
+
         foreach ($input as $case) {
+            $datasource = $this->getMock('FSi\Component\DataSource\DataSourceInterface');
+
+            $fieldExtension = new FieldExtension();
+
             $fields = array();
-            $expectedNextPriority = array_shift($case);
-            $givenNextPriority = null;
-            foreach ($case as $fieldData) {
-                $field = $this->getMock('FSi\Component\DataSource\Field\FieldTypeInterface');
-                $field
-                    ->expects($this->any())
-                    ->method('getOptions')
-                    ->will($this->returnValue(array(
-                        OrderingExtension::ORDERING_IS_GIVEN => $fieldData[0],
-                        OrderingExtension::ORDERING_PRIORITY => $fieldData[1],
-                    )))
-                ;
-
-                $field
-                    ->expects($this->any())
-                    ->method('hasOption')
-                    ->will($this->returnValue(true))
-                ;
-
-                $field
-                    ->expects($this->any())
-                    ->method('getOption')
-                    ->will($this->returnCallback(function () use ($fieldData) {
-                        $args = func_get_args();
-                        switch (array_shift($args)) {
-                            case OrderingExtension::ORDERING_IS_GIVEN:
-                                return $fieldData[0];
-
-                            case OrderingExtension::ORDERING_PRIORITY:
-                                return $fieldData[1];
-                        }
-
-                        throw new \Exception('Unsupported test case');
-                    }))
-                ;
-
-                $expected = array(
-                    OrderingExtension::ORDERING_IS_GIVEN => $fieldData[0],
-                    OrderingExtension::ORDERING_PRIORITY => $fieldData[2],
-                );
-
-                $field
-                    ->expects($this->once())
-                    ->method('setOptions')
-                    ->with($expected)
-                ;
-
-                $fields[] = $field;
+            foreach ($case['fields'] as $fieldData) {
+                // using fake class object instead of mock object is helpfull because we need functionality from AbstractFieldType
+                $field = new FakeFieldType();
+                $field->setName($fieldData['name']);
+                $field->setDataSource($datasource);
+                $field->addExtension($fieldExtension);
+                if (isset($fieldData['options']))
+                    $field->setOptions($fieldData['options']);
+                $fields[$fieldData['name']] = $field;
             }
 
-            $driver = $this->getMock('FSi\Component\DataSource\Driver\DriverInterface');
-            $datasource = $this->getMock('FSi\Component\DataSource\DataSourceInterface', array(), array($driver));
-            $view = $this->getMock('FSi\Component\DataSource\DataSourceViewInterface', array(), array($datasource));
+            $datasource
+                ->expects($this->atLeastOnce())
+                ->method('getName')
+                ->will($this->returnValue('ds'))
+            ;
 
             $datasource
                 ->expects($this->any())
@@ -149,104 +350,99 @@ class OrderingExtensionTest extends \PHPUnit_Framework_TestCase
                 ->will($this->returnValue($fields))
             ;
 
-            $view
+            $datasource
                 ->expects($this->any())
-                ->method('setAttribute')
-                ->will($this->returnCallback(function () use (&$givenNextPriority) {
-                    list($key, $value) = func_get_args();
-                    if ($key == OrderingExtension::VIEW_NEXT_PRIORITY) {
-                        $givenNextPriority = $value;
-                    }
-                }))
+                ->method('getField')
+                ->will($this->returnCallback(function () use ($fields) { return $fields[func_get_arg(0)]; }))
+            ;
+
+            $datasource
+                ->expects($this->any())
+                ->method('getAllParameters')
+                ->will($this->returnValue(array('ds' => array('ordering' => $case['parameters']))))
             ;
 
             $extension = new OrderingExtension();
             $subscribers = $extension->loadSubscribers();
             $subscriber = array_shift($subscribers);
-            $subscriber->preGetResult(new DataSourceEvent\DataSourceEventArgs($datasource));
-            $subscriber->postBuildView(new DataSourceEvent\ViewEventArgs($datasource, $view));
-            $this->assertEquals($expectedNextPriority, $givenNextPriority);
+            $subscriber->preBindParameters(new DataSourceEvent\ParametersEventArgs(
+                $datasource,
+                array('ds' => array('ordering' => $case['parameters']))
+            ));
+
+            // we use fake driver extension instead of specific driver extension because we want to test common DriverExtension functionality
+            $driverExtension = new FakeDriverExtension();
+            $result = $driverExtension->sort($fields);
+            $this->assertSame($case['expected_ordering'], $result);
+
+            foreach ($fields as $field) {
+                $view = $this->getMock('FSi\Component\DataSource\Field\FieldViewInterface');
+
+                $view
+                    ->expects($this->exactly(3))
+                    ->method('setAttribute')
+                    ->will($this->returnCallback(function ($attribute, $value) use ($field, $case) {
+                        switch ($attribute) {
+                            case 'ordering_current':
+                                if (key($case['parameters']) == $field->getName()) {
+                                    $this->assertEquals(
+                                        $case['parameters'][$field->getName()],
+                                        $value
+                                    );
+                                } else {
+                                    $this->assertEquals(
+                                        '',
+                                        $value
+                                    );
+                                }
+                                break;
+                            case 'ordering_ascending':
+                                $this->assertSame(
+                                    array(
+                                        'ds' => array(
+                                            'ordering' => $case['expected_parameters'][$field->getName()]['ordering_ascending']
+                                        )
+                                    ),
+                                    $value
+                                );
+                                break;
+                            case 'ordering_descending':
+                                $this->assertSame(
+                                    array(
+                                        'ds' => array(
+                                                'ordering' => $case['expected_parameters'][$field->getName()]['ordering_descending']
+                                        )
+                                    ),
+                                    $value
+                                );
+                                break;
+                        }
+                    }))
+                ;
+
+                $fieldExtension->postBuildView(new FieldEvent\ViewEventArgs($field, $view));
+            }
         }
     }
+}
 
-    /**
-     * Checks parameters manipulation.
-     */
-    public function testFieldParameters()
+class FakeFieldType extends FieldAbstractType
+{
+    public function getType()
     {
-        $driver = $this->getMock('FSi\Component\DataSource\Driver\DriverInterface');
-        $datasource = $this->getMock('FSi\Component\DataSource\DataSourceInterface', array(), array($driver));
+        return 'fake';
+    }
+}
 
-        $datasource
-            ->expects($this->any())
-            ->method('getName')
-            ->will($this->returnValue('datasource'))
-        ;
+class FakeDriverExtension extends DriverExtension
+{
+    public function getExtendedDriverTypes()
+    {
+        return array();
+    }
 
-        $extension = new FieldExtension();
-
-        $field = $this->getMock('FSi\Component\DataSource\Field\FieldTypeInterface');
-
-        $field
-            ->expects($this->any())
-            ->method('getDataSource')
-            ->will($this->returnValue($datasource))
-        ;
-
-        $field
-            ->expects($this->any())
-            ->method('getOptions')
-            ->will($this->returnValue(array()))
-        ;
-
-        $field
-            ->expects($this->any())
-            ->method('getName')
-            ->will($this->returnValue('field'))
-        ;
-
-        $field
-            ->expects($this->once())
-            ->method('setOptions')
-            ->with(array(
-                OrderingExtension::ORDERING => 'asc',
-                OrderingExtension::ORDERING_PRIORITY => 1,
-                OrderingExtension::ORDERING_IS_GIVEN => 1,
-            ))
-        ;
-
-        $parameter = array(
-            'datasource' => array(
-                OrderingExtension::ORDERING => array(
-                    'field' => array(
-                        OrderingExtension::ORDERING => 'asc',
-                        OrderingExtension::ORDERING_PRIORITY => 1,
-                    ),
-                ),
-            ),
-        );
-
-        $extension->preBindParameter(new FieldEvent\ParameterEventArgs($field, $parameter));
-
-        $parameter2 = array();
-        $args = new FieldEvent\ParameterEventArgs($field, $parameter2);
-        $extension->preGetParameter($args);
-        $this->assertEquals($parameter, $args->getParameter());
-
-        $enabled = null;
-        $fieldView = $this->getMock('FSi\Component\DataSource\Field\FieldViewInterface', array(), array($field));
-        $fieldView
-            ->expects($this->any())
-            ->method('setAttribute')
-            ->will($this->returnCallback(function () use (&$enabled) {
-                list($key, $value) = func_get_args();
-                if ($key == OrderingExtension::VIEW_IS_ENABLED) {
-                    $enabled = $value;
-                }
-            }))
-        ;
-
-        $extension->postBuildView(new FieldEvent\ViewEventArgs($field, $fieldView));
-        $this->assertTrue((bool) $enabled);
+    public function sort(array $fields)
+    {
+        return $this->sortFields($fields);
     }
 }
