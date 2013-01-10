@@ -20,6 +20,7 @@ use FSi\Component\DataSource\Event\DataSourceEvents;
 use FSi\Component\DataSource\Event\FieldEvents;
 use FSi\Component\DataSource\Event\FieldEvent;
 use FSi\Component\DataSource\Event\DataSourceFieldEventInterface;
+use FSi\Component\DataSource\Extension\Core\Pagination\PaginationExtension;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 /**
@@ -107,6 +108,8 @@ class FieldExtension extends FieldAbstractExtension
             unset($parameters[$dataSourceName][OrderingExtension::ORDERING][$field->getName()]);
         if (!isset($parameters[$dataSourceName][OrderingExtension::ORDERING]))
             $parameters[$dataSourceName][OrderingExtension::ORDERING] = array();
+        // little hack: we do not know if PaginationExtension is loaded but if it is we don't want page number in sorting URLs
+        unset($parameters[$dataSourceName][PaginationExtension::PAGE]);
         $fields = array_keys($parameters[$dataSourceName]['ordering']);
         array_unshift($fields, $field->getName());
         $directions = array_values($parameters[$dataSourceName][OrderingExtension::ORDERING]);
