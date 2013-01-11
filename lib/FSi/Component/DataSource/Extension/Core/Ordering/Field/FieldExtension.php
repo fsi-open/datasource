@@ -38,7 +38,7 @@ class FieldExtension extends FieldAbstractExtension
      */
     public function getExtendedFieldTypes()
     {
-        return array('text', 'number', 'date', 'time', 'datetime', 'entity');
+        return array('text', 'number', 'date', 'time', 'datetime');
     }
 
     /**
