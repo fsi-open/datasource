@@ -91,8 +91,8 @@ class FormFieldExtension extends FieldAbstractExtension
         $field = $event->getField();
         $view = $event->getView();
 
-        $form = $this->getForm($field);
-        $view->setAttribute(FormExtension::VIEW_FORM, $form->createView());
+        if ($form = $this->getForm($field))
+            $view->setAttribute(FormExtension::VIEW_FORM, $form->createView());
     }
 
     /**
@@ -104,11 +104,9 @@ class FormFieldExtension extends FieldAbstractExtension
         $field_oid = spl_object_hash($field);
         $parameter = $event->getParameter();
 
-        if ($field->hasOption('form_disabled') && $field->getOption('form_disabled')) {
+        if (!$form = $this->getForm($field))
             return;
-        }
 
-        $form = $this->getForm($field);
         if ($form->isBound()) {
             $form = $this->getForm($field, true);
         }
@@ -172,6 +170,10 @@ class FormFieldExtension extends FieldAbstractExtension
     protected function getForm(FieldTypeInterface $field, $force = false)
     {
         if (!$datasource = $field->getDataSource()) {
+            return;
+        }
+
+        if ($field->hasOption('form_disabled') && $field->getOption('form_disabled')) {
             return;
         }
 
