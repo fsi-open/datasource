@@ -1,14 +1,11 @@
 # Symfony Core Extension #
 
-Main and only purpose of this extension is to convert Symfony's Request object into array.
-What's important it **must** be loaded as first extension, so can convert it before any other extension
-will try to access it (and throw Exception probably).
-
-It extends **datasource**.
+Main and only purpose of this extension is to convert Symfony's Request object into an array of parameters.
+It loads event subscriber to **datasource** with highest priority to transform request before any other extension can access it.
 
 ## Requirements ##
 
-Symfony Http Foundation ("symfony/http-foundation")
+Symfony Http Foundation component ("symfony/http-foundation")
 
 ## Setup ##
 

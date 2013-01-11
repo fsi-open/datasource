@@ -9,8 +9,8 @@ properly configured driver, that will implement methods to get that kind of data
 
 ## Basic usage ##
 
-Lets assume that you have already preconfigured ``$driver`` (you can find documentation for specific drivers
-in doc folder) that allows us to fetch some data, which can be seen as array objects with specific fields - for our
+Let's assume that you have already preconfigured ``$driver`` (you can find documentation for specific drivers
+in ``doc`` folder) that allows us to fetch some data, which can be seen as array objects with specific fields - for our
 example let it be News objects with id, title, author, create date, short content and content.
 
 First we must create DataSource with proper ``$driver``.
@@ -43,13 +43,13 @@ $datasource
 ;
 ```
 
-If we have configured DataSource we can bind it some parameters for fields.
+If we have configured DataSource we can bind some parameters to it.
 ``` php
 <?php
 
 $parameters = array(
     'datasource_name' => array(
-        'fields' => array( //In fact this key if always equal to constant \FSi\Component\DataSource\DataSourceInterface::FIELDS.
+        'fields' => array( //In fact this key always equals to constant \FSi\Component\DataSource\DataSourceInterface::FIELDS.
             'title' => 'part of searched title',
             'author' => 'author@example.com',
             'create_date' => array( //Input data doesn't have to be scalar, but it must in form that fields expects it.
@@ -85,7 +85,7 @@ or create view helpfull during view rendering (see below for more info).
 $view = $datasource->createView();
 ```
 
-Result that is returned always impements ``Traversable`` interface.
+Result that is returned always implements ``Traversable`` interface.
 
 Note, that in fact all you need to do to fetch data is create DataSource and call ``getResult`` method, other steps are optional.
 
@@ -136,18 +136,18 @@ To see which attributes are set in which case see extensions docs.
 
 **You can find available extensions documentation in doc folder.**
 
-In general there are three types of extensions: extensions for DataSource, driver, and field.
+In general there are three types of extensions: DataSource extensions, Driver extension, and Field extensions.
 
 All parts of this component use Symfony's EventDispatcher (``Symfony\Component\EventDispatcher\EventDispatcher``) to manage events.
 
-### Extensions for DataSource ###
+### DataSource extensions ###
 
 Each extension must implement interface ``FSi\Component\DataSource\DataSourceExtensionInterface``.
 Method ``loadSubscribers`` must return array of objects that (if any) must implement ``Symfony\Component\EventDispatcher\EventSubscriberInterface``.
 Method ``loadDriverExtensions`` must return array of objects that (if any) must be valid driver extensions (see below).
 
-Each of subscribers can subscribe to one of following events:
-(list contains key, that is const of ``FSi\Component\DataSource\Event\DataSourceEvents`` and passed argument, that is defined
+Each of subscribers can subscribe to one or many of following events:
+(list contains key, that is const of ``FSi\Component\DataSource\Event\DataSourceEvents`` and event method's argument, which is defined
 in ``FSi\Component\DataSource\Event\DataSourceEvent`` namespace)
 
 * ``PRE_BIND_PARAMETERS`` - ``ParametersEventArgs``
@@ -168,17 +168,20 @@ Arguments:
 * ``ViewEventArgs`` - allows to get view through ``getView`` method
 * ``ResultEventArgs`` - allows to get and set result through ``getResult`` and ``setResult`` methods
 
-### Extension for Driver ###
+### Driver extensions ###
 
 Each extension must implement interface ``FSi\Component\DataSource\Driver\DriverExtensionInterface``.
 Method ``loadSubscribers`` must return array of objects that (if any) must implement ``Symfony\Component\EventDispatcher\EventSubscriberInterface``.
 
-Drivers extensions provides field types through methods ``hasFieldType`` and ``getFieldType``,
+Driver extension must implement method ``getExtendedDriverTypes()`` which returns types of drivers that this extension is
+suitable for.
+
+Driver extension provides field types through methods ``hasFieldType`` and ``getFieldType``,
 where getFieldType must return field object for given type, that implements ``FSi\Component\DataSource\Field\FieldTypeInterface``
 and already has all its extensions loaded.
 
 Each of subscribers can subscribe to one of following events:
-(list contains key, that is const of ``FSi\Component\DataSource\Event\DriverEvents`` and passed argument, that is defined
+(list contains key, that is const of ``FSi\Component\DataSource\Event\DriverEvents`` and event method's argument, that is defined
 in ``FSi\Component\DataSource\Event\DriverEvent`` namespace)
 
 * ``PRE_GET_RESULT`` - ``DriverEventArgs``
@@ -194,8 +197,11 @@ Arguments:
 Each extension must implement interface ``FSi\Component\DataSource\Field\FieldExtensionInterface``
 Method ``loadSubscribers`` must return array of objects that (if any) must implement ``Symfony\Component\EventDispatcher\EventSubscriberInterface``.
 
+Field extension must implement method ``getExtendedFieldTypes()`` which returns types of fields that this extension is
+suitable for.
+
 Each of subscribers can subscribe to one of following events:
-(list contains key, that is const of ``FSi\Component\DataSource\Event\FieldEvents`` and passed argument, that is defined
+(list contains key, that is const of ``FSi\Component\DataSource\Event\FieldEvents`` and event method's argument, that is defined
 in ``FSi\Component\DataSource\Event\FieldEvent`` namespace)
 
 * ``PRE_BIND_PARAMETER`` - ``ParameterEventArgs``
