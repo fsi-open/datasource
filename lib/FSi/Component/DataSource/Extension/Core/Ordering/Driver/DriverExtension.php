@@ -59,7 +59,7 @@ abstract class DriverExtension extends DriverAbstractExtension
                 return $extension;
             }
         }
-        throw new DataSourceException('In order to use ' . __CLASS__ . ' there must be FSi\Component\DataSource\Extension\Core\Ordering\Field\FieldExtension registered in all fields');
+        return null;
     }
 
     protected function sortFields(array $fields)
@@ -69,11 +69,12 @@ abstract class DriverExtension extends DriverAbstractExtension
 
         $tmpFields = array();
         foreach ($fields as $field) {
-            $fieldExtension = $this->getFieldExtension($field);
-            $fieldOrdering = $fieldExtension->getOrdering($field);
-            if (isset($fieldOrdering)) {
-                $tmpFields[$fieldOrdering['priority']] = $field;
-                $orderingDirection[$field->getName()] = $fieldOrdering['direction'];
+            if ($fieldExtension = $this->getFieldExtension($field)) {
+                $fieldOrdering = $fieldExtension->getOrdering($field);
+                if (isset($fieldOrdering)) {
+                    $tmpFields[$fieldOrdering['priority']] = $field;
+                    $orderingDirection[$field->getName()] = $fieldOrdering['direction'];
+                }
             }
         }
         ksort($tmpFields);
