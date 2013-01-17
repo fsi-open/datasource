@@ -182,7 +182,7 @@ abstract class FieldAbstractType implements FieldTypeInterface
      */
     public function hasOption($name)
     {
-        return isset($this->options[$name]) && !empty($this->options[$name]);
+        return isset($this->options[$name]);
     }
 
     /**
@@ -302,6 +302,8 @@ abstract class FieldAbstractType implements FieldTypeInterface
      */
     public function createView()
     {
+        $this->options = $this->optionsResolver->resolve($this->options);
+
         $view = new FieldView($this);
 
         //PreBuildView event.
@@ -311,8 +313,6 @@ abstract class FieldAbstractType implements FieldTypeInterface
         //PostBuildView event.
         $event = new FieldEvent\ViewEventArgs($this, $view);
         $this->eventDispatcher->dispatch(FieldEvents::POST_BUILD_VIEW, $event);
-
-        $this->options = $this->optionsResolver->resolve($this->options);
 
         return $view;
     }
