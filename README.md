@@ -1,7 +1,7 @@
 # FSi DataSource Component #
 
-DataSource allows to fetch data from various sources using appropriate driver.
-It supports pagination and trough fields (that driver or its extensions must provide) allows
+DataSource allows to fetch data from various sources using different drivers.
+It supports pagination and through fields (that driver or its extensions must provide) allows
 to give various conditions, that fetched data must fulfill.
 
 DataSource to fetch specific kind of data (from database, xml, json, etc.) must be created with
