@@ -12,6 +12,7 @@
 namespace FSi\Component\DataSource\Driver\Doctrine;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
+use FSi\Component\DataSource\DataSourceFactoryInterface;
 
 /**
  * Factory for creating drivers.
@@ -25,9 +26,10 @@ interface DoctrineFactoryInterface
      * which EntityManager has to be passed to driver.
      *
      * @param ManagerRegistry $registry
+     * @param DataSourceFactoryInterface $dataSourceFactory
      * @param array $extensions
      */
-    public function __construct(ManagerRegistry $registry, $extensions = array());
+    public function __construct(ManagerRegistry $registry, DataSourceFactoryInterface $dataSourceFactory, $extensions = array());
 
     /**
      * Creates driver.
@@ -38,4 +40,13 @@ interface DoctrineFactoryInterface
      * @return Doctrine
      */
     public function createDriver($entity, $alias = null, $entityManager = null);
+
+    /**
+     * Creates new driver and passes it to create new datasource in one step
+     * @param mixed $entity
+     * @param string $name
+     * @param string $alias
+     * @param string $entityManager
+     */
+    public function createDataSource($entity, $name, $alias = null, $entityManager = null);
 }

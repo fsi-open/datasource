@@ -71,19 +71,16 @@ class DoctrineDriverTest extends \PHPUnit_Framework_TestCase
     public function testGeneral()
     {
         $driverFactory = $this->getDoctrineFactory();
-        $dataSourceFactory = $this->getDataSourceFactory();
         $datasources = array();
 
-        $driver = $driverFactory->createDriver('FSi\Component\DataSource\Tests\Fixtures\News');
-        $datasources[] = $dataSourceFactory->createDataSource($driver, 'datasource');
+        $datasources[] = $driverFactory->createDataSource('FSi\Component\DataSource\Tests\Fixtures\News', 'datasource');
 
         $qb = $this->em
             ->createQueryBuilder()
             ->select('n')
             ->from('FSi\Component\DataSource\Tests\Fixtures\News', 'n')
         ;
-        $driver = $driverFactory->createDriver($qb, 'n');
-        $datasources[] = $dataSourceFactory->createDataSource($driver, 'datasource2');
+        $datasources[] = $driverFactory->createDataSource($qb, 'datasource2', 'n');
 
         foreach ($datasources as $datasource) {
             $datasource
@@ -352,7 +349,7 @@ class DoctrineDriverTest extends \PHPUnit_Framework_TestCase
             new CoreExtension(),
         );
 
-        return new DoctrineFactory(new TestManagerRegistry($this->em), $extensions);
+        return new DoctrineFactory(new TestManagerRegistry($this->em), $this->getDataSourceFactory(), $extensions);
     }
 
     /**
