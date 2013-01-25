@@ -19,6 +19,13 @@ use FSi\Component\DataSource\Util\AttributesContainerInterface;
 interface DataSourceViewInterface extends AttributesContainerInterface, \ArrayAccess, \Countable, \SeekableIterator
 {
     /**
+     * Returns name of datasource.
+     *
+     * @return string
+     */
+    public function getName();
+
+    /**
      * Returns parameters that were binded to datasource.
      *
      * @return array

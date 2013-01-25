@@ -25,7 +25,14 @@ class DataSourceViewTest extends \PHPUnit_Framework_TestCase
     {
         $driver = $this->getMock('FSi\Component\DataSource\Driver\DriverInterface');
         $datasource = $this->getMock('FSi\Component\DataSource\DataSource', array(), array($driver));
+        $datasource
+            ->expects($this->once())
+            ->method('getName')
+            ->will($this->returnValue('ds'))
+        ;
+
         $view = new DataSourceView($datasource);
+        $this->assertEquals($view->getName(), 'ds');
     }
 
     /**

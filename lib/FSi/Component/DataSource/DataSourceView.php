@@ -20,6 +20,11 @@ use FSi\Component\DataSource\Util\AttributesContainer;
 class DataSourceView extends AttributesContainer implements DataSourceViewInterface
 {
     /**
+     * @var string
+     */
+    private $name;
+
+    /**
      * @var array
      */
     private $parameters = array();
@@ -50,8 +55,17 @@ class DataSourceView extends AttributesContainer implements DataSourceViewInterf
      */
     public function __construct(DataSource $datasource)
     {
+        $this->name = $datasource->getName();
         $this->parameters = $datasource->getParameters();
         $this->otherParameters = $datasource->getOtherParameters();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getName()
+    {
+        return $this->name;
     }
 
     /**
