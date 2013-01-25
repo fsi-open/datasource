@@ -22,9 +22,14 @@ use FSi\Component\DataSource\Util\AttributesContainer;
 class FieldView extends AttributesContainer implements FieldViewInterface
 {
     /**
-     * @var FieldTypeInterface
+     * @var string
      */
-    private $field;
+    private $name;
+
+    /**
+     * @var string
+     */
+    private $type;
 
     /**
      * @var DataSourceViewInterface
@@ -36,15 +41,24 @@ class FieldView extends AttributesContainer implements FieldViewInterface
      */
     public function __construct(FieldTypeInterface $field)
     {
-        $this->field = $field;
+        $this->name = $field->getName();
+        $this->type = $field->getType();
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getField()
+    public function getName()
     {
-        return $this->field;
+        return $this->name;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getType()
+    {
+        return $this->type;
     }
 
     /**

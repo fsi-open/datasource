@@ -28,11 +28,18 @@ interface FieldViewInterface extends AttributesContainerInterface
     public function __construct(FieldTypeInterface $field);
 
     /**
-     * Return assigned field.
+     * Return field's name.
      *
-     * @return FieldTypeInterface
+     * @return string
      */
-    public function getField();
+    public function getName();
+
+    /**
+     * Return field's type.
+     *
+     * @return string
+     */
+    public function getType();
 
     /**
      * Sets DataSource view.

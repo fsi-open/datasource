@@ -26,7 +26,8 @@ class DataSourceViewTest extends \PHPUnit_Framework_TestCase
         $field = $this->getMock('FSi\Component\DataSource\Field\FieldTypeInterface');
         $fieldView = new FieldView($field);
 
-        $this->assertEquals($field, $fieldView->getField());
+        $this->assertEquals($field->getName(), $fieldView->getName());
+        $this->assertEquals($field->getType(), $fieldView->getType());
 
         $this->setExpectedException('Exception');
         $fieldView = new FieldView(new \stdClass());

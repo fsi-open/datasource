@@ -301,6 +301,7 @@ class DataSource implements DataSourceInterface
     {
         $this->dirty = true;
         $this->maxResults = $max;
+        return $this;
     }
 
     /**
@@ -310,6 +311,7 @@ class DataSource implements DataSourceInterface
     {
         $this->dirty = true;
         $this->firstResult = $first;
+        return $this;
     }
 
     /**
@@ -345,6 +347,7 @@ class DataSource implements DataSourceInterface
                 $this->driver->addExtension($driverExtension);
             }
         }
+        return $this;
     }
 
     /**
@@ -451,6 +454,7 @@ class DataSource implements DataSourceInterface
     public function setFactory(DataSourceFactoryInterface $factory)
     {
         $this->factory = $factory;
+        return $this;
     }
 
     /**
