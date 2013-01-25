@@ -96,7 +96,7 @@ class FieldExtension extends FieldAbstractExtension
             return;
         }
 
-        $parameters = $field->getDataSource()->getAllParameters();
+        $parameters = $field->getDataSource()->getParameters();
         $dataSourceName = $field->getDataSource()->getName();
 
         if (isset($this->ordering[$field_oid]['direction']) && (key($parameters[$dataSourceName]['ordering']) == $field->getName()))

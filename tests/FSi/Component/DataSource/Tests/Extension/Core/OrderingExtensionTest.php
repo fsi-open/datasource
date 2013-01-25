@@ -358,7 +358,7 @@ class OrderingExtensionTest extends \PHPUnit_Framework_TestCase
 
             $datasource
                 ->expects($this->any())
-                ->method('getAllParameters')
+                ->method('getParameters')
                 ->will($this->returnValue(array('ds' => array('ordering' => $case['parameters']))))
             ;
 
