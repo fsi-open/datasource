@@ -155,14 +155,28 @@ class FormExtensionTest extends \PHPUnit_Framework_TestCase
 
         $field
             ->expects($this->any())
-            ->method('getName')
-            ->will($this->returnValue('name'))
+            ->method('getType')
+            ->will($this->returnValue($type))
         ;
 
         $field
             ->expects($this->any())
-            ->method('getType')
-            ->will($this->returnValue($type))
+            ->method('hasOption')
+            ->will($this->returnCallback(function($option) use ($type) {
+                return (($type == 'number') && ($option =='form_type'));
+            }))
+        ;
+
+        $field
+            ->expects($this->any())
+            ->method('getOption')
+            ->will($this->returnCallback(function($option) use ($type) {
+                if (($type == 'number') && ($option =='form_type')) {
+                    return 'text';
+                } else {
+                    return null;
+                }
+            }))
         ;
 
         $extensions = $extension->getFieldTypeExtensions($type);
@@ -212,6 +226,11 @@ class FormExtensionTest extends \PHPUnit_Framework_TestCase
         $fieldView
             ->expects($this->atLeastOnce())
             ->method('setAttribute')
+            ->will($this->returnCallback(function ($attribute, $value) use ($type) {
+                if ($attribute == 'form') {
+                    $this->assertInstanceOf('\Symfony\Component\Form\FormView', $value);
+                }
+            }))
         ;
 
         $args = new FieldEvent\ViewEventArgs($field, $fieldView);

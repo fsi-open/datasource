@@ -80,7 +80,15 @@ class FormFieldExtension extends FieldAbstractExtension
      */
     public function loadOptionsConstraints(OptionsResolverInterface $optionsResolver)
     {
-        $optionsResolver->setDefaults(array('form_disabled' => false, 'form_options' => array()));
+        $optionsResolver
+            ->setDefaults(array(
+                'form_disabled' => false,
+                'form_options' => array()
+            ))
+            ->setOptional(array(
+                'form_type'
+            ))
+        ;
     }
 
     /**
@@ -217,13 +225,29 @@ class FormFieldExtension extends FieldAbstractExtension
                     $toOptions = array_merge($options, $toOptions);
                 }
 
-                $form2->add('from', $field->getType(), $fromOptions);
-                $form2->add('to', $field->getType(), $toOptions);
+                $type = array(
+                    'from' => $field->getType(),
+                    'to' => $field->getType()
+                );
+                if ($field->hasOption('form_type')) {
+                    $optionType = $field->getOption('form_type');
+                    if (!is_array($optionType)) {
+                        $type['from'] = $type['to'] = $optionType;
+                    } else {
+                        if (isset($optionType['from']))
+                            $type['from'] = $optionType['from'];
+                        if (isset($optionType['to']))
+                            $type['to'] = $optionType['to'];
+                    }
+                }
+                $form2->add('from', $optionType['from'], $fromOptions);
+                $form2->add('to', $optionType['to'], $toOptions);
                 $builder->add($form2);
                 break;
 
             default:
-                $builder->add($field->getName(), $field->getType(), $options);
+                $type = $field->hasOption('form_type')?$field->getOption('form_type'):$field->getType();
+                $builder->add($field->getName(), $type, $options);
         }
 
         $form->add($builder->getForm());
