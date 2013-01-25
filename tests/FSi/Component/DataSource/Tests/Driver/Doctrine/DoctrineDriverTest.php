@@ -42,10 +42,6 @@ class DoctrineDriverTest extends \PHPUnit_Framework_TestCase
             $this->markTestSkipped('Doctrine needed!');
         }
 
-        if (!class_exists('Symfony\Component\Form\Form')) {
-            $this->markTestSkipped('Symfony Form needed!');
-        }
-
         // the connection configuration
         $dbParams = array(
             'driver' => 'pdo_sqlite',
@@ -86,19 +82,12 @@ class DoctrineDriverTest extends \PHPUnit_Framework_TestCase
             $datasource
                 ->addField('title', 'text', 'like')
                 ->addField('author', 'text', 'like')
-                ->addField('time', 'time', 'between', array(
-                    'field_mapping' => 'create_time',
+                ->addField('created', 'datetime', 'between', array(
+                    'field_mapping' => 'create_date',
                 ))
-                ->addField('category', 'entity', 'eq', array(
-                    'form_options' => array(
-                        'class' => 'FSi\Component\DataSource\Tests\Fixtures\Category',
-                    ),
-                ))
+                ->addField('category', 'entity', 'eq')
                 ->addField('group', 'entity', 'memberof', array(
                     'field_mapping' => 'groups',
-                    'form_options' => array(
-                        'class' => 'FSi\Component\DataSource\Tests\Fixtures\Group',
-                    ),
                 ))
             ;
 
@@ -151,6 +140,7 @@ class DoctrineDriverTest extends \PHPUnit_Framework_TestCase
                     DataSourceInterface::FIELDS => array(
                         'author' => 'domain1.com',
                         'title' => 'title3',
+                        'created' => array('from' => new \DateTime(date("Y:m:d H:i:s", 35 * 24 * 60 * 60))),
                     ),
                 ),
             );
@@ -158,7 +148,7 @@ class DoctrineDriverTest extends \PHPUnit_Framework_TestCase
             $datasource->bindParameters($parameters);
             $view = $datasource->createView();
             $result = $datasource->getResult();
-            $this->assertEquals(5, count($result));
+            $this->assertEquals(2, count($result));
 
             //Checking entity fields. We assume that database was created so first category and first group have ids equal to 1.
             $parameters = array(
@@ -361,7 +351,6 @@ class DoctrineDriverTest extends \PHPUnit_Framework_TestCase
     {
         $extensions = array(
             new Symfony\Core\CoreExtension(),
-            new FormExtension($this->getFormFactory()),
             new Core\Pagination\PaginationExtension(),
             new OrderingExtension(),
         );
