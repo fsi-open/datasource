@@ -32,6 +32,16 @@ class FieldView extends AttributesContainer implements FieldViewInterface
     private $type;
 
     /**
+     * @var string
+     */
+    private $comparison;
+
+    /**
+     * @var string
+     */
+    private $parameter;
+
+    /**
      * @var DataSourceViewInterface
      */
     private $dataSourceView;
@@ -43,6 +53,8 @@ class FieldView extends AttributesContainer implements FieldViewInterface
     {
         $this->name = $field->getName();
         $this->type = $field->getType();
+        $this->comparison = $field->getComparison();
+        $this->parameter = $field->getCleanParameter();
     }
 
     /**
@@ -59,6 +71,22 @@ class FieldView extends AttributesContainer implements FieldViewInterface
     public function getType()
     {
         return $this->type;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getComparison()
+    {
+        return $this->comparison;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getParameter()
+    {
+        return $this->parameter;
     }
 
     /**

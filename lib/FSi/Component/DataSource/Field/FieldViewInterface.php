@@ -42,6 +42,20 @@ interface FieldViewInterface extends AttributesContainerInterface
     public function getType();
 
     /**
+     * Returns type of comparison for this field
+     *
+     * @return string
+     */
+    public function getComparison();
+
+    /**
+     * Returns current parameter value bound to this field
+     *
+     * @return string
+     */
+    public function getParameter();
+
+    /**
      * Sets DataSource view.
      *
      * @param DataSourceViewInterface $dataSourceView

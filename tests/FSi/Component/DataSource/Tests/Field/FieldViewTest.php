@@ -24,10 +24,37 @@ class DataSourceViewTest extends \PHPUnit_Framework_TestCase
     public function testCreate()
     {
         $field = $this->getMock('FSi\Component\DataSource\Field\FieldTypeInterface');
+
+        $field
+            ->expects($this->atLeastOnce())
+            ->method('getName')
+            ->will($this->returnValue('somename'))
+        ;
+
+        $field
+            ->expects($this->atLeastOnce())
+            ->method('getType')
+            ->will($this->returnValue('sometype'))
+        ;
+
+        $field
+            ->expects($this->atLeastOnce())
+            ->method('getComparison')
+            ->will($this->returnValue('somecomp'))
+        ;
+
+        $field
+            ->expects($this->atLeastOnce())
+            ->method('getCleanParameter')
+            ->will($this->returnValue('someparam'))
+        ;
+
         $fieldView = new FieldView($field);
 
         $this->assertEquals($field->getName(), $fieldView->getName());
         $this->assertEquals($field->getType(), $fieldView->getType());
+        $this->assertEquals($field->getComparison(), $fieldView->getComparison());
+        $this->assertEquals($field->getCleanParameter(), $fieldView->getParameter());
 
         $this->setExpectedException('Exception');
         $fieldView = new FieldView(new \stdClass());
