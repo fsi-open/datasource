@@ -9,14 +9,16 @@ properly configured driver, that will implement methods to get that kind of data
 
 ## Basic usage ##
 
-Let's assume that you have already preconfigured ``$driver`` (you can find documentation for specific drivers
-in ``doc`` folder) that allows us to fetch some data, which can be seen as array objects with specific fields - for our
-example let it be News objects with id, title, author, create date, short content and content.
+Let's assume we want to create DataSource with DoctrineDriver (you can find documentation for specific drivers in ``doc``
+folder) that allows us to fetch some data through Doctrine ORM. For our example let's assume we have a News object (entity) with
+id, title, author, create date, short content and content. We will need only a ``$managerRegistry`` instance. Then we can create
+``$datasource`` instance.
 
-First we must create DataSource with proper ``$driver``.
 ``` php
 <?php
 
+use FSi\Component\DataSource\Driver\Doctrine\DoctrineFactory;
+use FSi\Component\DataSource\Driver\Doctrine\Extension\Core\CoreExtension;
 use FSi\Component\DataSource\DataSourceFactory;
 
 $extensions = array(
@@ -25,10 +27,16 @@ $extensions = array(
 
 $factory = new DataSourceFactory($extensions);
 
-$datasource = $factory->createDataSource($driver, 'datasource_name');
+$driverExtensions = array(new CoreExtension());
+
+$driverFactory = new DoctrineFactory($managerRegistry, $factory, $driverExtensions);
+
+$datasource = $driverFactory->createDataSource('News', 'datasource_name');
+
 ```
 
 Then, if we want to give some conditions for returned data we need to specify fields, their type and way of comparison.
+
 ``` php
 <?php
 

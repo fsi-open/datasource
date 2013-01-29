@@ -12,9 +12,9 @@ You can create driver manually
 use FSi\Component\DataSource\Driver\Doctrine\DoctrineDriver;
 use FSi\Component\DataSource\Driver\Doctrine\Extension\Core\CoreExtension;
 
-$extensions = array(new CoreExtension());
+$driverExtensions = array(new CoreExtension());
 
-$driver = new DoctrineDriver($extensions, $entityManager, $entityName);
+$driver = new DoctrineDriver($driverExtensions, $entityManager, $entityName);
 
 ```
 
@@ -25,11 +25,40 @@ or through factory
 
 use FSi\Component\DataSource\Driver\Doctrine\DoctrineFactory;
 use FSi\Component\DataSource\Driver\Doctrine\Extension\Core\CoreExtension;
+use FSi\Component\DataSource\DataSourceFactory;
 
-$extensions = array(new CoreExtension());
+$extensions = array(
+    // (...) Extensions that have to be loaded to every DataSource after creation.
+);
 
-$factory = new DoctrineFactory($ManagerRegistry, $extensions);
-$driver = $factory->createDriver($entityName); //All drivers created this way will have same set of $extensions loaded.
+$factory = new DataSourceFactory($extensions);
+
+$driverExtensions = array(new CoreExtension());
+
+$driverFactory = new DoctrineFactory($ManagerRegistry, $factory, $driverExtensions);
+$driver = $driverFactory->createDriver($entityName); //All drivers created this way will have same set of $extensions loaded.
+
+```
+
+You can also create dataosurce directly from driver factory
+
+``` php
+<?php
+
+use FSi\Component\DataSource\Driver\Doctrine\DoctrineFactory;
+use FSi\Component\DataSource\Driver\Doctrine\Extension\Core\CoreExtension;
+use FSi\Component\DataSource\DataSourceFactory;
+
+$extensions = array(
+    // (...) Extensions that have to be loaded to every DataSource after creation.
+);
+
+$factory = new DataSourceFactory($extensions);
+
+$driverExtensions = array(new CoreExtension());
+
+$driverFactory = new DoctrineFactory($ManagerRegistry, $factory, $extensions);
+$datasource = $driverFactory->createDataSource($entityName, $dataSourceName); // All drivers created this way will have same set of $extensions loaded.
 
 ```
 
