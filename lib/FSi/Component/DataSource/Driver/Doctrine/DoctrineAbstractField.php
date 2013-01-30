@@ -70,7 +70,9 @@ abstract class DoctrineAbstractField extends FieldAbstractType implements Doctri
                 $comparison = 'gte';
                 $data = $from;
             } else {
-                $qb->andWhere($qb->expr()->between($fieldName, $from, $to));
+                $qb->andWhere($qb->expr()->between($fieldName, ":{$name}_from", ":{$name}_to"));
+                $qb->setParameter("{$name}_from", $from);
+                $qb->setParameter("{$name}_to", $to);
                 return;
             }
         }

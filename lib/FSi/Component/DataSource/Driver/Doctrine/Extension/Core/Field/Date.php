@@ -11,24 +11,23 @@
 
 namespace FSi\Component\DataSource\Driver\Doctrine\Extension\Core\Field;
 
+use FSi\Component\DataSource\Driver\Doctrine\DoctrineAbstractField;
+
 /**
  * Date field.
  */
-class Date extends DateTimeAbstract
+class Date extends DoctrineAbstractField
 {
+    /**
+     * {@inheritdoc}
+     */
+    protected $comparisons = array('eq', 'neq', 'lt', 'lte', 'gt', 'gte', 'in', 'notIn', 'between');
+
     /**
      * {@inheritdoc}
      */
     public function getType()
     {
         return 'date';
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function getFormat()
-    {
-        return 'Y-m-d';
     }
 }
