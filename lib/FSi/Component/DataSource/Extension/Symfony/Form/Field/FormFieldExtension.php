@@ -240,8 +240,8 @@ class FormFieldExtension extends FieldAbstractExtension
                             $type['to'] = $optionType['to'];
                     }
                 }
-                $form2->add('from', $optionType['from'], $fromOptions);
-                $form2->add('to', $optionType['to'], $toOptions);
+                $form2->add('from', $type['from'], $fromOptions);
+                $form2->add('to', $type['to'], $toOptions);
                 $builder->add($form2);
                 break;
 
