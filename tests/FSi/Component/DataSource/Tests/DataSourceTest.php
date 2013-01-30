@@ -12,6 +12,7 @@
 namespace FSi\Component\DataSource\Tests;
 
 use FSi\Component\DataSource\DataSource;
+use FSi\Component\DataSource\DataSourceInterface;
 use FSi\Component\DataSource\DataSourceViewInterface;
 use FSi\Component\DataSource\Tests\Fixtures\TestResult;
 use FSi\Component\DataSource\Tests\Fixtures\DataSourceExtension;
@@ -271,12 +272,12 @@ class DataSourceTest extends \PHPUnit_Framework_TestCase
 
         $firstData = array(
             $datasource->getName() => array(
-                DataSource::FIELDS => array('field' => 'value', 'other' => 'notimportant'),
+                DataSourceInterface::PARAMETER_FIELDS => array('field' => 'value', 'other' => 'notimportant'),
             ),
         );
         $secondData = array(
             $datasource->getName() => array(
-                DataSource::FIELDS => array('somefield' => 'somevalue'),
+                DataSourceInterface::PARAMETER_FIELDS => array('somefield' => 'somevalue'),
             ),
         );
 

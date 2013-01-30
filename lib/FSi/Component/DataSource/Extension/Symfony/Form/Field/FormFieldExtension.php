@@ -124,13 +124,13 @@ class FormFieldExtension extends FieldAbstractExtension
             return;
         }
 
-        if (isset($parameter[$datasourceName][DataSourceInterface::FIELDS][$field->getName()])) {
+        if (isset($parameter[$datasourceName][DataSourceInterface::PARAMETER_FIELDS][$field->getName()])) {
             $dataToBind = array(
-                DataSourceInterface::FIELDS => array(
-                    $field->getName() => $parameter[$datasourceName][DataSourceInterface::FIELDS][$field->getName()],
+                DataSourceInterface::PARAMETER_FIELDS => array(
+                    $field->getName() => $parameter[$datasourceName][DataSourceInterface::PARAMETER_FIELDS][$field->getName()],
                 ),
             );
-            $this->parameters[$field_oid] = $parameter[$datasourceName][DataSourceInterface::FIELDS][$field->getName()];
+            $this->parameters[$field_oid] = $parameter[$datasourceName][DataSourceInterface::PARAMETER_FIELDS][$field->getName()];
         } else {
             $dataToBind = array();
         }
@@ -138,10 +138,10 @@ class FormFieldExtension extends FieldAbstractExtension
         $form->bind($dataToBind);
         $data = $form->getData();
 
-        if (isset($data[DataSourceInterface::FIELDS][$field->getName()])) {
-            $parameter[$datasourceName][DataSourceInterface::FIELDS][$field->getName()] = $data[DataSourceInterface::FIELDS][$field->getName()];
+        if (isset($data[DataSourceInterface::PARAMETER_FIELDS][$field->getName()])) {
+            $parameter[$datasourceName][DataSourceInterface::PARAMETER_FIELDS][$field->getName()] = $data[DataSourceInterface::PARAMETER_FIELDS][$field->getName()];
         } else {
-            unset($parameter[$datasourceName][DataSourceInterface::FIELDS][$field->getName()]);
+            unset($parameter[$datasourceName][DataSourceInterface::PARAMETER_FIELDS][$field->getName()]);
         }
 
         $event->setParameter($parameter);
@@ -159,7 +159,7 @@ class FormFieldExtension extends FieldAbstractExtension
         if (isset($this->parameters[$field_oid])) {
             $parameters = array(
                 $datasourceName => array(
-                    DataSourceInterface::FIELDS => array(
+                    DataSourceInterface::PARAMETER_FIELDS => array(
                         $field->getName() => $this->parameters[$field_oid]
                     )
                 )
@@ -195,7 +195,7 @@ class FormFieldExtension extends FieldAbstractExtension
         $options = array_merge($options, array('required' => false));
 
         $form = $this->formFactory->createNamedBuilder($datasource->getName(), 'collection', array(), array('csrf_protection' => false))->getForm();
-        $builder = $this->formFactory->createNamedBuilder(DataSourceInterface::FIELDS);
+        $builder = $this->formFactory->createNamedBuilder(DataSourceInterface::PARAMETER_FIELDS);
 
         switch ($field->getComparison()) {
             case 'between':

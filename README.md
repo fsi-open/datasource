@@ -57,10 +57,10 @@ If we have configured DataSource we can bind some parameters to it.
 
 $parameters = array(
     'datasource_name' => array(
-        'fields' => array( //In fact this key always equals to constant \FSi\Component\DataSource\DataSourceInterface::FIELDS.
+        'fields' => array( // In fact this key always equals to constant \FSi\Component\DataSource\DataSourceInterface::PARAMETER_FIELDS.
             'title' => 'part of searched title',
             'author' => 'author@example.com',
-            'create_date' => array( //Input data doesn't have to be scalar, but it must in form that fields expects it.
+            'create_date' => array( // Input data doesn't have to be scalar, but it must in form that fields expects it.
                 'from' => '2012-04-04',
                 'to' => '2012-12-12',
             ),

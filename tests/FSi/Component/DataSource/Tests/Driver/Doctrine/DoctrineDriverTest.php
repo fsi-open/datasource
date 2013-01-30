@@ -100,7 +100,7 @@ class DoctrineDriverTest extends \PHPUnit_Framework_TestCase
 
             $parameters = array(
                 $datasource->getName() => array(
-                    DataSourceInterface::FIELDS => array(
+                    DataSourceInterface::PARAMETER_FIELDS => array(
                         'author' => 'domain1.com',
                     ),
                 ),
@@ -137,7 +137,7 @@ class DoctrineDriverTest extends \PHPUnit_Framework_TestCase
 
             $parameters = array(
                 $datasource->getName() => array(
-                    DataSourceInterface::FIELDS => array(
+                    DataSourceInterface::PARAMETER_FIELDS => array(
                         'author' => 'domain1.com',
                         'title' => 'title3',
                         'created' => array('from' => new \DateTime(date("Y:m:d H:i:s", 35 * 24 * 60 * 60))),
@@ -153,7 +153,7 @@ class DoctrineDriverTest extends \PHPUnit_Framework_TestCase
             //Checking entity fields. We assume that database was created so first category and first group have ids equal to 1.
             $parameters = array(
                 $datasource->getName() => array(
-                    DataSourceInterface::FIELDS => array(
+                    DataSourceInterface::PARAMETER_FIELDS => array(
                         'group' => 1,
                     ),
                 ),
@@ -165,7 +165,7 @@ class DoctrineDriverTest extends \PHPUnit_Framework_TestCase
 
             $parameters = array(
                 $datasource->getName() => array(
-                    DataSourceInterface::FIELDS => array(
+                    DataSourceInterface::PARAMETER_FIELDS => array(
                         'category' => 1,
                     ),
                 ),
@@ -177,7 +177,7 @@ class DoctrineDriverTest extends \PHPUnit_Framework_TestCase
 
             $parameters = array(
                 $datasource->getName() => array(
-                    DataSourceInterface::FIELDS => array(
+                    DataSourceInterface::PARAMETER_FIELDS => array(
                         'group' => 1,
                         'category' => 1,
                     ),
@@ -223,7 +223,7 @@ class DoctrineDriverTest extends \PHPUnit_Framework_TestCase
             $datasource->clearFields();
             $parameters = array(
                 $datasource->getName() => array(
-                    DataSourceInterface::FIELDS => array(
+                    DataSourceInterface::PARAMETER_FIELDS => array(
                         'author' => 'domain1.com',
                     ),
                 ),
@@ -266,7 +266,7 @@ class DoctrineDriverTest extends \PHPUnit_Framework_TestCase
 
         $parameters = array(
             $datasource->getName() => array(
-                DataSourceInterface::FIELDS => array(
+                DataSourceInterface::PARAMETER_FIELDS => array(
                     'group' => 'group0',
                 ),
             ),
@@ -277,7 +277,7 @@ class DoctrineDriverTest extends \PHPUnit_Framework_TestCase
 
         $parameters = array(
             $datasource->getName() => array(
-                DataSourceInterface::FIELDS => array(
+                DataSourceInterface::PARAMETER_FIELDS => array(
                     'group' => 'group',
                 ),
             ),
@@ -288,7 +288,7 @@ class DoctrineDriverTest extends \PHPUnit_Framework_TestCase
 
         $parameters = array(
             $datasource->getName() => array(
-                DataSourceInterface::FIELDS => array(
+                DataSourceInterface::PARAMETER_FIELDS => array(
                     'group' => 'group0',
                     'category' => 'category0',
                 ),

@@ -22,7 +22,7 @@ interface DataSourceInterface
     /**
      * Key for fields data.
      */
-    const FIELDS = 'fields';
+    const PARAMETER_FIELDS = 'fields';
 
     /**
      * Returns name of the DataSource.
