@@ -25,9 +25,9 @@ use FSi\Component\DataSource\Extension\Core\Ordering\OrderingExtension;
 class DoctrineDriver extends DriverAbstract
 {
     /**
-     * Arbitrary alias for entity during building query.
+     * Default alias for entity during building query when no alias is specified.
      */
-    const ENTITY_ALIAS = 'e';
+    const DEFAULT_ENTITY_ALIAS = 'e';
 
     /**
      * @var EntityManager
@@ -76,7 +76,7 @@ class DoctrineDriver extends DriverAbstract
         } else if ($entity instanceof QueryBuilder) {
             $this->alias = $entity->getRootAlias();
         } else {
-            $this->alias = self::ENTITY_ALIAS;
+            $this->alias = self::DEFAULT_ENTITY_ALIAS;
         }
 
         if ($entity instanceof QueryBuilder) {
