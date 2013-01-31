@@ -113,6 +113,7 @@ abstract class FieldAbstractType implements FieldTypeInterface
         $this->optionsResolver = new OptionsResolver();
         $this->extensions = array();
         $this->loadOptionsConstraints($this->optionsResolver);
+        $this->options = $this->optionsResolver->resolve(array());
     }
 
     /**
@@ -158,23 +159,7 @@ abstract class FieldAbstractType implements FieldTypeInterface
      */
     public function setOptions($options)
     {
-        foreach ($options as $key => $option) {
-            $this->setOption($key, $option);
-        }
-    }
-
-    /**
-     * {@inheritdoc}
-     *
-     * @throws FieldException
-     */
-    public function setOption($name, $value)
-    {
-        if (!$this->optionsResolver->isKnown($name)) {
-            throw new FieldException(sprintf('Unknown option "%s".', is_scalar($name) ? $name : gettype($name)));
-        }
-
-        $this->options[$name] = $value;
+        $this->options = $this->optionsResolver->resolve($options);
     }
 
     /**
@@ -230,8 +215,6 @@ abstract class FieldAbstractType implements FieldTypeInterface
         //PreBindParameter event.
         $event = new FieldEvent\FieldEventArgs($this);
         $this->eventDispatcher->dispatch(FieldEvents::POST_BIND_PARAMETER, $event);
-
-        $this->options = $this->optionsResolver->resolve($this->options);
     }
 
     /**
@@ -263,8 +246,6 @@ abstract class FieldAbstractType implements FieldTypeInterface
         $parameter = $event->getParameter();
 
         $parameters = array_merge_recursive($parameters, $parameter);
-
-        $this->options = $this->optionsResolver->resolve($this->options);
     }
 
     /**
@@ -287,6 +268,8 @@ abstract class FieldAbstractType implements FieldTypeInterface
         $this->eventDispatcher->addSubscriber($extension);
         $extension->loadOptionsConstraints($this->optionsResolver);
         $this->extensions[] = $extension;
+
+        $this->options = $this->optionsResolver->resolve($this->options);
     }
 
     /**
@@ -302,8 +285,6 @@ abstract class FieldAbstractType implements FieldTypeInterface
      */
     public function createView()
     {
-        $this->options = $this->optionsResolver->resolve($this->options);
-
         $view = new FieldView($this);
 
         //PreBuildView event.

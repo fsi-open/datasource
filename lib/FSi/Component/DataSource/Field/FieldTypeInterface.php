@@ -63,7 +63,7 @@ interface FieldTypeInterface
     public function getAvailableComparisons();
 
     /**
-     * Sets options for field.
+     * Sets options for field. All previously set options will be overwritten
      *
      * @param array $options
      */
