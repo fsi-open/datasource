@@ -79,7 +79,7 @@ class PaginationExtensionTest extends \PHPUnit_Framework_TestCase
                 $this->assertSame(
                     array(
                         'datasource' => array(
-                            PaginationExtension::PAGE => 2
+                            PaginationExtension::PARAMETER_PAGE => 2
                         )
                     ),
                     $event->getParameters()
@@ -87,7 +87,7 @@ class PaginationExtensionTest extends \PHPUnit_Framework_TestCase
             } else {
                 $parameters = $event->getParameters();
                 if (isset($parameters['datasource']))
-                    $this->assertArrayNotHasKey(PaginationExtension::PAGE, $parameters['datasource']);
+                    $this->assertArrayNotHasKey(PaginationExtension::PARAMETER_PAGE, $parameters['datasource']);
             }
 
             $view = $this->getMock('FSi\Component\DataSource\DataSourceViewInterface');
@@ -96,7 +96,7 @@ class PaginationExtensionTest extends \PHPUnit_Framework_TestCase
                 ->method('setAttribute')
                 ->will($this->returnCallback(function($attribute, $value) use ($case) {
                     switch ($attribute) {
-                        case PaginationExtension::VIEW_PAGE_CURRENT:
+                        case 'page':
                             $this->assertEquals($case['current_page'], $value);
                             break;
                     };

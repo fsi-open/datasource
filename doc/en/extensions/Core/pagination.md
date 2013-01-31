@@ -31,5 +31,5 @@ PaginationExtension reads only 'page' parameter from which it calculates number 
 
 ## View attributes ##
 
-* ``page_current`` - current page number
-* ``pages`` - array of sets of parameters for generating URL to every page of current results.
+* ``page`` - current page number
+* ``parameters_pages`` - array of sets of parameters for generating URL to every page of current results.

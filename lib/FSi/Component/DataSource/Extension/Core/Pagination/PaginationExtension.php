@@ -24,17 +24,7 @@ class PaginationExtension extends DataSourceAbstractExtension
     /**
      * Key for page info.
      */
-    const PAGE = 'page';
-
-    /**
-     * Current page attribute name.
-     */
-    const VIEW_PAGE_CURRENT = 'page_current';
-
-    /**
-     * Pages parameters attribute name.
-     */
-    const VIEW_PAGES = 'pages';
+    const PARAMETER_PAGE = 'page';
 
     /**
      * {@inheritdoc}

@@ -121,7 +121,7 @@ class DoctrineDriverTest extends \PHPUnit_Framework_TestCase
             $datasource->setMaxResults(20);
             $parameters = array(
                 $datasource->getName() => array(
-                    PaginationExtension::PAGE => 1,
+                    PaginationExtension::PARAMETER_PAGE => 1,
                 ),
             );
 

@@ -46,7 +46,7 @@ class Events implements EventSubscriberInterface
         $datasource = $event->getDataSource();
         $parameters = $event->getParameters();
 
-        $page = isset($parameters[$datasource->getName()][PaginationExtension::PAGE]) ? (int) $parameters[$datasource->getName()][PaginationExtension::PAGE] : 1;
+        $page = isset($parameters[$datasource->getName()][PaginationExtension::PARAMETER_PAGE]) ? (int) $parameters[$datasource->getName()][PaginationExtension::PARAMETER_PAGE] : 1;
         $datasource->setFirstResult(($page - 1) * $datasource->getMaxResults());
     }
 
@@ -64,9 +64,9 @@ class Events implements EventSubscriberInterface
             $current = $datasource->getFirstResult();
             $page = (int) floor($current/$maxresults) + 1;
         }
-        unset($parameters[$datasourceName][PaginationExtension::PAGE]);
+        unset($parameters[$datasourceName][PaginationExtension::PARAMETER_PAGE]);
         if ($page > 1)
-            $parameters[$datasourceName][PaginationExtension::PAGE] = $page;
+            $parameters[$datasourceName][PaginationExtension::PARAMETER_PAGE] = $page;
         $event->setParameters($parameters);
     }
 
@@ -92,15 +92,15 @@ class Events implements EventSubscriberInterface
             $page = (int) floor($current/$maxresults) + 1;
         }
 
-        unset($parameters[$datasourceName][PaginationExtension::PAGE]);
+        unset($parameters[$datasourceName][PaginationExtension::PARAMETER_PAGE]);
         $pages = array();
         for ($i = 1; $i <= $all; $i++) {
             if ($i > 1)
-                $parameters[$datasourceName][PaginationExtension::PAGE] = $i;
+                $parameters[$datasourceName][PaginationExtension::PARAMETER_PAGE] = $i;
             $pages[$i] = $parameters;
         }
 
-        $view->setAttribute(PaginationExtension::VIEW_PAGE_CURRENT, $page);
-        $view->setAttribute(PaginationExtension::VIEW_PAGES, $pages);
+        $view->setAttribute('page', $page);
+        $view->setAttribute('parameters_pages', $pages);
     }
 }
