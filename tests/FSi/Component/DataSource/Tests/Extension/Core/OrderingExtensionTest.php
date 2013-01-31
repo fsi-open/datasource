@@ -65,7 +65,7 @@ class OrderingExtensionTest extends \PHPUnit_Framework_TestCase
 
         $parameters = array(
             'ds'    => array(
-                'ordering'    => array(
+                OrderingExtension::PARAMETER_SORT    => array(
                     'test'    => 'asc'
                 )
             )
@@ -210,15 +210,15 @@ class OrderingExtensionTest extends \PHPUnit_Framework_TestCase
                 'fields' => array(
                     array(
                         'name'        => 'field1',
-                        'options'     => array('ordering' => 'asc', 'ordering_priority' => 1)
+                        'options'     => array('default_sort' => 'asc', 'default_sort_priority' => 1)
                     ),
                     array(
                         'name'        => 'field2',
-                        'options'     => array('ordering' => 'desc', 'ordering_priority' => 2)
+                        'options'     => array('default_sort' => 'desc', 'default_sort_priority' => 2)
                     ),
                     array(
                         'name'        => 'field3',
-                        'options'     => array('ordering' => 'asc')
+                        'options'     => array('default_sort' => 'asc')
                     ),
                 ),
                 'parameters'  => array(
@@ -264,15 +264,15 @@ class OrderingExtensionTest extends \PHPUnit_Framework_TestCase
                 'fields' => array(
                     array(
                         'name'        => 'field1',
-                        'options'     => array('ordering' => 'asc', 'ordering_priority' => 1)
+                        'options'     => array('default_sort' => 'asc', 'default_sort_priority' => 1)
                     ),
                     array(
                         'name'        => 'field2',
-                        'options'     => array('ordering' => 'desc', 'ordering_priority' => 2)
+                        'options'     => array('default_sort' => 'desc', 'default_sort_priority' => 2)
                     ),
                     array(
                         'name'        => 'field3',
-                        'options'     => array('ordering' => 'asc')
+                        'options'     => array('default_sort' => 'asc')
                     ),
                 ),
                 'parameters'  => array(
@@ -359,7 +359,7 @@ class OrderingExtensionTest extends \PHPUnit_Framework_TestCase
             $datasource
                 ->expects($this->any())
                 ->method('getParameters')
-                ->will($this->returnValue(array('ds' => array('ordering' => $case['parameters']))))
+                ->will($this->returnValue(array('ds' => array(OrderingExtension::PARAMETER_SORT => $case['parameters']))))
             ;
 
             $extension = new OrderingExtension();
@@ -367,7 +367,7 @@ class OrderingExtensionTest extends \PHPUnit_Framework_TestCase
             $subscriber = array_shift($subscribers);
             $subscriber->preBindParameters(new DataSourceEvent\ParametersEventArgs(
                 $datasource,
-                array('ds' => array('ordering' => $case['parameters']))
+                array('ds' => array(OrderingExtension::PARAMETER_SORT => $case['parameters']))
             ));
 
             // we use fake driver extension instead of specific driver extension because we want to test common DriverExtension functionality
@@ -379,38 +379,37 @@ class OrderingExtensionTest extends \PHPUnit_Framework_TestCase
                 $view = $this->getMock('FSi\Component\DataSource\Field\FieldViewInterface');
 
                 $view
-                    ->expects($this->exactly(3))
+                    ->expects($this->exactly(5))
                     ->method('setAttribute')
                     ->will($this->returnCallback(function ($attribute, $value) use ($field, $case) {
                         switch ($attribute) {
-                            case 'ordering_current':
-                                if (key($case['parameters']) == $field->getName()) {
-                                    $this->assertEquals(
-                                        $case['parameters'][$field->getName()],
-                                        $value
-                                    );
-                                } else {
-                                    $this->assertEquals(
-                                        '',
-                                        $value
-                                    );
-                                }
+                            case 'sorted_ascending':
+                                $this->assertEquals(
+                                    (key($case['parameters']) == $field->getName()) && (current($case['parameters']) == 'asc'),
+                                    $value
+                                );
                                 break;
-                            case 'ordering_ascending':
+                            case 'sorted_descending':
+                                $this->assertEquals(
+                                    (key($case['parameters']) == $field->getName()) && (current($case['parameters']) == 'desc'),
+                                    $value
+                                );
+                                break;
+                            case 'parameters_sort_ascending':
                                 $this->assertSame(
                                     array(
                                         'ds' => array(
-                                            'ordering' => $case['expected_parameters'][$field->getName()]['ordering_ascending']
+                                            OrderingExtension::PARAMETER_SORT => $case['expected_parameters'][$field->getName()]['ordering_ascending']
                                         )
                                     ),
                                     $value
                                 );
                                 break;
-                            case 'ordering_descending':
+                            case 'parameters_sort_descending':
                                 $this->assertSame(
                                     array(
                                         'ds' => array(
-                                                'ordering' => $case['expected_parameters'][$field->getName()]['ordering_descending']
+                                            OrderingExtension::PARAMETER_SORT => $case['expected_parameters'][$field->getName()]['ordering_descending']
                                         )
                                     ),
                                     $value

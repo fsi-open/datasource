@@ -34,9 +34,9 @@ $factory = new DataSourceFactory($extensions);
 
 ## Available field options ##
 
-* ``ordering_disabled`` - if true, field won't get any ordering parameters, ``false`` by default
-* ``ordering`` - default ordering ('asc' or 'desc'), note: it works **even if** ``ordering_disabled`` is set to ``true``
-* ``ordering_priority`` - default ordering priority, note: it works **even if** ``ordering_disabled`` is set to ``true``
+* ``sortable`` - if false, field won't get any sorting parameters, ``true`` by default
+* ``default_sort`` - default sorting direction ('asc' or 'desc'), note: it works **even if** ``sortable`` is set to ``false``
+* ``default_sort_priority`` - default sorting priority, note: it works **even if** ``sortable`` is set to ``false``
 
 ## Parameters ##
 
@@ -48,7 +48,7 @@ direction of sorting results by these fields i.e. Order of fields in this array 
 
 $parameters = array(
     'datasource' => array(
-        'ordering' => array(
+        'sort' => array(
             'field1' => 'asc',
             'field2' => 'desc
         )
@@ -60,10 +60,11 @@ In this example results will be sorted ascending by value of field1 and then des
 
 ## FieldView attributes ##
 
-* ``ordering_disabled`` - if true, field should not display sorting anchors, ``false`` by default
-* ``ordering_current`` - ``'asc'`` or ``'desc'`` if this field is current primary sorting field or ``''`` otherwise
-* ``ordering_ascending`` - array of parameters that should be passed to the URL which will sort current results by value of this field in an ascending order
-* ``ordering_descending`` - array of parameters that should be passed to the URL which will sort current results by value of this field in a descending order
+* ``sortable`` - if ``false``, field should not display sorting anchors, ``true`` by default
+* ``sorted_ascending`` - ``true`` if this field is currently primary sorting field in ascending order or ``false`` otherwise
+* ``sorted_descending`` - ``true`` if this field is currently primary sorting field in descending order or ``false`` otherwise
+* ``parameters_sort_ascending`` - array of parameters that should be passed to the URL which will sort current results by value of this field in an ascending order
+* ``parameters_sort_descending`` - array of parameters that should be passed to the URL which will sort current results by value of this field in a descending order
 
 ## example ##
 
@@ -75,13 +76,13 @@ This example shows how default sorting criteria are combined with sorting parame
 $datasource
     ->addField('id', 'number', 'eq')
     ->addField('title', 'text', 'like', array(
-        'ordering' => 'asc',
-        'ordering_priority' => 1
+        'default_sort' => 'asc',
+        'default_sort_priority' => 1
     ))
     ->addField('author', 'text', 'eq')
     ->addField('create_date', 'datetime', 'between', array(
-        'ordering' => 'desc',
-        'ordering_priority' => 2
+        'default_sort' => 'desc',
+        'default_sort_priority' => 2
     ))
     ->addField('content', 'text', 'like')
 ;
@@ -99,7 +100,7 @@ Now if we bind parameters like these...
 
 $parameters = array(
     'datasource' => array(
-        'ordering' => array(
+        'sort' => array(
             'author' => 'asc',
             'title' => 'asc
         )

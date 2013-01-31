@@ -85,19 +85,19 @@ abstract class DriverExtension extends DriverAbstractExtension
         $tmpFields = $fields;
         usort($tmpFields, function(FieldTypeInterface $a, FieldTypeInterface $b) {
             switch (true) {
-                case $a->hasOption(OrderingExtension::ORDERING) && !$b->hasOption(OrderingExtension::ORDERING):
+                case $a->hasOption('default_sort') && !$b->hasOption('default_sort'):
                     return -1;
-                case !$a->hasOption(OrderingExtension::ORDERING) && $b->hasOption(OrderingExtension::ORDERING):
+                case !$a->hasOption('default_sort') && $b->hasOption('default_sort'):
                     return 1;
-                case $a->hasOption(OrderingExtension::ORDERING) && $b->hasOption(OrderingExtension::ORDERING):
+                case $a->hasOption('default_sort') && $b->hasOption('default_sort'):
                     switch (true) {
-                        case $a->hasOption(OrderingExtension::ORDERING_PRIORITY) && !$b->hasOption(OrderingExtension::ORDERING_PRIORITY):
+                        case $a->hasOption('default_sort_priority') && !$b->hasOption('default_sort_priority'):
                             return -1;
-                        case !$a->hasOption(OrderingExtension::ORDERING_PRIORITY) && $b->hasOption(OrderingExtension::ORDERING_PRIORITY):
+                        case !$a->hasOption('default_sort_priority') && $b->hasOption('default_sort_priority'):
                             return 1;
-                        case $a->hasOption(OrderingExtension::ORDERING_PRIORITY) && $b->hasOption(OrderingExtension::ORDERING_PRIORITY):
-                            $aPriority = $a->getOption(OrderingExtension::ORDERING_PRIORITY);
-                            $bPriority = $b->getOption(OrderingExtension::ORDERING_PRIORITY);
+                        case $a->hasOption('default_sort_priority') && $b->hasOption('default_sort_priority'):
+                            $aPriority = $a->getOption('default_sort_priority');
+                            $bPriority = $b->getOption('default_sort_priority');
                             return ($aPriority != $bPriority) ? (($aPriority > $bPriority) ? -1 : 1) : 0;
                     }
                 default:
@@ -106,8 +106,8 @@ abstract class DriverExtension extends DriverAbstractExtension
         });
 
         foreach ($tmpFields as $field) {
-            if ($field->hasOption(OrderingExtension::ORDERING) && !isset($sortedFields[$field->getName()])) {
-                $sortedFields[$field->getName()] = $field->getOption(OrderingExtension::ORDERING);
+            if ($field->hasOption('default_sort') && !isset($sortedFields[$field->getName()])) {
+                $sortedFields[$field->getName()] = $field->getOption('default_sort');
             }
         }
 

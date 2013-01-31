@@ -11,10 +11,12 @@
 
 namespace FSi\Component\DataSource\Extension\Core\Ordering\EventSubscriber;
 
+
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use FSi\Component\DataSource\DataSourceInterface;
 use FSi\Component\DataSource\Event\DataSourceEvents;
 use FSi\Component\DataSource\Event\DataSourceEvent;
+use FSi\Component\DataSource\Exception\DataSourceException;
 use FSi\Component\DataSource\Extension\Core\Ordering\OrderingExtension;
 use FSi\Component\DataSource\Extension\Core\Ordering\Field\FieldExtension;
 use FSi\Component\DataSource\Field\FieldTypeInterface;
@@ -47,15 +49,18 @@ class Events implements EventSubscriberInterface
         $datasourceName = $datasource->getName();
         $parameters = $event->getParameters();
 
-        if (isset($parameters[$datasourceName][OrderingExtension::ORDERING]) && is_array($parameters[$datasourceName][OrderingExtension::ORDERING])) {
+        if (isset($parameters[$datasourceName][OrderingExtension::PARAMETER_SORT]) && is_array($parameters[$datasourceName][OrderingExtension::PARAMETER_SORT])) {
             $priority = 0;
-            foreach ($parameters[$datasourceName][OrderingExtension::ORDERING] as $fieldName => $direction) {
+            foreach ($parameters[$datasourceName][OrderingExtension::PARAMETER_SORT] as $fieldName => $direction) {
+                if (!in_array($direction, array('asc', 'desc'))) {
+                    throw new DataSourceException(sprintf("Unknown sorting direction %s specified", $direction));
+                }
                 $field = $datasource->getField($fieldName);
                 $fieldExtension = $this->getFieldExtension($field);
                 $fieldExtension->setOrdering($field, array('priority' => $priority, 'direction' => $direction));
                 $priority++;
             }
-            $this->ordering[$datasource_oid] = $parameters[$datasourceName][OrderingExtension::ORDERING];
+            $this->ordering[$datasource_oid] = $parameters[$datasourceName][OrderingExtension::PARAMETER_SORT];
         }
     }
 
@@ -67,7 +72,7 @@ class Events implements EventSubscriberInterface
         $parameters = $event->getParameters();
 
         if (isset($this->ordering[$datasource_oid]))
-            $parameters[$datasourceName][OrderingExtension::ORDERING] = $this->ordering[$datasource_oid];
+            $parameters[$datasourceName][OrderingExtension::PARAMETER_SORT] = $this->ordering[$datasource_oid];
 
         $event->setParameters($parameters);
     }

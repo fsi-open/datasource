@@ -191,7 +191,7 @@ class DoctrineDriverTest extends \PHPUnit_Framework_TestCase
             //Checking sorting.
             $parameters = array(
                 $datasource->getName() => array(
-                    OrderingExtension::ORDERING => array(
+                    OrderingExtension::PARAMETER_SORT => array(
                         'title' => 'asc'
                     ),
                 ),
@@ -206,7 +206,7 @@ class DoctrineDriverTest extends \PHPUnit_Framework_TestCase
             //Checking sorting.
             $parameters = array(
                 $datasource->getName() => array(
-                    OrderingExtension::ORDERING => array(
+                    OrderingExtension::PARAMETER_SORT => array(
                         'title' => 'desc',
                         'author' => 'asc'
                     ),

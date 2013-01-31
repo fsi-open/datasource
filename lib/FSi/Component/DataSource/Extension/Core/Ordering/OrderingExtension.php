@@ -27,37 +27,7 @@ class OrderingExtension extends DataSourceAbstractExtension
     /**
      * Key for passing data and ordering attribute.
      */
-    const ORDERING = 'ordering';
-
-    /**
-     * Key for ordering priority attribute.
-     */
-    const ORDERING_PRIORITY = 'ordering_priority';
-
-    /**
-     * Key for ordering disabled option.
-     */
-    const ORDERING_IS_DISABLED = 'ordering_disabled';
-
-    /**
-     * Key for current attribute.
-     */
-    const VIEW_CURRENT_ORDERING = 'ordering_current';
-
-    /**
-     * Key to determine if ordering is disabled.
-     */
-    const VIEW_ORDERING_DISABLED = 'ordering_disabled';
-
-    /**
-     * Key containing parameters for ascending sort
-     */
-    const VIEW_ASCENDING_PARAMETERS = 'ordering_ascending';
-
-    /**
-     * Key containing parameters for descending sorting
-     */
-    const VIEW_DESCENDING_PARAMETERS = 'ordering_descending';
+    const PARAMETER_SORT = 'sort';
 
     /**
      * {@inheritdoc}
