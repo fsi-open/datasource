@@ -53,7 +53,7 @@ class FormFieldExtension extends FieldAbstractExtension
         return array(
             FieldEvents::PRE_BIND_PARAMETER => array('preBindParameter'),
             FieldEvents::POST_BUILD_VIEW => array('postBuildView'),
-            FieldEvents::PRE_GET_PARAMETER => array('preGetParameter'),
+            FieldEvents::POST_GET_PARAMETER => array('preGetParameter'),
         );
     }
 

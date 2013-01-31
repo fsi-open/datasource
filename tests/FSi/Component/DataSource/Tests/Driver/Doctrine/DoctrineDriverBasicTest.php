@@ -295,11 +295,11 @@ class DoctrineDriverBasicTest extends \PHPUnit_Framework_TestCase
             $extension->resetCalls();
 
             $field->getParameter($parameter);
-            $this->assertEquals(array('preGetParameter', 'postGetParameter'), $extension->getCalls());
+            $this->assertEquals(array('postGetParameter'), $extension->getCalls());
             $extension->resetCalls();
 
             $field->createView(array());
-            $this->assertEquals(array('preBuildView', 'postBuildView'), $extension->getCalls());
+            $this->assertEquals(array('postBuildView'), $extension->getCalls());
             $extension->resetCalls();
         }
     }

@@ -27,19 +27,9 @@ class FieldEvents
     const POST_BIND_PARAMETER = 'datasource_field.post_bind_parameter';
 
     /**
-     * PreGetParameter event name.
-     */
-    const PRE_GET_PARAMETER = 'datasource_field.pre_get_parameter';
-
-    /**
      * PostGetParameter event name.
      */
     const POST_GET_PARAMETER = 'datasource_field.post_get_parameter';
-
-    /**
-     * PreBuildView event name.
-     */
-    const PRE_BUILD_VIEW = 'datasource_field.pre_build_view';
 
     /**
      * PostBuildView event name.

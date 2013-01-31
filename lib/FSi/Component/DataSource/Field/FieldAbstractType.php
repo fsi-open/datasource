@@ -235,11 +235,6 @@ abstract class FieldAbstractType implements FieldTypeInterface
             $parameter = array();
         }
 
-        //PreGetParameter event.
-        $event = new FieldEvent\ParameterEventArgs($this, $parameter);
-        $this->eventDispatcher->dispatch(FieldEvents::PRE_GET_PARAMETER, $event);
-        $parameter = $event->getParameter();
-
         //PostGetParameter event.
         $event = new FieldEvent\ParameterEventArgs($this, $parameter);
         $this->eventDispatcher->dispatch(FieldEvents::POST_GET_PARAMETER, $event);
@@ -286,10 +281,6 @@ abstract class FieldAbstractType implements FieldTypeInterface
     public function createView()
     {
         $view = new FieldView($this);
-
-        //PreBuildView event.
-        $event = new FieldEvent\ViewEventArgs($this, $view);
-        $this->eventDispatcher->dispatch(FieldEvents::PRE_BUILD_VIEW, $event);
 
         //PostBuildView event.
         $event = new FieldEvent\ViewEventArgs($this, $view);
