@@ -135,11 +135,13 @@ class FormExtensionEntityTest extends \PHPUnit_Framework_TestCase
             ->expects($this->any())
             ->method('getOption')
             ->will($this->returnCallback(function () {
-                $args = func_get_args();
-                if (array_shift($args) == 'form_options') {
-                    return array(
-                        'class' => 'FSi\Component\DataSource\Tests\Fixtures\News',
-                    );
+                switch (func_get_arg(0)) {
+                    case 'form_filter':
+                        return true;
+                    case 'form_options':
+                        return array(
+                            'class' => 'FSi\Component\DataSource\Tests\Fixtures\News',
+                        );
                 }
             }))
         ;

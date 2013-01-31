@@ -171,10 +171,15 @@ class FormExtensionTest extends \PHPUnit_Framework_TestCase
             ->expects($this->any())
             ->method('getOption')
             ->will($this->returnCallback(function($option) use ($type) {
-                if (($type == 'number') && ($option =='form_type')) {
-                    return 'text';
-                } else {
-                    return null;
+                switch ($option) {
+                    case 'form_filter':
+                        return true;
+                    case 'form_type':
+                        if ($type == 'number') {
+                            return 'text';
+                        } else {
+                            return null;
+                        }
                 }
             }))
         ;

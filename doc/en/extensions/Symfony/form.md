@@ -35,7 +35,7 @@ $factory = new DataSourceFactory($extensions);
 
 ## Available field options ##
 
-* ``form_disabled`` - whether form creation and rendering for this field is disabled, ``false`` by default
+* ``form_filter`` - whether form creation and rendering for this field is enabled, ``true`` by default
 * ``form_type`` - type of form that should be created for this datasource field, by default it equals to the type of datasource
   field, it can be any valid form type or array containing 'from' and 'to' types for 'between' comparisons
 * ``form_options`` - options passed to the form field (see documentation for Symfony Form component for details); for ``between``
@@ -61,5 +61,5 @@ $datasource
  
 ## FieldView attributes ##
 
-* ``form`` - set on each field's view (unless it has ``form_disabled`` option set to true), if set it's an instance of
+* ``form`` - set on each field's view (unless it has ``form_filter`` option set to ``false``), if set it's an instance of
   ``Symfony\Component\Form\FormView``

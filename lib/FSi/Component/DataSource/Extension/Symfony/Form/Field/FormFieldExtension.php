@@ -82,11 +82,15 @@ class FormFieldExtension extends FieldAbstractExtension
     {
         $optionsResolver
             ->setDefaults(array(
-                'form_disabled' => false,
+                'form_filter' => true,
                 'form_options' => array()
             ))
             ->setOptional(array(
                 'form_type'
+            ))
+            ->setAllowedTypes(array(
+                'form_filter' => 'bool',
+                'form_options' => 'array',
             ))
         ;
     }
@@ -100,7 +104,7 @@ class FormFieldExtension extends FieldAbstractExtension
         $view = $event->getView();
 
         if ($form = $this->getForm($field))
-            $view->setAttribute(FormExtension::VIEW_FORM, $form->createView());
+            $view->setAttribute('form', $form->createView());
     }
 
     /**
@@ -181,7 +185,7 @@ class FormFieldExtension extends FieldAbstractExtension
             return;
         }
 
-        if ($field->hasOption('form_disabled') && $field->getOption('form_disabled')) {
+        if (!$field->getOption('form_filter')) {
             return;
         }
 
