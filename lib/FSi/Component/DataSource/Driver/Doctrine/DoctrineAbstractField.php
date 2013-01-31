@@ -23,11 +23,6 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 abstract class DoctrineAbstractField extends FieldAbstractType implements DoctrineFieldInterface
 {
     /**
-     * Field mapping option name.
-     */
-    const FIELD_MAPPING = 'field_mapping';
-
-    /**
      * {@inheritdoc}
      */
     public function buildQuery(QueryBuilder $qb, $alias)
@@ -110,9 +105,10 @@ abstract class DoctrineAbstractField extends FieldAbstractType implements Doctri
      */
     public function loadOptionsConstraints(OptionsResolverInterface $optionsResolver)
     {
-        $optionsResolver->setDefaults(array(
-            self::FIELD_MAPPING => null,
-        ));
+        $optionsResolver
+            ->setOptional(array('field'))
+            ->setAllowedTypes(array('field' => 'string'))
+        ;
     }
 
     /**
@@ -124,8 +120,8 @@ abstract class DoctrineAbstractField extends FieldAbstractType implements Doctri
      */
     protected function getFieldName($alias)
     {
-        if ($this->hasOption(self::FIELD_MAPPING)) {
-            $name = $this->getOption(self::FIELD_MAPPING);
+        if ($this->hasOption('field')) {
+            $name = $this->getOption('field');
         } else {
             $name = $this->getName();
         }

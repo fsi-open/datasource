@@ -83,11 +83,11 @@ class DoctrineDriverTest extends \PHPUnit_Framework_TestCase
                 ->addField('title', 'text', 'like')
                 ->addField('author', 'text', 'like')
                 ->addField('created', 'datetime', 'between', array(
-                    'field_mapping' => 'create_date',
+                    'field' => 'create_date',
                 ))
                 ->addField('category', 'entity', 'eq')
                 ->addField('group', 'entity', 'memberof', array(
-                    'field_mapping' => 'groups',
+                    'field' => 'groups',
                 ))
             ;
 
@@ -257,10 +257,10 @@ class DoctrineDriverTest extends \PHPUnit_Framework_TestCase
         $datasource
             ->addField('author', 'text', 'like')
             ->addField('category', 'text', 'like', array(
-                'field_mapping' => 'c.name',
+                'field' => 'c.name',
             ))
             ->addField('group', 'text', 'like', array(
-                'field_mapping' => 'g.name',
+                'field' => 'g.name',
             ))
         ;
 

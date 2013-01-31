@@ -62,8 +62,8 @@ class DoctrineExtension extends DriverExtension implements EventSubscriberInterf
 
     protected function getFieldName(DoctrineAbstractField $field, $alias)
     {
-        if ($field->hasOption(DoctrineAbstractField::FIELD_MAPPING)) {
-            $name = $field->getOption(DoctrineAbstractField::FIELD_MAPPING);
+        if ($field->hasOption('field')) {
+            $name = $field->getOption('field');
         } else {
             $name = $field->getName();
         }

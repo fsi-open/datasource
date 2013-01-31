@@ -79,17 +79,17 @@ Provided field types:
 Note: When using ``between`` comparison, you must bind parameters as array('from' => $value1, 'to' => $value2), 
 if ``entity`` you must give entity to it and if ``in``, or ``notIn`` then as array.
 
-All fields allow by default to set option ``field_mapping`` which usage is explained below.
+All fields allow by default to set option ``field`` which usage is explained below.
 
 ## Basic usage ##
 
-In the simplest case you must just create driver with proper entity name and use it to create DataSource:
+In the simpliest case you must just create driver with proper entity name and use it to create DataSource:
 
 ``` php
 <?php
 
 $driverFactory = new DoctrineFactory($entityManager, $driverExtensions);
-$driver = $driverFactory->createDriver('Name\Of\Entity'); //It can be any entity name that is known to Doctrine.
+$driver = $driverFactory->createDriver('Name\Of\Entity'); // It can be any entity name that is known to Doctrine.
 
 $datasourceFactory = new DataSourceFactory($datasourceExtensions);
 $datasource = $datasourceFactory->createDataSource($driver, 'datasource_name');
@@ -105,20 +105,20 @@ $datasource
 ;
 ```
 
-You can use ``field_mapping`` option to have different field name, or many DataSource fields referring to one object field:
+You can use ``field`` option to have different field name, or many DataSource fields referring to one entity field:
 
 ``` php
 <?php
 
 $datasource
     ->addField('veryweirdname' 'number', 'eq', array(
-        'field_mapping' => 'id',
+        'field' => 'id',
     ))
     ->addField('datefrom', 'datetime', 'gte', array(
-        'field_mapping' => 'create_date',
+        'field' => 'create_date',
     ))
     ->addField('dateto', 'datetime', 'lte', array(
-        'field_mapping' => 'create_date',
+        'field' => 'create_date',
     ))
 ;
 ```
@@ -135,7 +135,7 @@ $queryBuilder = $entityManager->createQueryBuilder();
 $queryBuilder
     ->select('n')
     ->from('Name\Of\Entity', 'n')
-    ->where('n.active = 1') //All results will have additional condition.
+    ->where('n.active = 1') // All results will have additional condition.
 ;
 
 // Factory way:
@@ -151,7 +151,7 @@ $driver = new DoctrineDriver($extensions, $entityManager, $queryBuilder, 'n'); /
 ## Advanced use with QueryBuilder ##
 
 If you want to have conditions to fields from joined entities, or you build very sophisticated query,
-remember to add field mapping to all of fields, otherwise they will try do refer to main entity alias.
+remember to add field mapping to all of fields, otherwise they will try do refer to root entity alias.
 
 ``` php
 <?php
@@ -167,10 +167,10 @@ $factory = new DoctrineFactory($entityManager, $extensions);
 $driver = $factory->createDriver($queryBuilder); // We don't need to pass alias, if we specify field mappings.
 
 $datasource
-    ->addField('id', 'number', 'eq', array('field_mapping' => 'n.id'))
-    ->addField('title', 'text', 'like', array('field_mapping' => 'n.title'))
+    ->addField('id', 'number', 'eq', array('field' => 'n.id'))
+    ->addField('title', 'text', 'like', array('field' => 'n.title'))
     ->addField('category_name', 'text', 'like', array( // It's not entity field anymore.
-        'field_mapping' => 'c.name', // It allow us to specify condition for category name, not just category (as entity).
+        'field' => 'c.name', // It allow us to specify condition for category name, not just category (as entity).
     ))
 ;
 
