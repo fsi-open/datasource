@@ -270,6 +270,22 @@ abstract class FieldAbstractType implements FieldTypeInterface
     /**
      * {@inheritdoc}
      */
+    public function setExtensions(array $extensions)
+    {
+        foreach ($extensions as $extension) {
+            if (!($extension instanceof FieldExtensionInterface)) {
+                throw new FieldException(sprintf('Expected instance of FieldExtensionInterface, %s given', get_class($extension)));
+            }
+            $this->eventDispatcher->addSubscriber($extension);
+            $extension->loadOptionsConstraints($this->optionsResolver);
+        }
+        $this->options = $this->optionsResolver->resolve($this->options);
+        $this->extensions = $extensions;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getExtensions()
     {
         return $this->extensions;

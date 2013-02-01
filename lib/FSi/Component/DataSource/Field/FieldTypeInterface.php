@@ -121,6 +121,13 @@ interface FieldTypeInterface
     public function addExtension(FieldExtensionInterface $extension);
 
     /**
+     * Replace field extensions with specified ones.
+     *
+     * @param array $extensions
+     */
+    public function setExtensions(array $extensions);
+
+    /**
      * Returns array of registered extensions.
      *
      * @return array

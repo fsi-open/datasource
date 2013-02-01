@@ -107,9 +107,7 @@ abstract class DriverAbstract implements DriverInterface
         $field = clone $this->fieldTypes[$type];
 
         if (isset($this->fieldExtensions[$type])) {
-            foreach ($this->fieldExtensions[$type] as $fieldExtension) {
-                $field->addExtension($fieldExtension);
-            }
+            $field->setExtensions($this->fieldExtensions[$type]);
         }
 
         return $field;
