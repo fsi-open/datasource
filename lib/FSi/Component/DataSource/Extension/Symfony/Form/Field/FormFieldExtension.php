@@ -135,20 +135,18 @@ class FormFieldExtension extends FieldAbstractExtension
                 ),
             );
             $this->parameters[$field_oid] = $parameter[$datasourceName][DataSourceInterface::PARAMETER_FIELDS][$field->getName()];
-        } else {
-            $dataToBind = array();
+
+            $form->bind($dataToBind);
+            $data = $form->getData();
+
+            if (isset($data[DataSourceInterface::PARAMETER_FIELDS][$field->getName()])) {
+                $parameter[$datasourceName][DataSourceInterface::PARAMETER_FIELDS][$field->getName()] = $data[DataSourceInterface::PARAMETER_FIELDS][$field->getName()];
+            } else {
+                unset($parameter[$datasourceName][DataSourceInterface::PARAMETER_FIELDS][$field->getName()]);
+            }
+
+            $event->setParameter($parameter);
         }
-
-        $form->bind($dataToBind);
-        $data = $form->getData();
-
-        if (isset($data[DataSourceInterface::PARAMETER_FIELDS][$field->getName()])) {
-            $parameter[$datasourceName][DataSourceInterface::PARAMETER_FIELDS][$field->getName()] = $data[DataSourceInterface::PARAMETER_FIELDS][$field->getName()];
-        } else {
-            unset($parameter[$datasourceName][DataSourceInterface::PARAMETER_FIELDS][$field->getName()]);
-        }
-
-        $event->setParameter($parameter);
     }
 
     /**
