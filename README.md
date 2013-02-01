@@ -214,9 +214,7 @@ in ``FSi\Component\DataSource\Event\FieldEvent`` namespace)
 
 * ``PRE_BIND_PARAMETER`` - ``ParameterEventArgs``
 * ``POST_BIND_PARAMETER`` - ``FieldEventArgs``
-* ``PRE_BUILD_VIEW`` - ``ViewEventArgs``
 * ``POST_BUILD_VIEW`` - ``ViewEventArgs``
-* ``PRE_GET_PARAMETER`` - ``ParameterEventArgs``
 * ``POST_GET_PARAMETER`` - ``ParameterEventArgs``
 
 All of arguments allows to access ``Field`` through ``getField`` method.
