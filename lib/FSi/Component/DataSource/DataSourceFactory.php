@@ -62,7 +62,7 @@ class DataSourceFactory implements DataSourceFactoryInterface
         $this->datasources[$name] = $datasource;
 
         foreach ($this->extensions as $extension) {
-            $datasource->addExtension(clone $extension);
+            $datasource->addExtension($extension);
         }
 
         $datasource->setFactory($this);

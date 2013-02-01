@@ -1,6 +1,6 @@
 # Doctrine Driver #
 
-This driver allows to fetch data from database using Doctrine. 
+This driver allows to fetch data from database using Doctrine2 ORM. 
 
 ## Setup ##
 
@@ -12,9 +12,9 @@ You can create driver manually
 use FSi\Component\DataSource\Driver\Doctrine\DoctrineDriver;
 use FSi\Component\DataSource\Driver\Doctrine\Extension\Core\CoreExtension;
 
-$extensions = array(new CoreExtension());
+$driverExtensions = array(new CoreExtension());
 
-$driver = new DoctrineDriver($extensions, $entityManager, $entityName);
+$driver = new DoctrineDriver($driverExtensions, $entityManager, $entityName);
 
 ```
 
@@ -25,18 +25,47 @@ or through factory
 
 use FSi\Component\DataSource\Driver\Doctrine\DoctrineFactory;
 use FSi\Component\DataSource\Driver\Doctrine\Extension\Core\CoreExtension;
+use FSi\Component\DataSource\DataSourceFactory;
 
-$extensions = array(new CoreExtension());
+$extensions = array(
+    // (...) Extensions that have to be loaded to every DataSource after creation.
+);
 
-$factory = new DoctrineFactory($entityManager, $extensions);
-$driver = $factory->createDriver($entityName); //All drivers created this way will have same set of $extensions loaded.
+$factory = new DataSourceFactory($extensions);
+
+$driverExtensions = array(new CoreExtension());
+
+$driverFactory = new DoctrineFactory($ManagerRegistry, $factory, $driverExtensions);
+$driver = $driverFactory->createDriver($entityName); //All drivers created this way will have same set of $extensions loaded.
+
+```
+
+You can also create dataosurce directly from driver factory
+
+``` php
+<?php
+
+use FSi\Component\DataSource\Driver\Doctrine\DoctrineFactory;
+use FSi\Component\DataSource\Driver\Doctrine\Extension\Core\CoreExtension;
+use FSi\Component\DataSource\DataSourceFactory;
+
+$extensions = array(
+    // (...) Extensions that have to be loaded to every DataSource after creation.
+);
+
+$factory = new DataSourceFactory($extensions);
+
+$driverExtensions = array(new CoreExtension());
+
+$driverFactory = new DoctrineFactory($ManagerRegistry, $factory, $extensions);
+$datasource = $driverFactory->createDataSource($entityName, $dataSourceName); // All drivers created this way will have same set of $extensions loaded.
 
 ```
 
 ## Provided fields ##
 
 Doctrine driver provides some field types through ``FSi\Component\DataSource\Driver\Doctrine\Extension\Core\CoreExtension``
-so remember to **always load it** to driver.
+so remember to **always load it** to this driver.
 
 Provided field types:
 
@@ -45,22 +74,22 @@ Provided field types:
 * ``date`` - allowed comparisons: eq, neq, lt, lte, gt, gte, in, notIn, between.
 * ``time`` - allowed comparisons: eq, neq, lt, lte, gt, gte, in, notIn, between.
 * ``datetime`` - allowed comparisons: eq, neq, lt, lte, gt, gte, in, notIn, between.
-* ``entity`` - allowed comparisons: eq, memberof.
+* ``entity`` - allowed comparisons: eq, memberof, in.
 
-Note: If using ``between`` comparison, you must bind parameters as array('from' => $value1, 'to' => $value2), 
+Note: When using ``between`` comparison, you must bind parameters as array('from' => $value1, 'to' => $value2), 
 if ``entity`` you must give entity to it and if ``in``, or ``notIn`` then as array.
 
-All fields allow by default to set option ``field_mapping`` that usage is explained below.
+All fields allow by default to set option ``field`` which usage is explained below.
 
 ## Basic usage ##
 
-In simplest case you must just create driver with proper entity name and use it to create DataSource:
+In the simpliest case you must just create driver with proper entity name and use it to create DataSource:
 
 ``` php
 <?php
 
 $driverFactory = new DoctrineFactory($entityManager, $driverExtensions);
-$driver = $driverFactory->createDriver('Name\Of\Entity'); //It can be any entity name that is correct for Doctrine.
+$driver = $driverFactory->createDriver('Name\Of\Entity'); // It can be any entity name that is known to Doctrine.
 
 $datasourceFactory = new DataSourceFactory($datasourceExtensions);
 $datasource = $datasourceFactory->createDataSource($driver, 'datasource_name');
@@ -76,28 +105,28 @@ $datasource
 ;
 ```
 
-You can use ``field_mapping`` option to have different field name, or many fields referring to one field:
+You can use ``field`` option to have different field name, or many DataSource fields referring to one entity field:
 
 ``` php
 <?php
 
 $datasource
     ->addField('veryweirdname' 'number', 'eq', array(
-        'field_mapping' => 'id',
+        'field' => 'id',
     ))
     ->addField('datefrom', 'datetime', 'gte', array(
-        'field_mapping' => 'create_date',
+        'field' => 'create_date',
     ))
     ->addField('dateto', 'datetime', 'lte', array(
-        'field_mapping' => 'create_date',
+        'field' => 'create_date',
     ))
 ;
 ```
 
 ## Using predefined QueryBuilder ##
 
-You can always use predefined QueryBuilder, and if so, you can pass it to factory or DoctrineDriver insetad of ``$entityName``.
-If you do, remember to pass also that entity alias as additional argument.
+You can also use predefined QueryBuilder, and if so, you can pass it to factory or DoctrineDriver insetad of ``$entityName``.
+If you do you can also pass an alias of entity as additional argument.
 
 ``` php
 <?php
@@ -106,23 +135,23 @@ $queryBuilder = $entityManager->createQueryBuilder();
 $queryBuilder
     ->select('n')
     ->from('Name\Of\Entity', 'n')
-    ->where('n.active = 1') //All results will have additional condition.
+    ->where('n.active = 1') // All results will have additional condition.
 ;
 
-//Factory way:
+// Factory way:
 
 $factory = new DoctrineFactory($entityManager, $extensions);
-$driver = $factory->createDriver($queryBuilder, 'n'); //Passing alias.
+$driver = $factory->createDriver($queryBuilder, 'n'); // Passing alias which otherwise would be guessed from root entity of $queryBuilder.
 
-//Manual way:
+// Manual way:
 
-$driver = new DoctrineDriver($extensions, $entityManager, $queryBuilder, 'n'); //Passing alias.
+$driver = new DoctrineDriver($extensions, $entityManager, $queryBuilder, 'n'); // Passing alias which otherwise would be guessed from root entity of $queryBuilder.
 ```
 
 ## Advanced use with QueryBuilder ##
 
 If you want to have conditions to fields from joined entities, or you build very sophisticated query,
-remember to add field mapping to all of fields, otherwise they will try do refer to main entity alias.
+remember to add field mapping to all of fields, otherwise they will try do refer to root entity alias.
 
 ``` php
 <?php
@@ -131,17 +160,17 @@ $queryBuilder = $entityManager->createQueryBuilder();
 $queryBuilder
     ->select('n')
     ->from('Name\Of\Entity', 'n')
-    ->join('n.category', 'c') //Joining category.
+    ->join('n.category', 'c') // Joining category.
     ->where('n.active = 1')
 ;
 $factory = new DoctrineFactory($entityManager, $extensions);
-$driver = $factory->createDriver($queryBuilder); //We don't need to pass alias, if we specify field mappings.
+$driver = $factory->createDriver($queryBuilder); // We don't need to pass alias, if we specify field mappings.
 
 $datasource
-    ->addField('id', 'number', 'eq', array('field_mapping' => 'n.id'))
-    ->addField('title', 'text', 'like', array('field_mapping' => 'n.title'))
-    ->addField('category_name', 'text', 'like', array( //It's not entity field anymore.
-        'field_mapping' => 'c.name', //It allow us to specify condition for category name, not just category (as entity).
+    ->addField('id', 'number', 'eq', array('field' => 'n.id'))
+    ->addField('title', 'text', 'like', array('field' => 'n.title'))
+    ->addField('category_name', 'text', 'like', array( // It's not entity field anymore.
+        'field' => 'c.name', // It allow us to specify condition for category name, not just category (as entity).
     ))
 ;
 

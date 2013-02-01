@@ -28,9 +28,9 @@ class Events implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return array(
-            DataSourceEvents::PRE_BIND_PARAMETERS => array('preBindParameters', 128),
-            DataSourceEvents::POST_BUILD_VIEW => array('postBuildView', 128),
-            DataSourceEvents::PRE_GET_PARAMETERS => array('preGetParameters', 128),
+            DataSourceEvents::PRE_BIND_PARAMETERS => 'preBindParameters',
+            DataSourceEvents::POST_GET_PARAMETERS => array('postGetParameters', -1024),
+            DataSourceEvents::POST_BUILD_VIEW => 'postBuildView',
         );
     }
 
@@ -46,8 +46,28 @@ class Events implements EventSubscriberInterface
         $datasource = $event->getDataSource();
         $parameters = $event->getParameters();
 
-        $page = isset($parameters[$datasource->getName()][PaginationExtension::PAGE]) ? (int) $parameters[$datasource->getName()][PaginationExtension::PAGE] : 1;
+        $page = isset($parameters[$datasource->getName()][PaginationExtension::PARAMETER_PAGE]) ? (int) $parameters[$datasource->getName()][PaginationExtension::PARAMETER_PAGE] : 1;
         $datasource->setFirstResult(($page - 1) * $datasource->getMaxResults());
+    }
+
+    public function postGetParameters(DataSourceEvent\ParametersEventArgs $event)
+    {
+        $datasource = $event->getDataSource();
+        $datasource_oid = spl_object_hash($datasource);
+        $datasourceName = $datasource->getName();
+
+        $parameters = $event->getParameters();
+        $maxresults = $datasource->getMaxResults();
+        if ($maxresults == 0) {
+            $page = 1;
+        } else {
+            $current = $datasource->getFirstResult();
+            $page = (int) floor($current/$maxresults) + 1;
+        }
+        unset($parameters[$datasourceName][PaginationExtension::PARAMETER_PAGE]);
+        if ($page > 1)
+            $parameters[$datasourceName][PaginationExtension::PARAMETER_PAGE] = $page;
+        $event->setParameters($parameters);
     }
 
     /**
@@ -58,46 +78,29 @@ class Events implements EventSubscriberInterface
     public function postBuildView(DataSourceEvent\ViewEventArgs $event)
     {
         $datasource = $event->getDataSource();
+        $datasourceName = $datasource->getName();
         $view = $event->getView();
-
-        $view->setAttribute(PaginationExtension::VIEW_PAGE_PARAM_NAME, sprintf('%s[%s]', $datasource->getName(), PaginationExtension::PAGE));
+        $parameters = $view->getParameters();
 
         $maxresults = $datasource->getMaxResults();
         if ($maxresults == 0) {
             $all = 1;
-        } else {
-            $all = ceil(count($datasource->getResult())/$maxresults);
-        }
-
-        $params = $datasource->getParameters();
-        $datasourceName = $datasource->getName();
-        $page = isset($params[$datasourceName][PaginationExtension::PAGE]) ? $params[$datasourceName][PaginationExtension::PAGE] : 1;
-        $view->setAttribute(PaginationExtension::VIEW_PAGE_AMOUNT, $all);
-        $view->setAttribute(PaginationExtension::VIEW_PAGE_CURRENT, $page);
-    }
-
-    /**
-     * Method called at PreGetParameters event.
-     *
-     * @param DataSourceEvent\ParametersEventArgs $event
-     */
-    public function preGetParameters(DataSourceEvent\ParametersEventArgs $event)
-    {
-        $datasource = $event->getDataSource();
-        $data = $event->getParameters();
-
-        $datasourceName = $datasource->getName();
-        $maxresults = $datasource->getMaxResults();
-        if ($maxresults == 0) {
             $page = 1;
         } else {
+            $all = (int) ceil(count($datasource->getResult())/$maxresults);
             $current = $datasource->getFirstResult();
-            $page = floor($current/$maxresults) + 1;
+            $page = (int) floor($current/$maxresults) + 1;
         }
 
-        if ($page != 1) {
-            $data[$datasourceName][PaginationExtension::PAGE] = $page;
-            $event->setParameters($data);
+        unset($parameters[$datasourceName][PaginationExtension::PARAMETER_PAGE]);
+        $pages = array();
+        for ($i = 1; $i <= $all; $i++) {
+            if ($i > 1)
+                $parameters[$datasourceName][PaginationExtension::PARAMETER_PAGE] = $i;
+            $pages[$i] = $parameters;
         }
+
+        $view->setAttribute('page', $page);
+        $view->setAttribute('parameters_pages', $pages);
     }
 }

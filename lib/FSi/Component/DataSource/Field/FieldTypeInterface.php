@@ -63,7 +63,7 @@ interface FieldTypeInterface
     public function getAvailableComparisons();
 
     /**
-     * Sets options for field.
+     * Sets options for field. All previously set options will be overwritten
      *
      * @param array $options
      */
@@ -121,6 +121,20 @@ interface FieldTypeInterface
     public function addExtension(FieldExtensionInterface $extension);
 
     /**
+     * Replace field extensions with specified ones.
+     *
+     * @param array $extensions
+     */
+    public function setExtensions(array $extensions);
+
+    /**
+     * Returns array of registered extensions.
+     *
+     * @return array
+     */
+    public function getExtensions();
+
+    /**
      * Builds view.
      *
      * @return FieldViewInterface
@@ -140,13 +154,6 @@ interface FieldTypeInterface
      * @param bool $dirty
      */
     public function setDirty($dirty = true);
-
-    /**
-     * Returns all extensions.
-     *
-     * @return array
-     */
-    public function getExtensions();
 
     /**
      * Sets reference to datasource.

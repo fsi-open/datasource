@@ -26,11 +26,6 @@ use Symfony\Component\Form\FormFactory;
 class FormExtension extends DataSourceAbstractExtension
 {
     /**
-     * Attribute name for form.
-     */
-    const VIEW_FORM = 'form';
-
-    /**
      * @var FormFactory
      */
     private $formFactory;

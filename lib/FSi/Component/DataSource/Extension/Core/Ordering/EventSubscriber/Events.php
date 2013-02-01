@@ -11,10 +11,15 @@
 
 namespace FSi\Component\DataSource\Extension\Core\Ordering\EventSubscriber;
 
+
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use FSi\Component\DataSource\DataSourceInterface;
 use FSi\Component\DataSource\Event\DataSourceEvents;
 use FSi\Component\DataSource\Event\DataSourceEvent;
+use FSi\Component\DataSource\Exception\DataSourceException;
 use FSi\Component\DataSource\Extension\Core\Ordering\OrderingExtension;
+use FSi\Component\DataSource\Extension\Core\Ordering\Field\FieldExtension;
+use FSi\Component\DataSource\Field\FieldTypeInterface;
 
 /**
  * Class contains method called during DataSource events.
@@ -22,9 +27,9 @@ use FSi\Component\DataSource\Extension\Core\Ordering\OrderingExtension;
 class Events implements EventSubscriberInterface
 {
     /**
-     * @var int
+     * @var array
      */
-    private $nextPriority;
+    private $ordering = array();
 
     /**
      * {@inheritdoc}
@@ -32,103 +37,54 @@ class Events implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return array(
-            DataSourceEvents::PRE_GET_RESULT => array('preGetResult', 128),
-            DataSourceEvents::POST_BUILD_VIEW => array('postBuildView', 128),
+            DataSourceEvents::PRE_BIND_PARAMETERS => array('preBindParameters'),
+            DataSourceEvents::POST_GET_PARAMETERS => array('postGetParameters'),
         );
     }
 
-    /**
-     * Method called at PreGetResult event.
-     *
-     * @param DataSourceEvent\DataSourceEventArgs $event
-     */
-    public function preGetResult(DataSourceEvent\DataSourceEventArgs $event)
+    public function preBindParameters(DataSourceEvent\ParametersEventArgs $event)
     {
         $datasource = $event->getDataSource();
-        $this->countNextPriority($datasource);
-        $resultBasic = array();
-        $endBasic = array();
-        $resultGiven = array();
-        $endGiven = array();
-
-        foreach ($datasource->getFields() as $field) {
-            if ($field->hasOption(OrderingExtension::ORDERING_IS_GIVEN) && $field->getOption(OrderingExtension::ORDERING_IS_GIVEN)) {
-                $result = &$resultGiven;
-                $end = &$endGiven;
-            } else {
-                $result = &$resultBasic;
-                $end = &$endBasic;
-            }
-
-            $options = $field->getOptions();
-            if (isset($options[OrderingExtension::ORDERING_PRIORITY])) {
-                $priority = (int) $options[OrderingExtension::ORDERING_PRIORITY];
-            } else {
-                $end[] = array('field' => $field);
-                continue;
-            }
-
-            $i = 0;
-            foreach ($result as $item) {
-                if ($item['priority'] < $priority) {
-                    break;
-                }
-                $i++;
-            }
-
-            array_splice($result, $i, 0, array(array('priority' => $priority, 'field' => $field)));
-        }
-
-        $fields = array_merge($resultGiven, $endGiven, $resultBasic, $endBasic);
-
-        $max = count($fields);
-        foreach ($fields as $item) {
-            $field = $item['field'];
-            $options = $field->getOptions();
-            $options[OrderingExtension::ORDERING_PRIORITY] = $max;
-            $field->setOptions($options);
-            $max--;
-        }
-    }
-
-    /**
-     * Method called at PostBuildView event.
-     *
-     * @param DataSourceEvent\ViewEventArgs $event
-     */
-    public function postBuildView(DataSourceEvent\ViewEventArgs $event)
-    {
-        $datasource = $event->getDataSource();
-        $view = $event->getView();
-
-        $this->countNextPriority($datasource);
-        $view->setAttribute(OrderingExtension::VIEW_NEXT_PRIORITY, $this->nextPriority);
-
+        $datasource_oid = spl_object_hash($datasource);
         $datasourceName = $datasource->getName();
-        $view->setAttribute(OrderingExtension::VIEW_PATTERN_ORDERING, sprintf(OrderingExtension::PATTERN, $datasourceName, OrderingExtension::ORDERING, '%s', OrderingExtension::ORDERING));
-        $view->setAttribute(OrderingExtension::VIEW_PATTERN_PRIORITY, sprintf(OrderingExtension::PATTERN, $datasourceName, OrderingExtension::ORDERING, '%s', OrderingExtension::ORDERING_PRIORITY));
+        $parameters = $event->getParameters();
+
+        if (isset($parameters[$datasourceName][OrderingExtension::PARAMETER_SORT]) && is_array($parameters[$datasourceName][OrderingExtension::PARAMETER_SORT])) {
+            $priority = 0;
+            foreach ($parameters[$datasourceName][OrderingExtension::PARAMETER_SORT] as $fieldName => $direction) {
+                if (!in_array($direction, array('asc', 'desc'))) {
+                    throw new DataSourceException(sprintf("Unknown sorting direction %s specified", $direction));
+                }
+                $field = $datasource->getField($fieldName);
+                $fieldExtension = $this->getFieldExtension($field);
+                $fieldExtension->setOrdering($field, array('priority' => $priority, 'direction' => $direction));
+                $priority++;
+            }
+            $this->ordering[$datasource_oid] = $parameters[$datasourceName][OrderingExtension::PARAMETER_SORT];
+        }
     }
 
-    /**
-     * Counts next priority for orderings.
-     *
-     * @param DataSourceInterface $datasource
-     */
-    private function countNextPriority($datasource)
+    public function postGetParameters(DataSourceEvent\ParametersEventArgs $event)
     {
-        if (isset($this->nextPriority)) {
-            return;
-        }
+        $datasource = $event->getDataSource();
+        $datasource_oid = spl_object_hash($datasource);
+        $datasourceName = $datasource->getName();
+        $parameters = $event->getParameters();
 
-        $next = 0;
-        foreach ($datasource->getFields() as $field) {
-            if ($field->hasOption(OrderingExtension::ORDERING_IS_GIVEN) && $field->getOption(OrderingExtension::ORDERING_IS_GIVEN) && $field->hasOption(OrderingExtension::ORDERING_PRIORITY)) {
-                $tmp = (int) $field->getOption(OrderingExtension::ORDERING_PRIORITY);
-                if ($tmp > $next) {
-                    $next = $tmp;
-                }
+        if (isset($this->ordering[$datasource_oid]))
+            $parameters[$datasourceName][OrderingExtension::PARAMETER_SORT] = $this->ordering[$datasource_oid];
+
+        $event->setParameters($parameters);
+    }
+
+    protected function getFieldExtension(FieldTypeInterface $field)
+    {
+        $extensions = $field->getExtensions();
+        foreach ($extensions as $extension) {
+            if ($extension instanceof FieldExtension) {
+                return $extension;
             }
         }
-        $this->nextPriority = floor($next) + 1;
+        throw new DataSourceException('In order to use ' . __CLASS__ . ' there must be FSi\Component\DataSource\Extension\Core\Ordering\Field\FieldExtension registered in all fields');
     }
 }

@@ -19,6 +19,13 @@ use FSi\Component\DataSource\DataSourceInterface;
 interface DriverInterface
 {
     /**
+     * Returns type (name) of this driver.
+     *
+     * @return string
+     */
+    public function getType();
+
+    /**
      * Sets reference to DataSource.
      *
      * @param DataSourceInterface $datasource

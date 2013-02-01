@@ -155,59 +155,74 @@ class FormExtensionTest extends \PHPUnit_Framework_TestCase
 
         $field
             ->expects($this->any())
-            ->method('getName')
-            ->will($this->returnValue('name'))
+            ->method('getType')
+            ->will($this->returnValue($type))
         ;
 
         $field
             ->expects($this->any())
-            ->method('getType')
-            ->will($this->returnValue($type))
+            ->method('hasOption')
+            ->will($this->returnCallback(function($option) use ($type) {
+                return (($type == 'number') && ($option =='form_type'));
+            }))
+        ;
+
+        $field
+            ->expects($this->any())
+            ->method('getOption')
+            ->will($this->returnCallback(function($option) use ($type) {
+                switch ($option) {
+                    case 'form_filter':
+                        return true;
+                    case 'form_type':
+                        if ($type == 'number') {
+                            return 'text';
+                        } else {
+                            return null;
+                        }
+                }
+            }))
         ;
 
         $extensions = $extension->getFieldTypeExtensions($type);
 
         if ($type == 'datetime') {
-            $parameters = array('datasource' => array(DataSourceInterface::FIELDS => array('name' =>
+            $parameters = array('datasource' => array(DataSourceInterface::PARAMETER_FIELDS => array('name' =>
                 array(
                     'date' => array('year' => 2012, 'month' => 12, 'day' => 12),
                     'time' => array('hour' => 12, 'minute' => 12),
                 ),
             )));
-            $parameters2 = array('datasource' => array(DataSourceInterface::FIELDS => array('name' => new \DateTime('2012-12-12 12:12:00'))));
+            $parameters2 = array('datasource' => array(DataSourceInterface::PARAMETER_FIELDS => array('name' => new \DateTime('2012-12-12 12:12:00'))));
         } elseif ($type == 'time') {
-            $parameters = array('datasource' => array(DataSourceInterface::FIELDS => array('name' =>
+            $parameters = array('datasource' => array(DataSourceInterface::PARAMETER_FIELDS => array('name' =>
                 array(
                     'hour' => 12,
                     'minute' => 12,
                 ),
             )));
-            $parameters2 = array('datasource' => array(DataSourceInterface::FIELDS => array('name' => new \DateTime(date('Y-m-d', 0).' 12:12:00'))));
+            $parameters2 = array('datasource' => array(DataSourceInterface::PARAMETER_FIELDS => array('name' => new \DateTime(date('Y-m-d', 0).' 12:12:00'))));
         } elseif ($type == 'date') {
-            $parameters = array('datasource' => array(DataSourceInterface::FIELDS => array('name' =>
+            $parameters = array('datasource' => array(DataSourceInterface::PARAMETER_FIELDS => array('name' =>
                 array(
                     'year' => 2012,
                     'month' => 12,
                     'day' => 12,
                 ),
             )));
-            $parameters2 = array('datasource' => array(DataSourceInterface::FIELDS => array('name' => new \DateTime('2012-12-12'))));
+            $parameters2 = array('datasource' => array(DataSourceInterface::PARAMETER_FIELDS => array('name' => new \DateTime('2012-12-12'))));
         } elseif ($type == 'number') {
-            $parameters = array('datasource' => array(DataSourceInterface::FIELDS => array('name' => 123)));
+            $parameters = array('datasource' => array(DataSourceInterface::PARAMETER_FIELDS => array('name' => 123)));
             $parameters2 = $parameters;
         } else {
-            $parameters = array('datasource' => array(DataSourceInterface::FIELDS => array('name' => 'value')));
+            $parameters = array('datasource' => array(DataSourceInterface::PARAMETER_FIELDS => array('name' => 'value')));
             $parameters2 = $parameters;
         }
 
         $args = new FieldEvent\ParameterEventArgs($field, $parameters);
         foreach ($extensions as $ext) {
             $this->assertTrue($ext instanceof FieldAbstractExtension);
-            $subscribers = $ext->loadSubscribers();
-            if ($subscribers) {
-                $subscriber = array_shift($subscribers);
-                $subscriber->preBindParameter($args);
-            }
+            $ext->preBindParameter($args);
         }
         $parameters = $args->getParameter();
         $this->assertEquals($parameters2, $parameters);
@@ -216,15 +231,16 @@ class FormExtensionTest extends \PHPUnit_Framework_TestCase
         $fieldView
             ->expects($this->atLeastOnce())
             ->method('setAttribute')
+            ->will($this->returnCallback(function ($attribute, $value) use ($type) {
+                if ($attribute == 'form') {
+                    $this->assertInstanceOf('\Symfony\Component\Form\FormView', $value);
+                }
+            }))
         ;
 
         $args = new FieldEvent\ViewEventArgs($field, $fieldView);
         foreach ($extensions as $ext) {
-            $subscribers = $ext->loadSubscribers();
-            if ($subscribers) {
-                $subscriber = array_shift($subscribers);
-                $subscriber->postBuildView($args);
-            }
+            $ext->postBuildView($args);
         }
     }
 }

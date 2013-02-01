@@ -33,9 +33,7 @@ class FieldExtension extends FieldAbstractExtension implements EventSubscriberIn
         return array(
             FieldEvents::PRE_BIND_PARAMETER => array('preBindParameter', 128),
             FieldEvents::POST_BIND_PARAMETER => array('postBindParameter', 128),
-            FieldEvents::PRE_BUILD_VIEW => array('preBuildView', 128),
             FieldEvents::POST_BUILD_VIEW => array('postBuildView', 128),
-            FieldEvents::PRE_GET_PARAMETER => array('preGetParameter', 128),
             FieldEvents::POST_GET_PARAMETER => array('postGetParameter', 128),
         );
     }

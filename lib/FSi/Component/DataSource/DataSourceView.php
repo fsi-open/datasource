@@ -20,9 +20,19 @@ use FSi\Component\DataSource\Util\AttributesContainer;
 class DataSourceView extends AttributesContainer implements DataSourceViewInterface
 {
     /**
-     * @var DataSource
+     * @var string
      */
-    private $datasource;
+    private $name;
+
+    /**
+     * @var array
+     */
+    private $parameters = array();
+
+    /**
+     * @var array
+     */
+    private $otherParameters = array();
 
     /**
      * Array of field views.
@@ -30,13 +40,6 @@ class DataSourceView extends AttributesContainer implements DataSourceViewInterf
      * @var array
      */
     private $fields = array();
-
-    /**
-     * Options of view.
-     *
-     * @var array
-     */
-    private $options = array();
 
     /**
      * Fields iterator.
@@ -52,7 +55,17 @@ class DataSourceView extends AttributesContainer implements DataSourceViewInterf
      */
     public function __construct(DataSource $datasource)
     {
-        $this->datasource = $datasource;
+        $this->name = $datasource->getName();
+        $this->parameters = $datasource->getParameters();
+        $this->otherParameters = $datasource->getOtherParameters();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getName()
+    {
+        return $this->name;
     }
 
     /**
@@ -60,7 +73,7 @@ class DataSourceView extends AttributesContainer implements DataSourceViewInterf
      */
     public function getParameters()
     {
-        return $this->datasource->getParameters();
+        return $this->parameters;
     }
 
     /**
@@ -68,7 +81,7 @@ class DataSourceView extends AttributesContainer implements DataSourceViewInterf
      */
     public function getAllParameters()
     {
-        return $this->datasource->getAllParameters();
+        return array_merge($this->otherParameters, $this->parameters);
     }
 
     /**
@@ -76,7 +89,7 @@ class DataSourceView extends AttributesContainer implements DataSourceViewInterf
      */
     public function getOtherParameters()
     {
-        return $this->datasource->getOtherParameters();
+        return $this->otherParameters;
     }
 
     /**
@@ -111,23 +124,13 @@ class DataSourceView extends AttributesContainer implements DataSourceViewInterf
      */
     public function addField(Field\FieldViewInterface $fieldView)
     {
-        $name = $fieldView->getField()->getName();
+        $name = $fieldView->getName();
         if ($this->hasField($name)) {
             throw new DataSourceViewException(sprintf('There\'s already field with name "%s"', $name));
         }
         $this->fields[$name] = $fieldView;
         $fieldView->setDataSourceView($this);
         $this->iterator = null;
-    }
-
-    /**
-     * Method to fetch result from datasource.
-     *
-     * @return mixed
-     */
-    private function getResult()
-    {
-        return $this->datasource->getResult();
     }
 
     /**

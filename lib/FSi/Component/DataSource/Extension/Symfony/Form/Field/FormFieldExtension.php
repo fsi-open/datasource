@@ -26,7 +26,7 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 /**
  * Fields extension.
  */
-class FormFieldExtension extends FieldAbstractExtension implements EventSubscriberInterface
+class FormFieldExtension extends FieldAbstractExtension
 {
     /**
      * @var FormFactory
@@ -34,9 +34,16 @@ class FormFieldExtension extends FieldAbstractExtension implements EventSubscrib
     protected $formFactory;
 
     /**
-     * @var \Symfony\Component\Form\Form
+     * @var array
      */
-    protected $form;
+    protected $forms = array();
+
+    /**
+     * Original values of input parameters for each supported field
+     *
+     * @var array
+     */
+    protected $parameters = array();
 
     /**
      * {@inheritdoc}
@@ -44,8 +51,9 @@ class FormFieldExtension extends FieldAbstractExtension implements EventSubscrib
     public static function getSubscribedEvents()
     {
         return array(
-            FieldEvents::PRE_BIND_PARAMETER => array('preBindParameter', 128),
-            FieldEvents::POST_BUILD_VIEW => array('postBuildView', 128),
+            FieldEvents::PRE_BIND_PARAMETER => array('preBindParameter'),
+            FieldEvents::POST_BUILD_VIEW => array('postBuildView'),
+            FieldEvents::POST_GET_PARAMETER => array('preGetParameter'),
         );
     }
 
@@ -72,7 +80,19 @@ class FormFieldExtension extends FieldAbstractExtension implements EventSubscrib
      */
     public function loadOptionsConstraints(OptionsResolverInterface $optionsResolver)
     {
-        $optionsResolver->setDefaults(array('form_disabled' => false, 'form_options' => array()));
+        $optionsResolver
+            ->setDefaults(array(
+                'form_filter' => true,
+                'form_options' => array()
+            ))
+            ->setOptional(array(
+                'form_type'
+            ))
+            ->setAllowedTypes(array(
+                'form_filter' => 'bool',
+                'form_options' => 'array',
+            ))
+        ;
     }
 
     /**
@@ -83,8 +103,8 @@ class FormFieldExtension extends FieldAbstractExtension implements EventSubscrib
         $field = $event->getField();
         $view = $event->getView();
 
-        $this->createForm($field);
-        $view->setAttribute(FormExtension::VIEW_FORM, $this->form->createView());
+        if ($form = $this->getForm($field))
+            $view->setAttribute('form', $form->createView());
     }
 
     /**
@@ -93,16 +113,14 @@ class FormFieldExtension extends FieldAbstractExtension implements EventSubscrib
     public function preBindParameter(FieldEvent\ParameterEventArgs $event)
     {
         $field = $event->getField();
+        $field_oid = spl_object_hash($field);
         $parameter = $event->getParameter();
 
-        if ($field->hasOption('form_disabled') && $field->getOption('form_disabled')) {
+        if (!$form = $this->getForm($field))
             return;
-        }
 
-        $this->createForm($field);
-        if ($this->form->isBound()) {
-            unset($this->form);
-            $this->createForm($field);
+        if ($form->isBound()) {
+            $form = $this->getForm($field, true);
         }
 
         $datasourceName = $field->getDataSource() ? $field->getDataSource()->getName() : null;
@@ -110,46 +128,76 @@ class FormFieldExtension extends FieldAbstractExtension implements EventSubscrib
             return;
         }
 
-        if (isset($parameter[$datasourceName][DataSourceInterface::FIELDS][$field->getName()])) {
+        if (isset($parameter[$datasourceName][DataSourceInterface::PARAMETER_FIELDS][$field->getName()])) {
             $dataToBind = array(
-                DataSourceInterface::FIELDS => array(
-                    $field->getName() => $parameter[$datasourceName][DataSourceInterface::FIELDS][$field->getName()],
+                DataSourceInterface::PARAMETER_FIELDS => array(
+                    $field->getName() => $parameter[$datasourceName][DataSourceInterface::PARAMETER_FIELDS][$field->getName()],
                 ),
             );
-        } else {
-            $dataToBind = array();
-        }
+            $this->parameters[$field_oid] = $parameter[$datasourceName][DataSourceInterface::PARAMETER_FIELDS][$field->getName()];
 
-        $this->form->bind($dataToBind);
-        $data = $this->form->getData();
-        if (isset($data[DataSourceInterface::FIELDS][$field->getName()])) {
-            $parameter[$datasourceName][DataSourceInterface::FIELDS][$field->getName()] = $data[DataSourceInterface::FIELDS][$field->getName()];
-        } else {
-            unset($parameter[$datasourceName][DataSourceInterface::FIELDS][$field->getName()]);
+            $form->bind($dataToBind);
+            $data = $form->getData();
+
+            if (isset($data[DataSourceInterface::PARAMETER_FIELDS][$field->getName()])) {
+                $parameter[$datasourceName][DataSourceInterface::PARAMETER_FIELDS][$field->getName()] = $data[DataSourceInterface::PARAMETER_FIELDS][$field->getName()];
+            } else {
+                unset($parameter[$datasourceName][DataSourceInterface::PARAMETER_FIELDS][$field->getName()]);
+            }
+
+            $event->setParameter($parameter);
         }
-        $event->setParameter($parameter);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function preGetParameter(FieldEvent\ParameterEventArgs $event)
+    {
+        $field = $event->getField();
+        $field_oid = spl_object_hash($field);
+
+        $datasourceName = $field->getDataSource() ? $field->getDataSource()->getName() : null;
+        if (isset($this->parameters[$field_oid])) {
+            $parameters = array(
+                $datasourceName => array(
+                    DataSourceInterface::PARAMETER_FIELDS => array(
+                        $field->getName() => $this->parameters[$field_oid]
+                    )
+                )
+            );
+            $event->setParameter($parameters);
+        }
     }
 
     /**
      * Builds form.
      *
      * @param FieldTypeInterface $field
+     * @param bool $force
+     * @return \Symfony\Component\Form\Form
      */
-    protected function createForm(FieldTypeInterface $field)
+    protected function getForm(FieldTypeInterface $field, $force = false)
     {
-        if (isset($this->form)) {
+        if (!$datasource = $field->getDataSource()) {
             return;
         }
 
-        if (!$datasource = $field->getDataSource()) {
+        if (!$field->getOption('form_filter')) {
             return;
+        }
+
+        $field_oid = spl_object_hash($field);
+
+        if (isset($this->forms[$field_oid]) && !$force) {
+            return $this->forms[$field_oid];
         }
 
         $options = $field->hasOption('form_options') ? (array) $field->getOption('form_options') : array();
         $options = array_merge($options, array('required' => false));
 
         $form = $this->formFactory->createNamedBuilder($datasource->getName(), 'collection', array(), array('csrf_protection' => false))->getForm();
-        $builder = $this->formFactory->createNamedBuilder(DataSourceInterface::FIELDS);
+        $builder = $this->formFactory->createNamedBuilder(DataSourceInterface::PARAMETER_FIELDS);
 
         switch ($field->getComparison()) {
             case 'between':
@@ -179,17 +227,34 @@ class FormFieldExtension extends FieldAbstractExtension implements EventSubscrib
                     $toOptions = array_merge($options, $toOptions);
                 }
 
-                $form2->add('from', $field->getType(), $fromOptions);
-                $form2->add('to', $field->getType(), $toOptions);
+                $type = array(
+                    'from' => $field->getType(),
+                    'to' => $field->getType()
+                );
+                if ($field->hasOption('form_type')) {
+                    $optionType = $field->getOption('form_type');
+                    if (!is_array($optionType)) {
+                        $type['from'] = $type['to'] = $optionType;
+                    } else {
+                        if (isset($optionType['from']))
+                            $type['from'] = $optionType['from'];
+                        if (isset($optionType['to']))
+                            $type['to'] = $optionType['to'];
+                    }
+                }
+                $form2->add('from', $type['from'], $fromOptions);
+                $form2->add('to', $type['to'], $toOptions);
                 $builder->add($form2);
                 break;
 
             default:
-                $builder->add($field->getName(), $field->getType(), $options);
+                $type = $field->hasOption('form_type')?$field->getOption('form_type'):$field->getType();
+                $builder->add($field->getName(), $type, $options);
         }
 
         $form->add($builder->getForm());
-        $this->form = $form;
+        $this->forms[$field_oid] = $form;
+        return $form;
     }
 
     /**
@@ -198,13 +263,5 @@ class FormFieldExtension extends FieldAbstractExtension implements EventSubscrib
     protected function getFormFactory()
     {
         return $this->formFactory;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function loadSubscribers()
-    {
-        return array($this);
     }
 }

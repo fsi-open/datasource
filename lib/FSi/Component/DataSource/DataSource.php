@@ -63,22 +63,6 @@ class DataSource implements DataSourceInterface
     private $factory;
 
     /**
-     * Cache for given data.
-     *
-     * Helpful when determining if criterions have any changes.
-     *
-     * @var null|array
-     */
-    private $criterions;
-
-    /**
-     * Cache for result.
-     *
-     * @var null|mixed
-     */
-    private $result;
-
-    /**
      * Max results fetched at once.
      *
      * @var int
@@ -317,6 +301,7 @@ class DataSource implements DataSourceInterface
     {
         $this->dirty = true;
         $this->maxResults = $max;
+        return $this;
     }
 
     /**
@@ -326,6 +311,7 @@ class DataSource implements DataSourceInterface
     {
         $this->dirty = true;
         $this->firstResult = $first;
+        return $this;
     }
 
     /**
@@ -357,8 +343,11 @@ class DataSource implements DataSourceInterface
         }
 
         foreach ((array) $extension->loadDriverExtensions() as $driverExtension) {
-            $this->driver->addExtension($driverExtension);
+            if (in_array($this->driver->getType(), $driverExtension->getExtendedDriverTypes())) {
+                $this->driver->addExtension($driverExtension);
+            }
         }
+        return $this;
     }
 
     /**
@@ -465,6 +454,7 @@ class DataSource implements DataSourceInterface
     public function setFactory(DataSourceFactoryInterface $factory)
     {
         $this->factory = $factory;
+        return $this;
     }
 
     /**

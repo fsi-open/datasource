@@ -13,6 +13,7 @@ namespace FSi\Component\DataSource\Driver\Doctrine;
 
 use Doctrine\ORM\EntityManager;
 use Doctrine\Common\Persistence\ManagerRegistry;
+use FSi\Component\DataSource\DataSourceFactoryInterface;
 
 /**
  * {@inheritdoc}
@@ -25,6 +26,11 @@ class DoctrineFactory implements DoctrineFactoryInterface
     private $registry;
 
     /**
+     * @var DataSourceFactoryInterface
+     */
+    private $dataSourceFactory;
+
+    /**
      * Array of extensions.
      *
      * @var array
@@ -34,9 +40,10 @@ class DoctrineFactory implements DoctrineFactoryInterface
     /**
      * {@inheritdoc}
      */
-    public function __construct(ManagerRegistry $registry, $extensions = array())
+    public function __construct(ManagerRegistry $registry, DataSourceFactoryInterface $dataSourceFactory, $extensions = array())
     {
         $this->registry = $registry;
+        $this->dataSourceFactory = $dataSourceFactory;
         $this->extensions = $extensions;
     }
 
@@ -52,5 +59,14 @@ class DoctrineFactory implements DoctrineFactoryInterface
             $em = $this->registry->getManager($entityManager);
         }
         return new DoctrineDriver($this->extensions, $em, $entity, $alias);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function createDataSource($entity, $name = 'datasource', $alias = null, $entityManager = null)
+    {
+        $driver = $this->createDriver($entity, $alias, $entityManager);
+        return $this->dataSourceFactory->createDataSource($driver, $name);
     }
 }

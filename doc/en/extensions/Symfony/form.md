@@ -1,17 +1,16 @@
 # Symfony Form Extension #
 
-Builds forms for fields and binds them as attributes to fields views.
-It also automatically maps data between form and datasources fields.
-
-It loads extensions for **fields**.
+This extension builds forms for datasource fields so use them to easly create "filtes" on web pages.
+It loads event subscriber to **fields**.
 
 ## Requirements ##
 
-Symfony Form ("symfony/form")
+Symfony Form component ("symfony/form")
 
 ## Setup ##
 
-Add its instance as extension while creating new DataSource. It requires fully configured ``Symfony\Component\Form\FormFactory`` in constructor. 
+Add its instance as extension while creating new DataSource or DataSourceFactory. It requires fully configured
+``Symfony\Component\Form\FormFactory`` as an argument to the constructor.
 
 ``` php
 <?php
@@ -19,11 +18,11 @@ Add its instance as extension while creating new DataSource. It requires fully c
 use FSi\Component\DataSource\DataSourceFactory;
 use FSi\Component\DataSource\Extension\Symfony\Form\FormExtension;
 
-$formFactory; //Preconfigured instance of Symfony\Component\Form\FormFactory
+$formFactory; // Preconfigured instance of Symfony\Component\Form\FormFactory
 
 $extensions = array(
     new FormExtension($formFactory),
-    //(...) Other extensions.
+    // (...) Other extensions.
 );
 
 $factory = new DataSourceFactory($extensions);
@@ -36,23 +35,16 @@ $factory = new DataSourceFactory($extensions);
 
 ## Available field options ##
 
-* all fields
-    * ``form_disabled`` - whether form rendering for this field is disabled
-        * ``false`` by default
-    * ``form_options`` - options passed to form (see documentation for Symfony Form fields). When you set
-    ``between`` comparison, you can pass specific options for each field by passing two arrays in this option
-    (extension will also search for specific options under ``from`` and ``to`` keys). If you pass also some
-    general options, they will be merged to specific options, but specific options have higher precedence.
- 
-## FieldView attributes ##
+* ``form_filter`` - whether form creation and rendering for this field is enabled, ``true`` by default
+* ``form_type`` - type of form that should be created for this datasource field, by default it equals to the type of datasource
+  field, it can be any valid form type or array containing 'from' and 'to' types for 'between' comparisons
+* ``form_options`` - options passed to the form field (see documentation for Symfony Form component for details); for ``between``
+  comparison, you can pass specific options for each field by passing two arrays in this option (extension will also search for
+  specific options under ``from`` and ``to`` keys); If you pass also some general options, they will be merged to specific options,
+  but specific options have higher precedence.
 
-* ``form`` - set on each fields view (unless it has ``form_disabled`` option set to true)
-    * if set, instance of ``Symfony\Component\Form\FormView``
-
-## Entity field ##
-
-**Note:** Remember you **must** pass ``class`` option in ``form_options`` with proper entity name to render form correctly.
-Otherwise exception will be thrown.
+**Note**: Remember that for fields of type ``entity`` you **must** always pass ``class`` option in ``form_option`` in order to
+specify class of associated entity. Otherwise an exception will be thrown from Symfony Form component.
 
 ``` php
 <?php
@@ -66,3 +58,8 @@ $datasource
 ;
 
 ```
+ 
+## FieldView attributes ##
+
+* ``form`` - set on each field's view (unless it has ``form_filter`` option set to ``false``), if set it's an instance of
+  ``Symfony\Component\Form\FormView``

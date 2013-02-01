@@ -17,6 +17,13 @@ namespace FSi\Component\DataSource\Driver;
 interface DriverExtensionInterface
 {
     /**
+     * Returns types of extended drivers
+     *
+     * return array
+     */
+    public function getExtendedDriverTypes();
+
+    /**
      * Checks whether given extension has field for given type.
      *
      * @param string $type

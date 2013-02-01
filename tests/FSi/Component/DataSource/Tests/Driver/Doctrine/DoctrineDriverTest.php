@@ -42,10 +42,6 @@ class DoctrineDriverTest extends \PHPUnit_Framework_TestCase
             $this->markTestSkipped('Doctrine needed!');
         }
 
-        if (!class_exists('Symfony\Component\Form\Form')) {
-            $this->markTestSkipped('Symfony Form needed!');
-        }
-
         // the connection configuration
         $dbParams = array(
             'driver' => 'pdo_sqlite',
@@ -71,37 +67,27 @@ class DoctrineDriverTest extends \PHPUnit_Framework_TestCase
     public function testGeneral()
     {
         $driverFactory = $this->getDoctrineFactory();
-        $dataSourceFactory = $this->getDataSourceFactory();
         $datasources = array();
 
-        $driver = $driverFactory->createDriver('FSi\Component\DataSource\Tests\Fixtures\News');
-        $datasources[] = $dataSourceFactory->createDataSource($driver, 'datasource');
+        $datasources[] = $driverFactory->createDataSource('FSi\Component\DataSource\Tests\Fixtures\News', 'datasource');
 
         $qb = $this->em
             ->createQueryBuilder()
             ->select('n')
             ->from('FSi\Component\DataSource\Tests\Fixtures\News', 'n')
         ;
-        $driver = $driverFactory->createDriver($qb, 'n');
-        $datasources[] = $dataSourceFactory->createDataSource($driver, 'datasource2');
+        $datasources[] = $driverFactory->createDataSource($qb, 'datasource2', 'n');
 
         foreach ($datasources as $datasource) {
             $datasource
                 ->addField('title', 'text', 'like')
                 ->addField('author', 'text', 'like')
-                ->addField('time', 'time', 'between', array(
-                    'field_mapping' => 'create_time',
+                ->addField('created', 'datetime', 'between', array(
+                    'field' => 'create_date',
                 ))
-                ->addField('category', 'entity', 'eq', array(
-                    'form_options' => array(
-                        'class' => 'FSi\Component\DataSource\Tests\Fixtures\Category',
-                    ),
-                ))
+                ->addField('category', 'entity', 'eq')
                 ->addField('group', 'entity', 'memberof', array(
-                    'field_mapping' => 'groups',
-                    'form_options' => array(
-                        'class' => 'FSi\Component\DataSource\Tests\Fixtures\Group',
-                    ),
+                    'field' => 'groups',
                 ))
             ;
 
@@ -114,7 +100,7 @@ class DoctrineDriverTest extends \PHPUnit_Framework_TestCase
 
             $parameters = array(
                 $datasource->getName() => array(
-                    DataSourceInterface::FIELDS => array(
+                    DataSourceInterface::PARAMETER_FIELDS => array(
                         'author' => 'domain1.com',
                     ),
                 ),
@@ -135,7 +121,7 @@ class DoctrineDriverTest extends \PHPUnit_Framework_TestCase
             $datasource->setMaxResults(20);
             $parameters = array(
                 $datasource->getName() => array(
-                    PaginationExtension::PAGE => 1,
+                    PaginationExtension::PARAMETER_PAGE => 1,
                 ),
             );
 
@@ -151,9 +137,10 @@ class DoctrineDriverTest extends \PHPUnit_Framework_TestCase
 
             $parameters = array(
                 $datasource->getName() => array(
-                    DataSourceInterface::FIELDS => array(
+                    DataSourceInterface::PARAMETER_FIELDS => array(
                         'author' => 'domain1.com',
                         'title' => 'title3',
+                        'created' => array('from' => new \DateTime(date("Y:m:d H:i:s", 35 * 24 * 60 * 60))),
                     ),
                 ),
             );
@@ -161,12 +148,12 @@ class DoctrineDriverTest extends \PHPUnit_Framework_TestCase
             $datasource->bindParameters($parameters);
             $view = $datasource->createView();
             $result = $datasource->getResult();
-            $this->assertEquals(5, count($result));
+            $this->assertEquals(2, count($result));
 
             //Checking entity fields. We assume that database was created so first category and first group have ids equal to 1.
             $parameters = array(
                 $datasource->getName() => array(
-                    DataSourceInterface::FIELDS => array(
+                    DataSourceInterface::PARAMETER_FIELDS => array(
                         'group' => 1,
                     ),
                 ),
@@ -178,7 +165,7 @@ class DoctrineDriverTest extends \PHPUnit_Framework_TestCase
 
             $parameters = array(
                 $datasource->getName() => array(
-                    DataSourceInterface::FIELDS => array(
+                    DataSourceInterface::PARAMETER_FIELDS => array(
                         'category' => 1,
                     ),
                 ),
@@ -190,7 +177,7 @@ class DoctrineDriverTest extends \PHPUnit_Framework_TestCase
 
             $parameters = array(
                 $datasource->getName() => array(
-                    DataSourceInterface::FIELDS => array(
+                    DataSourceInterface::PARAMETER_FIELDS => array(
                         'group' => 1,
                         'category' => 1,
                     ),
@@ -204,11 +191,8 @@ class DoctrineDriverTest extends \PHPUnit_Framework_TestCase
             //Checking sorting.
             $parameters = array(
                 $datasource->getName() => array(
-                    OrderingExtension::ORDERING => array(
-                        'title' => array(
-                            OrderingExtension::ORDERING => 'asc',
-                            OrderingExtension::ORDERING_PRIORITY => 1,
-                        ),
+                    OrderingExtension::PARAMETER_SORT => array(
+                        'title' => 'asc'
                     ),
                 ),
             );
@@ -222,15 +206,9 @@ class DoctrineDriverTest extends \PHPUnit_Framework_TestCase
             //Checking sorting.
             $parameters = array(
                 $datasource->getName() => array(
-                    OrderingExtension::ORDERING => array(
-                        'title' => array(
-                            OrderingExtension::ORDERING => 'desc',
-                            OrderingExtension::ORDERING_PRIORITY => 2,
-                        ),
-                        'author' => array(
-                            OrderingExtension::ORDERING => 'asc',
-                            OrderingExtension::ORDERING_PRIORITY => 1,
-                        ),
+                    OrderingExtension::PARAMETER_SORT => array(
+                        'title' => 'desc',
+                        'author' => 'asc'
                     ),
                 ),
             );
@@ -245,7 +223,7 @@ class DoctrineDriverTest extends \PHPUnit_Framework_TestCase
             $datasource->clearFields();
             $parameters = array(
                 $datasource->getName() => array(
-                    DataSourceInterface::FIELDS => array(
+                    DataSourceInterface::PARAMETER_FIELDS => array(
                         'author' => 'domain1.com',
                     ),
                 ),
@@ -279,16 +257,16 @@ class DoctrineDriverTest extends \PHPUnit_Framework_TestCase
         $datasource
             ->addField('author', 'text', 'like')
             ->addField('category', 'text', 'like', array(
-                'field_mapping' => 'c.name',
+                'field' => 'c.name',
             ))
             ->addField('group', 'text', 'like', array(
-                'field_mapping' => 'g.name',
+                'field' => 'g.name',
             ))
         ;
 
         $parameters = array(
             $datasource->getName() => array(
-                DataSourceInterface::FIELDS => array(
+                DataSourceInterface::PARAMETER_FIELDS => array(
                     'group' => 'group0',
                 ),
             ),
@@ -299,7 +277,7 @@ class DoctrineDriverTest extends \PHPUnit_Framework_TestCase
 
         $parameters = array(
             $datasource->getName() => array(
-                DataSourceInterface::FIELDS => array(
+                DataSourceInterface::PARAMETER_FIELDS => array(
                     'group' => 'group',
                 ),
             ),
@@ -310,7 +288,7 @@ class DoctrineDriverTest extends \PHPUnit_Framework_TestCase
 
         $parameters = array(
             $datasource->getName() => array(
-                DataSourceInterface::FIELDS => array(
+                DataSourceInterface::PARAMETER_FIELDS => array(
                     'group' => 'group0',
                     'category' => 'category0',
                 ),
@@ -361,7 +339,7 @@ class DoctrineDriverTest extends \PHPUnit_Framework_TestCase
             new CoreExtension(),
         );
 
-        return new DoctrineFactory(new TestManagerRegistry($this->em), $extensions);
+        return new DoctrineFactory(new TestManagerRegistry($this->em), $this->getDataSourceFactory(), $extensions);
     }
 
     /**
@@ -373,7 +351,6 @@ class DoctrineDriverTest extends \PHPUnit_Framework_TestCase
     {
         $extensions = array(
             new Symfony\Core\CoreExtension(),
-            new FormExtension($this->getFormFactory()),
             new Core\Pagination\PaginationExtension(),
             new OrderingExtension(),
         );

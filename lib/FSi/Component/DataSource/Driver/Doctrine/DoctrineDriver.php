@@ -25,9 +25,9 @@ use FSi\Component\DataSource\Extension\Core\Ordering\OrderingExtension;
 class DoctrineDriver extends DriverAbstract
 {
     /**
-     * Arbitrary alias for entity during building query.
+     * Default alias for entity during building query when no alias is specified.
      */
-    const ENTITY_ALIAS = 'e';
+    const DEFAULT_ENTITY_ALIAS = 'e';
 
     /**
      * @var EntityManager
@@ -35,33 +35,26 @@ class DoctrineDriver extends DriverAbstract
     private $em;
 
     /**
-     * Name of entity to fetch.
-     *
-     * @var null|string
-     */
-    private $entity;
-
-    /**
-     * Preconfigured query builder, given in constructor.
-     *
-     * @var QueryBuilder
-     */
-    private $givenQuery;
-
-    /**
      * Alias, that can be used with preconfigured query when fetching one entity and field mappings
      * don't have mappings prefixed with aliases.
      *
      * @var string
      */
-    private $givenAlias;
+    private $alias;
 
     /**
-     * Reference to query builder during getResult method.
+     * Template query builder.
      *
      * @var QueryBuilder
      */
     private $query;
+
+    /**
+     * Query builder available during preGetResult event
+     *
+     * @var QueryBuilder
+     */
+    private $currentQuery;
 
     /**
      * Constructor.
@@ -78,17 +71,40 @@ class DoctrineDriver extends DriverAbstract
 
         $this->em = $em;
 
-        if ($entity instanceof QueryBuilder) {
-            $this->givenQuery = $entity;
-            if ($alias) {
-                $this->givenAlias = (string) $alias;
-            }
+        if (isset($alias)) {
+            $this->alias = (string) $alias;
+        } else if ($entity instanceof QueryBuilder) {
+            $this->alias = $entity->getRootAlias();
         } else {
-            $this->entity = (string) $entity;
-            if (empty($this->entity)) {
+            $this->alias = self::DEFAULT_ENTITY_ALIAS;
+        }
+
+        if ($entity instanceof QueryBuilder) {
+            $this->query = $entity;
+        } else {
+            if (empty($entity)) {
                 throw new DoctrineDriverException('Name of entity can\'t be empty.');
             }
+
+            $this->query = $this->em->createQueryBuilder();
+            $this->query
+                ->select($this->alias)
+                ->from((string) $entity, $this->alias)
+            ;
         }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getType()
+    {
+        return 'doctrine';
+    }
+
+    public function getAlias()
+    {
+        return $this->alias;
     }
 
     /**
@@ -96,21 +112,7 @@ class DoctrineDriver extends DriverAbstract
      */
     public function initResult()
     {
-        $entityAlias = self::ENTITY_ALIAS;
-        if (isset($this->givenQuery)) {
-            $qb = clone $this->givenQuery;
-            if ($this->givenAlias) {
-                $entityAlias = $this->givenAlias;
-            }
-        } else {
-            $qb = $this->em->createQueryBuilder();
-            $qb
-            ->select($entityAlias)
-            ->from($this->entity, $entityAlias)
-            ;
-        }
-
-        $this->query = $qb;
+        $this->currentQuery = clone $this->query;
     }
 
     /**
@@ -119,38 +121,23 @@ class DoctrineDriver extends DriverAbstract
     public function buildResult($fields, $first, $max)
     {
         $ordered = array();
-        $orderedEnd = array();
-        $entityAlias = isset($this->givenAlias)?$this->givenAlias:self::ENTITY_ALIAS;
 
         foreach ($fields as $field) {
             if (!$field instanceof DoctrineFieldInterface) {
                 throw new DoctrineDriverException(sprintf('All fields must be instances of FSi\Component\DataSource\Driver\Doctrine\DoctrineFieldInterface.'));
             }
 
-            $field->buildQuery($this->query, $entityAlias);
-
-            $options = $field->getOptions();
-            if (isset($options[OrderingExtension::ORDERING_PRIORITY])) {
-                $ordered[$options[OrderingExtension::ORDERING_PRIORITY]] = $field;
-            }
-        }
-
-        ksort($ordered);
-        $ordered = array_reverse($ordered);
-        $fields = array_merge($ordered, $orderedEnd);
-        foreach ($fields as $field) {
-            $field->setOrder($this->query, $entityAlias);
+            $field->buildQuery($this->currentQuery, $this->alias);
         }
 
         if ($max > 0) {
-            $this->query->setMaxResults($max);
-            $this->query->setFirstResult($first);
+            $this->currentQuery->setMaxResults($max);
+            $this->currentQuery->setFirstResult($first);
         }
 
-        $result = new Paginator($this->query);
+        $result = new Paginator($this->currentQuery);
 
-        //Cleaning query.
-        $this->query = null;
+        $this->currentQuery = null;
 
         return $result;
     }
@@ -164,10 +151,10 @@ class DoctrineDriver extends DriverAbstract
      */
     public function getQueryBuilder()
     {
-        if (!isset($this->query)) {
+        if (!isset($this->currentQuery)) {
             throw new DoctrineDriverException('Query is accessible only during preGetResult event.');
         }
 
-        return $this->query;
+        return $this->currentQuery;
     }
 }

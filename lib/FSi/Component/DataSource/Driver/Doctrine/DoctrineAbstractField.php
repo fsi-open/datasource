@@ -23,11 +23,6 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 abstract class DoctrineAbstractField extends FieldAbstractType implements DoctrineFieldInterface
 {
     /**
-     * Field mapping option name.
-     */
-    const FIELD_MAPPING = 'field_mapping';
-
-    /**
      * {@inheritdoc}
      */
     public function buildQuery(QueryBuilder $qb, $alias)
@@ -70,7 +65,9 @@ abstract class DoctrineAbstractField extends FieldAbstractType implements Doctri
                 $comparison = 'gte';
                 $data = $from;
             } else {
-                $qb->andWhere($qb->expr()->between($fieldName, $from, $to));
+                $qb->andWhere($qb->expr()->between($fieldName, ":{$name}_from", ":{$name}_to"));
+                $qb->setParameter("{$name}_from", $from);
+                $qb->setParameter("{$name}_to", $to);
                 return;
             }
         }
@@ -106,29 +103,12 @@ abstract class DoctrineAbstractField extends FieldAbstractType implements Doctri
     /**
      * {@inheritdoc}
      */
-    public function setOrder(QueryBuilder $qb, $alias)
-    {
-        $options = $this->getOptions();
-        $fieldName = $this->getFieldName($alias);
-
-        if (isset($options[OrderingExtension::ORDERING])) {
-            $name = $this->getName();
-            if ($options[OrderingExtension::ORDERING] == 'asc') {
-                $qb->addOrderBy($fieldName, 'asc');
-            } else {
-                $qb->addOrderBy($fieldName, 'desc');
-            }
-        }
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function loadOptionsConstraints(OptionsResolverInterface $optionsResolver)
     {
-        $optionsResolver->setDefaults(array(
-            self::FIELD_MAPPING => null,
-        ));
+        $optionsResolver
+            ->setOptional(array('field'))
+            ->setAllowedTypes(array('field' => 'string'))
+        ;
     }
 
     /**
@@ -140,8 +120,8 @@ abstract class DoctrineAbstractField extends FieldAbstractType implements Doctri
      */
     protected function getFieldName($alias)
     {
-        if ($this->hasOption(self::FIELD_MAPPING)) {
-            $name = $this->getOption(self::FIELD_MAPPING);
+        if ($this->hasOption('field')) {
+            $name = $this->getOption('field');
         } else {
             $name = $this->getName();
         }

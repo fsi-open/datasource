@@ -25,13 +25,20 @@ class DriverEventArgs extends Event
     private $driver;
 
     /**
+     * @var array
+     */
+    private $fields;
+
+    /**
      * Constructor.
      *
      * @param DriverInterface $driver
+     * @param array $fields
      */
-    public function __construct(DriverInterface $driver)
+    public function __construct(DriverInterface $driver, array $fields)
     {
         $this->driver = $driver;
+        $this->fields = $fields;
     }
 
     /**
@@ -40,5 +47,13 @@ class DriverEventArgs extends Event
     public function getDriver()
     {
         return $this->driver;
+    }
+
+    /**
+     * @return array
+     */
+    public function getFields()
+    {
+        return $this->fields;
     }
 }
