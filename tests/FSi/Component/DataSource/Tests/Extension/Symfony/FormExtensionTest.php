@@ -180,6 +180,8 @@ class FormExtensionTest extends \PHPUnit_Framework_TestCase
                         } else {
                             return null;
                         }
+                    case 'form_options':
+                        return array();
                 }
             }))
         ;
