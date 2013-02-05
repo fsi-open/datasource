@@ -37,7 +37,7 @@ $factory = new DataSourceFactory($extensions);
 
 * ``form_filter`` - whether form creation and rendering for this field is enabled, ``true`` by default
 * ``form_type`` - type of form that should be created for this datasource field, by default it equals to the type of datasource
-  field, it can be any valid form type or array containing 'from' and 'to' types for 'between' comparisons
+  field, it can be any valid form type
 * ``form_options`` - options passed to the form field (see documentation for Symfony Form component for details); for ``between``
   comparison, you can pass specific options for each field by passing two arrays in this option (extension will also search for
   specific options under ``from`` and ``to`` keys); If you pass also some general options, they will be merged to specific options,

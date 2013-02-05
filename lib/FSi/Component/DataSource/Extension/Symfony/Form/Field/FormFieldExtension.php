@@ -91,6 +91,7 @@ class FormFieldExtension extends FieldAbstractExtension
             ->setAllowedTypes(array(
                 'form_filter' => 'bool',
                 'form_options' => 'array',
+                'form_type' => 'string'
             ))
         ;
     }
@@ -227,23 +228,12 @@ class FormFieldExtension extends FieldAbstractExtension
                     $toOptions = array_merge($options, $toOptions);
                 }
 
-                $type = array(
-                    'from' => $field->getType(),
-                    'to' => $field->getType()
-                );
+                $type = $field->getType();
                 if ($field->hasOption('form_type')) {
-                    $optionType = $field->getOption('form_type');
-                    if (!is_array($optionType)) {
-                        $type['from'] = $type['to'] = $optionType;
-                    } else {
-                        if (isset($optionType['from']))
-                            $type['from'] = $optionType['from'];
-                        if (isset($optionType['to']))
-                            $type['to'] = $optionType['to'];
-                    }
+                    $type = $field->getOption('form_type');
                 }
-                $form2->add('from', $type['from'], $fromOptions);
-                $form2->add('to', $type['to'], $toOptions);
+                $form2->add('from', $type, $fromOptions);
+                $form2->add('to', $type, $toOptions);
                 $builder->add($form2);
                 break;
 
