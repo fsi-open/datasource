@@ -49,4 +49,14 @@ class FormExtension extends DataSourceAbstractExtension
             new Driver\DriverExtension($this->formFactory),
         );
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function loadSubscribers()
+    {
+        return array(
+            new EventSubscriber\Events(),
+        );
+    }
 }

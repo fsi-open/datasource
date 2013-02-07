@@ -13,13 +13,15 @@ namespace FSi\Component\DataSource\Tests\Extension\Symfony;
 
 use FSi\Component\DataSource\Extension\Symfony\Form\FormExtension;
 use FSi\Component\DataSource\Extension\Symfony\Form\Driver\DriverExtension;
+use FSi\Component\DataSource\Extension\Symfony\Form\EventSubscriber\Events;
 use FSi\Component\DataSource\Field\FieldAbstractExtension;
 use Symfony\Component\Form;
-use FSi\Component\DataSource\DataSourceInterface;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Bridge\Doctrine\Form\DoctrineOrmExtension;
 use FSi\Component\DataSource\Tests\Fixtures\TestManagerRegistry;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use FSi\Component\DataSource\DataSourceInterface;
 use FSi\Component\DataSource\Event\FieldEvent;
+use FSi\Component\DataSource\Event\DataSourceEvent\ViewEventArgs;
 
 /**
  * Tests for Symfony Form Extension.
@@ -120,6 +122,94 @@ class FormExtensionTest extends \PHPUnit_Framework_TestCase
         $extension->getFieldTypeExtensions('datetime');
         $this->setExpectedException('FSi\Component\DataSource\Exception\DataSourceException');
         $extension->getFieldTypeExtensions('wrong');
+    }
+
+    public function testFormOrder()
+    {
+        $datasource = $this->getMock('FSi\Component\DataSource\DataSourceInterface');
+        $view = $this->getMock('FSi\Component\DataSource\DataSourceViewInterface');
+
+        $fields = array();
+        $fieldViews = array();
+        for ($i = 0; $i < 15; $i++) {
+            $field = $this->getMock('FSi\Component\DataSource\Field\FieldTypeInterface');
+            $fieldView = $this->getMock('FSi\Component\DataSource\Field\FieldViewInterface');
+
+            unset($order);
+            if ($i < 5) {
+                $order = -4 + $i;
+            } else if ($i > 10) {
+                $order = $i - 10;
+            }
+
+            $field
+                ->expects($this->any())
+                ->method('getName')
+                ->will($this->returnValue('field' . $i))
+            ;
+
+            $field
+                ->expects($this->any())
+                ->method('hasOption')
+                ->will($this->returnValue(isset($order)))
+            ;
+
+            if (isset($order)) {
+                $field
+                    ->expects($this->any())
+                    ->method('getOption')
+                    ->will($this->returnValue($order))
+                ;
+            }
+
+            $fieldView
+                ->expects($this->any())
+                ->method('getName')
+                ->will($this->returnValue('field' . $i))
+            ;
+
+            $fields['field' . $i] = $field;
+            $fieldViews['field' . $i] = $fieldView;
+            if (isset($order)) {
+                $names['field' . $i] = $order;
+            } else {
+                $names['field' . $i] = null;
+            }
+        }
+
+        $datasource
+            ->expects($this->any())
+            ->method('getField')
+            ->will($this->returnCallback(function($field) use ($fields) { return $fields[$field]; }))
+        ;
+
+        $view
+            ->expects($this->any())
+            ->method('getFields')
+            ->will($this->returnValue($fieldViews))
+        ;
+
+        $view
+            ->expects($this->once())
+            ->method('setFields')
+            ->will($this->returnCallback(function(array $fields) {
+                $names = array();
+                foreach ($fields as $field)
+                    $names[] = $field->getName();
+                $this->assertSame(
+                    array(
+                        'field14', 'field13', 'field12', 'field11', 'field4',
+                        'field5', 'field6', 'field7', 'field8', 'field9', 'field10',
+                        'field3', 'field2', 'field1', 'field0'
+                    ),
+                    $names
+                );
+            }))
+        ;
+
+        $event = new ViewEventArgs($datasource, $view);
+        $subscriber = new Events();
+        $subscriber->postBuildView($event);
     }
 
     /**
