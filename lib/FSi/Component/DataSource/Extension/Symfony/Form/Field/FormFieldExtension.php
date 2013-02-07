@@ -88,13 +88,15 @@ class FormFieldExtension extends FieldAbstractExtension
                 'form_to_options' =>array()
             ))
             ->setOptional(array(
-                'form_type'
+                'form_type',
+                'form_order'
             ))
             ->setAllowedTypes(array(
                 'form_filter' => 'bool',
                 'form_options' => 'array',
                 'form_from_options' => 'array',
                 'form_to_options' =>'array',
+                'form_order' => 'integer',
                 'form_type' => 'string'
             ))
         ;
