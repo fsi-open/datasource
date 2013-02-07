@@ -27,6 +27,8 @@ class PaginationExtensionTest extends \PHPUnit_Framework_TestCase
      */
     public function testPaginationExtension()
     {
+        $self = $this;
+
         $cases = array(
             array(
                 'first_result'    => 20,
@@ -94,10 +96,10 @@ class PaginationExtensionTest extends \PHPUnit_Framework_TestCase
             $view
                 ->expects($this->any())
                 ->method('setAttribute')
-                ->will($this->returnCallback(function($attribute, $value) use ($case) {
+                ->will($this->returnCallback(function($attribute, $value) use ($self, $case) {
                     switch ($attribute) {
                         case 'page':
-                            $this->assertEquals($case['current_page'], $value);
+                            $self->assertEquals($case['current_page'], $value);
                             break;
                     };
                 }))
