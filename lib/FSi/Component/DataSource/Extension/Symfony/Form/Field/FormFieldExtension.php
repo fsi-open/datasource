@@ -83,14 +83,21 @@ class FormFieldExtension extends FieldAbstractExtension
         $optionsResolver
             ->setDefaults(array(
                 'form_filter' => true,
-                'form_options' => array()
+                'form_options' => array(),
+                'form_from_options' => array(),
+                'form_to_options' =>array()
             ))
             ->setOptional(array(
-                'form_type'
+                'form_type',
+                'form_order'
             ))
             ->setAllowedTypes(array(
                 'form_filter' => 'bool',
                 'form_options' => 'array',
+                'form_from_options' => 'array',
+                'form_to_options' =>'array',
+                'form_order' => 'integer',
+                'form_type' => 'string'
             ))
         ;
     }
@@ -193,7 +200,7 @@ class FormFieldExtension extends FieldAbstractExtension
             return $this->forms[$field_oid];
         }
 
-        $options = $field->hasOption('form_options') ? (array) $field->getOption('form_options') : array();
+        $options = $field->getOption('form_options');
         $options = array_merge($options, array('required' => false));
 
         $form = $this->formFactory->createNamedBuilder($datasource->getName(), 'collection', array(), array('csrf_protection' => false))->getForm();
@@ -203,47 +210,17 @@ class FormFieldExtension extends FieldAbstractExtension
             case 'between':
                 $form2 = $this->getFormFactory()->createNamedBuilder($field->getName());
 
-                //Options assignment, allows to specify different options for each of fields.
-                $fromOptions = isset($options[0]) ? $options[0] : null;
-                $toOptions = isset($options[1]) ? $options[1] : null;
-                if (!$fromOptions) {
-                    $fromOptions = isset($options['from']) ? $options['from'] : null;
-                }
-                if (!$toOptions) {
-                    $toOptions = isset($options['to']) ? $options['to'] : null;
-                }
+                $fromOptions = $field->getOption('form_from_options');
+                $toOptions = $field->getOption('form_to_options');
+                $fromOptions = array_merge($options, $fromOptions);
+                $toOptions = array_merge($options, $toOptions);
 
-                unset($options[0], $options[1], $options['from'], $options['to']);
-
-                //Checking and merging (if need) with general options.
-                if (!$fromOptions) {
-                    $fromOptions = $options;
-                } else {
-                    $fromOptions = array_merge($options, $fromOptions);
-                }
-                if (!$toOptions) {
-                    $toOptions = $options;
-                } else {
-                    $toOptions = array_merge($options, $toOptions);
-                }
-
-                $type = array(
-                    'from' => $field->getType(),
-                    'to' => $field->getType()
-                );
+                $type = $field->getType();
                 if ($field->hasOption('form_type')) {
-                    $optionType = $field->getOption('form_type');
-                    if (!is_array($optionType)) {
-                        $type['from'] = $type['to'] = $optionType;
-                    } else {
-                        if (isset($optionType['from']))
-                            $type['from'] = $optionType['from'];
-                        if (isset($optionType['to']))
-                            $type['to'] = $optionType['to'];
-                    }
+                    $type = $field->getOption('form_type');
                 }
-                $form2->add('from', $type['from'], $fromOptions);
-                $form2->add('to', $type['to'], $toOptions);
+                $form2->add('from', $type, $fromOptions);
+                $form2->add('to', $type, $toOptions);
                 $builder->add($form2);
                 break;
 

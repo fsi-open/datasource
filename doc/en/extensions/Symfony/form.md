@@ -35,13 +35,17 @@ $factory = new DataSourceFactory($extensions);
 
 ## Available field options ##
 
-* ``form_filter`` - whether form creation and rendering for this field is enabled, ``true`` by default
+* ``form_filter`` - whether form creation and rendering for this field is enabled, ``true`` by default.
+* ``form_order`` - optional integer value specifying order of fields in filter form; fields in filter form are sorted according
+  to descending value of this option; field that has not this option set will stay in their natural order (between fields with
+  positive and negative values of this option).
 * ``form_type`` - type of form that should be created for this datasource field, by default it equals to the type of datasource
-  field, it can be any valid form type or array containing 'from' and 'to' types for 'between' comparisons
-* ``form_options`` - options passed to the form field (see documentation for Symfony Form component for details); for ``between``
-  comparison, you can pass specific options for each field by passing two arrays in this option (extension will also search for
-  specific options under ``from`` and ``to`` keys); If you pass also some general options, they will be merged to specific options,
-  but specific options have higher precedence.
+  field, it can be any valid form type.
+* ``form_options`` - array of options passed to the form field (see documentation for Symfony Form component for details)
+* ``form_from_options`` - optional array of options passed to the ``from`` form field in datasource fields with ``between``
+  comparison; it's merged with ``form_options``.
+* ``form_to_options`` - optional array of options passed to the ``to`` form field in datasource fields with ``between``
+  comparison; it's merged with ``form_options``.
 
 **Note**: Remember that for fields of type ``entity`` you **must** always pass ``class`` option in ``form_option`` in order to
 specify class of associated entity. Otherwise an exception will be thrown from Symfony Form component.
