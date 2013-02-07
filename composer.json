@@ -8,6 +8,10 @@
         {
             "name": "Szczepan Cieslik",
             "email": "szczepan@fsi.pl"
+        },
+        {
+            "name": "Lukasz Cybula",
+            "email": "lukasz@fsi.pl"
         }
     ],
     "require": {
@@ -19,11 +23,17 @@
         "symfony/form" : "2.1.*",
         "symfony/http-foundation": "2.1.*",
         "doctrine/orm": "2.3.x-dev",
-        "symfony/doctrine-bridge": "2.2.x-dev"
+        "symfony/doctrine-bridge": "2.3.x-dev",
+        "symfony/property-access": "2.2.x-dev"
     },
     "autoload": {
         "psr-0": {
             "FSi\\Component\\DataSource": "lib/"
+        }
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "1.0.x-dev"
         }
     }
 }

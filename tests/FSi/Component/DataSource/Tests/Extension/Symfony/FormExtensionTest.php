@@ -126,6 +126,8 @@ class FormExtensionTest extends \PHPUnit_Framework_TestCase
 
     public function testFormOrder()
     {
+        $self = $this;
+
         $datasource = $this->getMock('FSi\Component\DataSource\DataSourceInterface');
         $view = $this->getMock('FSi\Component\DataSource\DataSourceViewInterface');
 
@@ -192,11 +194,13 @@ class FormExtensionTest extends \PHPUnit_Framework_TestCase
         $view
             ->expects($this->once())
             ->method('setFields')
-            ->will($this->returnCallback(function(array $fields) {
+            ->will($this->returnCallback(function(array $fields) use ($self) {
                 $names = array();
-                foreach ($fields as $field)
+                foreach ($fields as $field) {
                     $names[] = $field->getName();
-                $this->assertSame(
+                }
+
+                $self->assertSame(
                     array(
                         'field14', 'field13', 'field12', 'field11', 'field4',
                         'field5', 'field6', 'field7', 'field8', 'field9', 'field10',
@@ -219,6 +223,7 @@ class FormExtensionTest extends \PHPUnit_Framework_TestCase
      */
     public function testFields($type)
     {
+        $self = $this;
         $formFactory = $this->getFormFactory();
         $extension = new DriverExtension($formFactory);
         $field = $this->getMock('FSi\Component\DataSource\Field\FieldTypeInterface');
@@ -323,9 +328,9 @@ class FormExtensionTest extends \PHPUnit_Framework_TestCase
         $fieldView
             ->expects($this->atLeastOnce())
             ->method('setAttribute')
-            ->will($this->returnCallback(function ($attribute, $value) use ($type) {
+            ->will($this->returnCallback(function ($attribute, $value) use ($self, $type) {
                 if ($attribute == 'form') {
-                    $this->assertInstanceOf('\Symfony\Component\Form\FormView', $value);
+                    $self->assertInstanceOf('\Symfony\Component\Form\FormView', $value);
                 }
             }))
         ;
