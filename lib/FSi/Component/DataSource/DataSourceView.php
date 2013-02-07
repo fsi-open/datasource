@@ -103,6 +103,15 @@ class DataSourceView extends AttributesContainer implements DataSourceViewInterf
     /**
      * {@inheritdoc}
      */
+    public function removeField($name)
+    {
+        unset($this->fields[$name]);
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getField($name)
     {
         if (!$this->hasField($name)) {
@@ -122,6 +131,15 @@ class DataSourceView extends AttributesContainer implements DataSourceViewInterf
     /**
      * {@inheritdoc}
      */
+    public function clearFields()
+    {
+        $this->fields = array();
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function addField(Field\FieldViewInterface $fieldView)
     {
         $name = $fieldView->getName();
@@ -131,6 +149,25 @@ class DataSourceView extends AttributesContainer implements DataSourceViewInterf
         $this->fields[$name] = $fieldView;
         $fieldView->setDataSourceView($this);
         $this->iterator = null;
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setFields(array $fields)
+    {
+        $this->fields = array();
+
+        foreach ($fields as $field) {
+            if (!($field instanceof Field\FieldViewInterface)) {
+                throw new \InvalidArgumentException('Field must implement FSi\Component\DataSource\Field\FieldViewInterface');
+            }
+
+            $this->fields[$field->getName()] = $field;
+        }
+
+        return $this;
     }
 
     /**

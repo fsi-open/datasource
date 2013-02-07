@@ -54,6 +54,13 @@ interface DataSourceViewInterface extends AttributesContainerInterface, \ArrayAc
     public function hasField($name);
 
     /**
+     * Removes field with given name.
+     *
+     * @param string $name
+     */
+    public function removeField($name);
+
+    /**
      * Returns field with given name.
      *
      * @param string $name
@@ -68,9 +75,23 @@ interface DataSourceViewInterface extends AttributesContainerInterface, \ArrayAc
     public function getFields();
 
     /**
+     * Removes all fields.
+     *
+     * @return array
+     */
+    public function clearFields();
+
+    /**
      * Adds new field view.
      *
      * @param Field\FieldViewInterface $fieldView
      */
     public function addField(Field\FieldViewInterface $fieldView);
+
+    /**
+     * Replace fields with specified ones.
+     *
+     * @param Field\FieldViewInterface[] $fieldView
+     */
+    public function setFields(array $fields);
 }
