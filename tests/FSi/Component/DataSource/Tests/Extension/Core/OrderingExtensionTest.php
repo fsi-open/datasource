@@ -96,6 +96,7 @@ class OrderingExtensionTest extends \PHPUnit_Framework_TestCase
      */
     public function testOrdering()
     {
+        $self = $this;
         /**
          * Each test case consists of fields options definition, ordering parameters passed to datasource and expected fields
          * array which should be sorted in terms of priority of sorting results. Expected array contain sorting passed in
@@ -381,22 +382,22 @@ class OrderingExtensionTest extends \PHPUnit_Framework_TestCase
                 $view
                     ->expects($this->exactly(5))
                     ->method('setAttribute')
-                    ->will($this->returnCallback(function ($attribute, $value) use ($field, $case) {
+                    ->will($this->returnCallback(function ($attribute, $value) use ($self, $field, $case) {
                         switch ($attribute) {
                             case 'sorted_ascending':
-                                $this->assertEquals(
+                                $self->assertEquals(
                                     (key($case['parameters']) == $field->getName()) && (current($case['parameters']) == 'asc'),
                                     $value
                                 );
                                 break;
                             case 'sorted_descending':
-                                $this->assertEquals(
+                                $self->assertEquals(
                                     (key($case['parameters']) == $field->getName()) && (current($case['parameters']) == 'desc'),
                                     $value
                                 );
                                 break;
                             case 'parameters_sort_ascending':
-                                $this->assertSame(
+                                $self->assertSame(
                                     array(
                                         'ds' => array(
                                             OrderingExtension::PARAMETER_SORT => $case['expected_parameters'][$field->getName()]['ordering_ascending']
@@ -406,7 +407,7 @@ class OrderingExtensionTest extends \PHPUnit_Framework_TestCase
                                 );
                                 break;
                             case 'parameters_sort_descending':
-                                $this->assertSame(
+                                $self->assertSame(
                                     array(
                                         'ds' => array(
                                             OrderingExtension::PARAMETER_SORT => $case['expected_parameters'][$field->getName()]['ordering_descending']
