@@ -105,7 +105,10 @@ class DataSourceView extends AttributesContainer implements DataSourceViewInterf
      */
     public function removeField($name)
     {
-        unset($this->fields[$name]);
+        if (isset($this->fields[$name])) {
+            $this->fields[$name]->setDataSourceView(null);
+            unset($this->fields[$name]);
+        }
         return $this;
     }
 
@@ -165,7 +168,9 @@ class DataSourceView extends AttributesContainer implements DataSourceViewInterf
             }
 
             $this->fields[$field->getName()] = $field;
+            $field->setDataSourceView($this);
         }
+        $this->iterator = null;
 
         return $this;
     }
