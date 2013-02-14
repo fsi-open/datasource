@@ -29,7 +29,7 @@ class CollectionDriver extends DriverAbstract
     public function __construct(array $extensions, array $collection)
     {
         parent::__construct($extensions);
-        $this->collection = new ArrayCollection($collection);
+        $this->collection = $collection;
     }
 
     public function getType()
@@ -57,7 +57,7 @@ class CollectionDriver extends DriverAbstract
             $this->currentCriteria->setFirstResult($first);
         }
 
-        return $this->collection->matching($this->currentCriteria);
+        return new CollectionResult($this->collection, $this->currentCriteria);
     }
 
     /**
