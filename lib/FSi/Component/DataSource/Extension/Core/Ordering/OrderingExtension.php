@@ -36,6 +36,7 @@ class OrderingExtension extends DataSourceAbstractExtension
     {
         return array(
             new Driver\DoctrineExtension(),
+            new Driver\CollectionExtension(),
         );
     }
 
