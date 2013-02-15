@@ -129,7 +129,7 @@ class CollectionDriverTest extends \PHPUnit_Framework_TestCase
 
             $datasource->bindParameters($parameters);
             $result = $datasource->getResult();
-            $this->assertEquals(20, count($result));
+            $this->assertEquals(100, count($result));
             $i = 0;
             foreach ($result as $item) {
                 $i++;
