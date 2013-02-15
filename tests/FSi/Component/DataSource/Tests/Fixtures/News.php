@@ -179,7 +179,7 @@ class News
      *
      * @return \DateTime
      */
-    public function getCreateDate()
+    public function getCreate_Date()
     {
         return $this->create_date;
     }

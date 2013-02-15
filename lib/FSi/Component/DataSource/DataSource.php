@@ -67,14 +67,14 @@ class DataSource implements DataSourceInterface
      *
      * @var int
      */
-    private $maxResults = 20;
+    private $maxResults;
 
     /**
      * Offset for first result.
      *
      * @var int
      */
-    private $firstResult = 0;
+    private $firstResult;
 
     /**
      * Cache for methods that depends on fields data (cache is dropped whenever any of fields is dirty, or fields have changed).
