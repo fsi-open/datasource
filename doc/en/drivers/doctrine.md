@@ -36,7 +36,7 @@ $factory = new DataSourceFactory($extensions);
 $driverExtensions = array(new CoreExtension());
 
 $driverFactory = new DoctrineFactory($ManagerRegistry, $factory, $driverExtensions);
-$driver = $driverFactory->createDriver($entityName); //All drivers created this way will have same set of $extensions loaded.
+$driver = $driverFactory->createDriver($entityName); // All drivers created this way will have same set of $driverExtensions loaded.
 
 ```
 
@@ -57,8 +57,8 @@ $factory = new DataSourceFactory($extensions);
 
 $driverExtensions = array(new CoreExtension());
 
-$driverFactory = new DoctrineFactory($ManagerRegistry, $factory, $extensions);
-$datasource = $driverFactory->createDataSource($entityName, $dataSourceName); // All drivers created this way will have same set of $extensions loaded.
+$driverFactory = new DoctrineFactory($ManagerRegistry, $factory, $driverExtensions);
+$datasource = $driverFactory->createDataSource($entityName, $dataSourceName); // All drivers created this way will have same set of $driverExtensions loaded.
 
 ```
 
