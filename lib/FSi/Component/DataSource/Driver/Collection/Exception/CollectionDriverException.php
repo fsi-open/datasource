@@ -18,5 +18,4 @@ use FSi\Component\DataSource\Exception\DataSourceException;
  */
 class CollectionDriverException extends DataSourceException
 {
-
 }
