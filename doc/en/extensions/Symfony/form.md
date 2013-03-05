@@ -37,7 +37,7 @@ $factory = new DataSourceFactory($extensions);
 
 * ``form_filter`` - whether form creation and rendering for this field is enabled, ``true`` by default.
 * ``form_order`` - optional integer value specifying order of fields in filter form; fields in filter form are sorted according
-  to descending value of this option; field that has not this option set will stay in their natural order (between fields with
+  to ascending value of this option; field that has not this option set will stay in their natural order (between fields with
   positive and negative values of this option).
 * ``form_type`` - type of form that should be created for this datasource field, by default it equals to the type of datasource
   field, it can be any valid form type.
