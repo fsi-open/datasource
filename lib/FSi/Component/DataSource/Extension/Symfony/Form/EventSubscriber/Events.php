@@ -61,15 +61,14 @@ class Events implements EventSubscriberInterface
         }
         asort($positive);
         asort($negative);
-        $positive = array_reverse($positive, true);
-        $negative = array_reverse($negative, true);
 
         $fieldViews = array();
-        foreach ($positive as $name => $order) {
+        foreach ($negative as $name => $order) {
             $fieldViews[] = $indexedViews[$name];
         }
+
         $fieldViews = array_merge($fieldViews, $neutral);
-        foreach ($negative as $name => $order) {
+        foreach ($positive as $name => $order) {
             $fieldViews[] = $indexedViews[$name];
         }
 
