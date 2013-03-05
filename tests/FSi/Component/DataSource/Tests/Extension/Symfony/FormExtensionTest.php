@@ -202,9 +202,9 @@ class FormExtensionTest extends \PHPUnit_Framework_TestCase
 
                 $self->assertSame(
                     array(
-                        'field14', 'field13', 'field12', 'field11', 'field4',
-                        'field5', 'field6', 'field7', 'field8', 'field9', 'field10',
-                        'field3', 'field2', 'field1', 'field0'
+                        'field0', 'field1', 'field2', 'field3', 'field5',
+                        'field6', 'field7', 'field8', 'field9', 'field10', 'field4',
+                        'field11', 'field12', 'field13', 'field14'
                     ),
                     $names
                 );
