@@ -78,7 +78,7 @@ class FormFieldExtension extends FieldAbstractExtension
     /**
      * {@inheritdoc}
      */
-    public function loadOptionsConstraints(OptionsResolverInterface $optionsResolver)
+    public function initOptions(OptionsResolverInterface $optionsResolver)
     {
         $optionsResolver
             ->setDefaults(array(

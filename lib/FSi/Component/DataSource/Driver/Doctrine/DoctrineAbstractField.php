@@ -103,7 +103,7 @@ abstract class DoctrineAbstractField extends FieldAbstractType implements Doctri
     /**
      * {@inheritdoc}
      */
-    public function loadOptionsConstraints(OptionsResolverInterface $optionsResolver)
+    public function initOptions(OptionsResolverInterface $optionsResolver)
     {
         $optionsResolver
             ->setOptional(array('field'))

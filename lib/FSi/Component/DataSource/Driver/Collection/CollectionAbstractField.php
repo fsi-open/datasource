@@ -23,7 +23,7 @@ abstract class CollectionAbstractField extends FieldAbstractType implements Coll
     /**
      * {@inheritdoc}
      */
-    public function loadOptionsConstraints(OptionsResolverInterface $optionsResolver)
+    public function initOptions(OptionsResolverInterface $optionsResolver)
     {
         $optionsResolver
             ->setOptional(array('field'))

@@ -54,7 +54,7 @@ class FieldExtension extends FieldAbstractExtension
     /**
      * {@inheritdoc}
      */
-    public function loadOptionsConstraints(OptionsResolverInterface $optionsResolver)
+    public function initOptions(OptionsResolverInterface $optionsResolver)
     {
         $optionsResolver
             ->setOptional(array('default_sort_priority'))
