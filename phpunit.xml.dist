@@ -8,11 +8,11 @@
          processIsolation="false"
          stopOnFailure="false"
          syntaxCheck="false"
-         bootstrap="./bootstrap.php"
+         bootstrap="tests/bootstrap.php"
 >
     <testsuites>
         <testsuite name="FSi Datasource Component Test Suite">
-            <directory>./FSi/Component/DataSource/Tests/</directory>
+            <directory>tests/FSi/Component/DataSource/Tests/</directory>
         </testsuite>
     </testsuites>
 </phpunit>
