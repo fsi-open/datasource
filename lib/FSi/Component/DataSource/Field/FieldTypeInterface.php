@@ -174,5 +174,5 @@ interface FieldTypeInterface
      *
      * @param OptionsResolverInterface $optionsResolver
      */
-    public function loadOptionsConstraints(OptionsResolverInterface $optionsResolver);
+    public function initOptions(OptionsResolverInterface $optionsResolver);
 }

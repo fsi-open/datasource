@@ -112,7 +112,7 @@ abstract class FieldAbstractType implements FieldTypeInterface
         $this->eventDispatcher = new EventDispatcher();
         $this->optionsResolver = new OptionsResolver();
         $this->extensions = array();
-        $this->loadOptionsConstraints($this->optionsResolver);
+        $this->initOptions($this->optionsResolver);
         $this->options = $this->optionsResolver->resolve(array());
     }
 
@@ -261,7 +261,7 @@ abstract class FieldAbstractType implements FieldTypeInterface
         }
 
         $this->eventDispatcher->addSubscriber($extension);
-        $extension->loadOptionsConstraints($this->optionsResolver);
+        $extension->initOptions($this->optionsResolver);
         $this->extensions[] = $extension;
 
         $this->options = $this->optionsResolver->resolve($this->options);
@@ -277,7 +277,7 @@ abstract class FieldAbstractType implements FieldTypeInterface
                 throw new FieldException(sprintf('Expected instance of FieldExtensionInterface, %s given', get_class($extension)));
             }
             $this->eventDispatcher->addSubscriber($extension);
-            $extension->loadOptionsConstraints($this->optionsResolver);
+            $extension->initOptions($this->optionsResolver);
         }
         $this->options = $this->optionsResolver->resolve($this->options);
         $this->extensions = $extensions;
@@ -340,7 +340,7 @@ abstract class FieldAbstractType implements FieldTypeInterface
     /**
      * {@inheritdoc}
      */
-    public function loadOptionsConstraints(OptionsResolverInterface $optionsResolver)
+    public function initOptions(OptionsResolverInterface $optionsResolver)
     {
 
     }
