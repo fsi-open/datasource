@@ -21,7 +21,7 @@ class Text extends CollectionAbstractField
     /**
      * {@inheritdoc}
      */
-    protected $comparisons = array('eq', 'neq', 'in', 'nin');
+    protected $comparisons = array('eq', 'neq', 'in', 'nin', 'contains');
 
     /**
      * {@inheritdoc}

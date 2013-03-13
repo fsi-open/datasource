@@ -85,6 +85,7 @@ abstract class CollectionAbstractField extends FieldAbstractType implements Coll
             case 'lte':
             case 'gt':
             case 'gte':
+            case 'contains':
                 $c->andWhere($eb->$comparison($field, $data));
                 break;
 

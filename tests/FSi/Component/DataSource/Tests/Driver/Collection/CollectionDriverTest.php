@@ -86,8 +86,8 @@ class CollectionDriverTest extends \PHPUnit_Framework_TestCase
 
         foreach ($datasources as $datasource) {
             $datasource
-                ->addField('title', 'text', 'eq')
-                ->addField('author', 'text', 'in')
+                ->addField('title', 'text', 'contains')
+                ->addField('author', 'text', 'contains')
                 ->addField('created', 'datetime', 'between', array(
                     'field' => 'create_date',
                 ))
@@ -103,7 +103,7 @@ class CollectionDriverTest extends \PHPUnit_Framework_TestCase
             $parameters = array(
                 $datasource->getName() => array(
                     DataSourceInterface::PARAMETER_FIELDS => array(
-                        'author' => array('author2@domain1.com', 'author1@domain1.com', 'author3@domain2.com'),
+                        'author' => 'domain1.com',
                     ),
                 ),
             );
@@ -113,7 +113,7 @@ class CollectionDriverTest extends \PHPUnit_Framework_TestCase
             //Checking cache.
             $this->assertSame($result2, $datasource->getResult());
 
-            $this->assertEquals(2, count($result2));
+            $this->assertEquals(50, count($result2));
             $this->assertNotSame($result1, $result2);
             unset($result1);
             unset($result2);
@@ -139,9 +139,10 @@ class CollectionDriverTest extends \PHPUnit_Framework_TestCase
             $parameters = array(
                 $datasource->getName() => array(
                     DataSourceInterface::PARAMETER_FIELDS => array(
+                        'author' => 'domain1.com',
+                        'title' => 'title3',
                         'created' => array(
-                            'from' => new \DateTime(date("Y:m:d H:i:s", 46 * 24 * 60 * 60)),
-                            'to' => new \DateTime(date("Y:m:d H:i:s", 53 * 24 * 60 * 60))
+                            'from' => new \DateTime(date("Y:m:d H:i:s", 35 * 24 * 60 * 60)),
                         ),
                     ),
                 ),
@@ -149,7 +150,7 @@ class CollectionDriverTest extends \PHPUnit_Framework_TestCase
             $datasource->bindParameters($parameters);
             $view = $datasource->createView();
             $result = $datasource->getResult();
-            $this->assertEquals(8, count($result));
+            $this->assertEquals(2, count($result));
 
             $parameters = array(
                 $datasource->getName() => array(
@@ -200,7 +201,7 @@ class CollectionDriverTest extends \PHPUnit_Framework_TestCase
             $parameters = array(
                 $datasource->getName() => array(
                     DataSourceInterface::PARAMETER_FIELDS => array(
-                        'author' => 'author1@domain1.com',
+                        'author' => 'domain1.com',
                     ),
                 ),
             );
