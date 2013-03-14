@@ -72,7 +72,7 @@ so remember to **always load it** to this driver.
 
 Provided field types:
 
-* ``text`` - allowed comparisons: eq, neq, in, nin (not in).
+* ``text`` - allowed comparisons: eq, neq, in, nin (not in), contains.
 * ``number`` - allowed comparisons: eq, neq, lt, lte, gt, gte, in, nin (not in), between.
 * ``date`` - allowed comparisons: eq, neq, lt, lte, gt, gte, in, nin (not in), between.
 * ``time`` - allowed comparisons: eq, neq, lt, lte, gt, gte, in, nin (not in), between.
