@@ -73,6 +73,11 @@ abstract class DoctrineAbstractField extends FieldAbstractType implements Doctri
         }
 
         switch ($comparison) {
+            case 'in':
+            case 'notIn':
+                if (!is_array($data)) {
+                    throw new DoctrineDriverException('Fields with \'in\' and \'notIn\' comparisons require to bind an array.');
+                }
             case 'eq':
             case 'neq':
             case 'lt':
@@ -87,13 +92,6 @@ abstract class DoctrineAbstractField extends FieldAbstractType implements Doctri
             case 'contains':
                 $qb->andWhere($qb->expr()->like($fieldName, ":$name"));
                 $qb->setParameter($this->getName(), "%$data%");
-                break;
-
-            case 'in':
-            case 'notIn':
-                if (!is_array($data)) {
-                    throw new DoctrineDriverException('Given data must be an array.');
-                }
                 break;
 
             default:

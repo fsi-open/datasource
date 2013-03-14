@@ -80,7 +80,7 @@ class DoctrineDriverTest extends \PHPUnit_Framework_TestCase
 
         foreach ($datasources as $datasource) {
             $datasource
-                ->addField('title', 'text', 'contains')
+                ->addField('title', 'text', 'in')
                 ->addField('author', 'text', 'like')
                 ->addField('created', 'datetime', 'between', array(
                     'field' => 'create_date',
@@ -139,7 +139,7 @@ class DoctrineDriverTest extends \PHPUnit_Framework_TestCase
                 $datasource->getName() => array(
                     DataSourceInterface::PARAMETER_FIELDS => array(
                         'author' => 'domain1.com',
-                        'title' => 'title3',
+                        'title' => array('title44', 'title58'),
                         'created' => array('from' => new \DateTime(date("Y:m:d H:i:s", 35 * 24 * 60 * 60))),
                     ),
                 ),
