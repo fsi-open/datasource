@@ -21,7 +21,7 @@ class Text extends DoctrineAbstractField
     /**
      * {@inheritdoc}
      */
-    protected $comparisons = array('eq', 'neq', 'like');
+    protected $comparisons = array('eq', 'neq', 'like', 'contains');
 
     /**
      * {@inheritdoc}

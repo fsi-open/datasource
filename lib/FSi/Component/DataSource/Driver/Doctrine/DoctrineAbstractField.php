@@ -84,6 +84,7 @@ abstract class DoctrineAbstractField extends FieldAbstractType implements Doctri
                 break;
 
             case 'like':
+            case 'contains':
                 $qb->andWhere($qb->expr()->like($fieldName, ":$name"));
                 $qb->setParameter($this->getName(), "%$data%");
                 break;

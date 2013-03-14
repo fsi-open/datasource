@@ -80,7 +80,7 @@ class DoctrineDriverTest extends \PHPUnit_Framework_TestCase
 
         foreach ($datasources as $datasource) {
             $datasource
-                ->addField('title', 'text', 'like')
+                ->addField('title', 'text', 'contains')
                 ->addField('author', 'text', 'like')
                 ->addField('created', 'datetime', 'between', array(
                     'field' => 'create_date',
