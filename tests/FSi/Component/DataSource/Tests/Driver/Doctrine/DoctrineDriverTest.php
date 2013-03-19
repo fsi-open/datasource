@@ -69,14 +69,24 @@ class DoctrineDriverTest extends \PHPUnit_Framework_TestCase
         $driverFactory = $this->getDoctrineFactory();
         $datasources = array();
 
-        $datasources[] = $driverFactory->createDataSource('FSi\Component\DataSource\Tests\Fixtures\News', 'datasource');
+        $options = array(
+            'entity' => 'FSi\Component\DataSource\Tests\Fixtures\News',
+            'name' => 'datasource'
+        );
+        $datasources[] = $driverFactory->createDataSource($options);
 
         $qb = $this->em
             ->createQueryBuilder()
             ->select('n')
             ->from('FSi\Component\DataSource\Tests\Fixtures\News', 'n')
         ;
-        $datasources[] = $driverFactory->createDataSource($qb, 'datasource2', 'n');
+
+        $options = array(
+            'entity' => $qb,
+            'name' => 'datasource2',
+            'alias' => 'n'
+        );
+        $datasources[] = $driverFactory->createDataSource($options);
 
         foreach ($datasources as $datasource) {
             $datasource
@@ -251,7 +261,12 @@ class DoctrineDriverTest extends \PHPUnit_Framework_TestCase
             ->join('n.category', 'c')
             ->join('n.groups', 'g')
         ;
-        $driver = $driverFactory->createDriver($qb, 'n');
+
+        $options = array(
+            'entity' => $qb,
+            'alias' => 'n'
+        );
+        $driver = $driverFactory->createDriver($options);
         $datasource = $dataSourceFactory->createDataSource($driver);
 
         $datasource

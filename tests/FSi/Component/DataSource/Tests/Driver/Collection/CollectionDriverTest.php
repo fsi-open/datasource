@@ -69,20 +69,21 @@ class CollectionDriverTest extends \PHPUnit_Framework_TestCase
         $driverFactory = $this->getCollectionFactory();
         $datasources = array();
 
-        $datasources[] = $driverFactory->createDataSource(
-            $this->em->getRepository('FSi\Component\DataSource\Tests\Fixtures\News')->findAll(),
-            'datasource'
-        );
+        $datasources[] = $driverFactory->createDataSource(array(
+            'collection' => $this->em->getRepository('FSi\Component\DataSource\Tests\Fixtures\News')->findAll(),
+            'name' => 'datasource'
+        ));
 
         $qb = $this->em
             ->createQueryBuilder()
             ->select('n')
             ->from('FSi\Component\DataSource\Tests\Fixtures\News', 'n')
         ;
-        $datasources[] = $driverFactory->createDataSource(
-            $qb->getQuery()->execute(),
-            'datasource2'
-        );
+
+        $datasources[] = $driverFactory->createDataSource(array(
+            'collection' => $qb->getQuery()->execute(),
+            'name' => 'datasource2'
+        ));
 
         foreach ($datasources as $datasource) {
             $datasource

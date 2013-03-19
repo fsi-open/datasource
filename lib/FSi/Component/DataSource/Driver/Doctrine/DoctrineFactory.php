@@ -11,14 +11,15 @@
 
 namespace FSi\Component\DataSource\Driver\Doctrine;
 
-use Doctrine\ORM\EntityManager;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use FSi\Component\DataSource\DataSourceFactoryInterface;
+use FSi\Component\DataSource\Driver\DriverFactoryInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * {@inheritdoc}
  */
-class DoctrineFactory implements DoctrineFactoryInterface
+class DoctrineFactory implements DriverFactoryInterface
 {
     /**
      * @var ManagerRegistry
@@ -38,6 +39,16 @@ class DoctrineFactory implements DoctrineFactoryInterface
     private $extensions;
 
     /**
+     * @var \Symfony\Component\OptionsResolver\OptionsResolver
+     */
+    private $driverOptionsResolver;
+
+    /**
+     * @var \Symfony\Component\OptionsResolver\OptionsResolver
+     */
+    private $datasourceOptionsResolver;
+
+    /**
      * {@inheritdoc}
      */
     public function __construct(ManagerRegistry $registry, DataSourceFactoryInterface $dataSourceFactory, $extensions = array())
@@ -45,28 +56,86 @@ class DoctrineFactory implements DoctrineFactoryInterface
         $this->registry = $registry;
         $this->dataSourceFactory = $dataSourceFactory;
         $this->extensions = $extensions;
+        $this->driverOptionsResolver = new OptionsResolver();
+        $this->datasourceOptionsResolver = new OptionsResolver();
+        $this->initOptions();
     }
 
     /**
      * {@inheritdoc}
      */
-    public function createDriver($entity, $alias = null, $entityManager = null)
+    public function getDriverType()
     {
-        $entityManager = (string) $entityManager;
+        return 'doctrine';
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function createDriver($options = array())
+    {
+        $options = $this->driverOptionsResolver->resolve($options);
+
         if (empty($entityManager)) {
             $em = $this->registry->getManager($this->registry->getDefaultManagerName());
         } else {
-            $em = $this->registry->getManager($entityManager);
+            $em = $this->registry->getManager($options['em']);
         }
-        return new DoctrineDriver($this->extensions, $em, $entity, $alias);
+
+        return new DoctrineDriver($this->extensions, $em, $options['entity'], $options['alias']);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function createDataSource($entity, $name = 'datasource', $alias = null, $entityManager = null)
+    public function createDataSource($options = array())
     {
-        $driver = $this->createDriver($entity, $alias, $entityManager);
-        return $this->dataSourceFactory->createDataSource($driver, $name);
+        $options = $this->datasourceOptionsResolver->resolve($options);
+
+        $driver = $this->createDriver(array(
+            'entity' => $options['entity'],
+            'alias' => $options['alias'],
+            'em' => $options['em']
+        ));
+
+        return $this->dataSourceFactory->createDataSource($driver, $options['name']);
+    }
+
+    /**
+     * Initialize Options Resolvers for driver and datasource builder.
+     */
+    private function initOptions()
+    {
+        $this->driverOptionsResolver->setRequired(array(
+            'entity'
+        ));
+
+        $this->driverOptionsResolver->setDefaults(array(
+            'alias' => null,
+            'em' => null
+        ));
+
+        $this->driverOptionsResolver->setAllowedTypes(array(
+            'entity' => array('string', '\Doctrine\ORM\QueryBuilder'),
+            'alias' => array('null', 'string'),
+            'em' => array('null', 'string')
+        ));
+
+        $this->datasourceOptionsResolver->setRequired(array(
+            'entity'
+        ));
+
+        $this->datasourceOptionsResolver->setDefaults(array(
+            'name' => 'datasource',
+            'alias' => null,
+            'em' => null
+        ));
+
+        $this->datasourceOptionsResolver->setAllowedTypes(array(
+            'entity' => array('string', '\Doctrine\ORM\QueryBuilder'),
+            'name' => 'string',
+            'alias' => array('null', 'string'),
+            'em' => array('null', 'string')
+        ));
     }
 }
