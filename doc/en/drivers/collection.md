@@ -28,40 +28,15 @@ or through factory
 
 use FSi\Component\DataSource\Driver\Collection\CollectionFactory;
 use FSi\Component\DataSource\Driver\Collection\Extension\Core\CoreExtension;
-use FSi\Component\DataSource\DataSourceFactory;
 
 $extensions = array(
     // (...) Extensions that have to be loaded to every DataSource after creation.
 );
 
-$factory = new DataSourceFactory($extensions);
-
 $driverExtensions = array(new CoreExtension());
 
-$driverFactory = new CollectionFactory($factory, $driverExtensions);
+$driverFactory = new CollectionFactory($driverExtensions);
 $driver = $driverFactory->createDriver($arrayOfObjects); // All drivers created this way will have same set of $driverExtensions loaded.
-
-```
-
-You can also create dataosurce directly from driver factory
-
-``` php
-<?php
-
-use FSi\Component\DataSource\Driver\Collection\CollectionFactory;
-use FSi\Component\DataSource\Driver\Collection\Extension\Core\CoreExtension;
-use FSi\Component\DataSource\DataSourceFactory;
-
-$extensions = array(
-    // (...) Extensions that have to be loaded to every DataSource after creation.
-);
-
-$factory = new DataSourceFactory($extensions);
-
-$driverExtensions = array(new CoreExtension());
-
-$driverFactory = new CollectionFactory($factory, $driverExtensions);
-$datasource = $driverFactory->createDataSource($arrayOfObjects, $dataSourceName); // All drivers created this way will have same set of $driverExtensions loaded.
 
 ```
 
@@ -96,18 +71,20 @@ $data = array(
     ...
 );
 
-$driverFactory = new DoctrineFactory($driverExtensions);
-$driver = $driverFactory->createDriver($data);
+$driverManager = DriverFactoryManager(array(
+    new DoctrineFactory($driverExtensions)
+));
 
-$datasourceFactory = new DataSourceFactory($datasourceExtensions);
-$datasource = $datasourceFactory->createDataSource($driver, 'datasource_name');
+$datasourceFactory = new DataSourceFactory($driverManager, $datasourceExtensions);
+$driverOptions = array(
+    'collection' => $data
+);
+$datasource = $datasourceFactory->createDataSource('collection', $driverOptions, 'datasource_name');
 
-$datasource
-    ->addField('id', 'number', 'eq')
+$datasource->addField('id', 'number', 'eq')
     ->addField('title', 'text', 'eq')
     ->addField('author', 'text', 'eq')
-    ->addField('create_date', 'datetime', 'between')
-;
+    ->addField('create_date', 'datetime', 'between');
 ```
 
 You can use ``field`` option to have different field name, or many DataSource fields referring to one object field:

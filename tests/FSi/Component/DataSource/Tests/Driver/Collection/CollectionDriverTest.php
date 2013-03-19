@@ -11,22 +11,22 @@
 
 namespace FSi\Component\DataSource\Tests\Driver\Doctrine;
 
-use Doctrine\ORM\Tools\Setup;
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\Tools\Setup;
+use FSi\Component\DataSource\DataSourceFactory;
 use FSi\Component\DataSource\DataSourceInterface;
-use FSi\Component\DataSource\Tests\Fixtures\News;
-use FSi\Component\DataSource\Tests\Fixtures\Category;
-use FSi\Component\DataSource\Tests\Fixtures\Group;
-use FSi\Component\DataSource\Tests\Fixtures\TestManagerRegistry;
-use FSi\Component\DataSource\Driver\Collection\Extension\Core\CoreExtension;
 use FSi\Component\DataSource\Driver\Collection\CollectionFactory;
-use FSi\Component\DataSource\Extension\Symfony\Form\FormExtension;
-use FSi\Component\DataSource\Extension\Symfony;
+use FSi\Component\DataSource\Driver\Collection\Extension\Core\CoreExtension;
+use FSi\Component\DataSource\Driver\DriverFactoryManager;
 use FSi\Component\DataSource\Extension\Core;
 use FSi\Component\DataSource\Extension\Core\Ordering\OrderingExtension;
-use Symfony\Component\Form;
-use Symfony\Bridge\Doctrine\Form\DoctrineOrmExtension;
 use FSi\Component\DataSource\Extension\Core\Pagination\PaginationExtension;
+use FSi\Component\DataSource\Extension\Symfony;
+use FSi\Component\DataSource\Tests\Fixtures\Category;
+use FSi\Component\DataSource\Tests\Fixtures\Group;
+use FSi\Component\DataSource\Tests\Fixtures\News;
+use FSi\Component\DataSource\Tests\Fixtures\TestManagerRegistry;
+use Symfony\Component\Form;
 
 /**
  * Tests for Doctrine driver.
@@ -66,13 +66,18 @@ class CollectionDriverTest extends \PHPUnit_Framework_TestCase
      */
     public function testGeneral()
     {
+        $datasourceFactory = $this->getDataSourceFactory();
+
         $driverFactory = $this->getCollectionFactory();
+        $driver = $driverFactory->createDriver();
+
         $datasources = array();
 
-        $datasources[] = $driverFactory->createDataSource(array(
+        $driverOptions = array(
             'collection' => $this->em->getRepository('FSi\Component\DataSource\Tests\Fixtures\News')->findAll(),
-            'name' => 'datasource'
-        ));
+        );
+
+        $datasources[] = $datasourceFactory->createDataSource('collection', $driverOptions, 'datasource');
 
         $qb = $this->em
             ->createQueryBuilder()
@@ -80,10 +85,11 @@ class CollectionDriverTest extends \PHPUnit_Framework_TestCase
             ->from('FSi\Component\DataSource\Tests\Fixtures\News', 'n')
         ;
 
-        $datasources[] = $driverFactory->createDataSource(array(
-            'collection' => $qb->getQuery()->execute(),
-            'name' => 'datasource2'
-        ));
+        $driverOptions = array(
+            'collection' => $qb->getQuery()->execute()
+        );
+
+        $datasources[] = $datasourceFactory->createDataSource('collection', $driverOptions, 'datasource2');
 
         foreach ($datasources as $datasource) {
             $datasource
@@ -223,27 +229,6 @@ class CollectionDriverTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * Returns mock of FormFactory.
-     *
-     * @return object
-     */
-    private function getFormFactory()
-    {
-        $typeFactory = new Form\ResolvedFormTypeFactory();
-        $registry = new Form\FormRegistry(
-            array(
-                new Form\Extension\Core\CoreExtension(),
-                new Form\Extension\Csrf\CsrfExtension(
-                    new Form\Extension\Csrf\CsrfProvider\DefaultCsrfProvider('secret')
-                ),
-                new DoctrineOrmExtension(new TestManagerRegistry($this->em)),
-            ),
-            $typeFactory
-        );
-        return new Form\FormFactory($registry, $typeFactory);
-    }
-
-    /**
      * Return configured DoctrinFactory.
      *
      * @return DoctrineFactory.
@@ -254,7 +239,7 @@ class CollectionDriverTest extends \PHPUnit_Framework_TestCase
             new CoreExtension(),
         );
 
-        return new CollectionFactory($this->getDataSourceFactory(), $extensions);
+        return new CollectionFactory($extensions);
     }
 
     /**
@@ -264,18 +249,21 @@ class CollectionDriverTest extends \PHPUnit_Framework_TestCase
      */
     private function getDataSourceFactory()
     {
+        $driverFactoryManager = new DriverFactoryManager(array(
+            $this->getCollectionFactory()
+        ));
+
         $extensions = array(
             new Symfony\Core\CoreExtension(),
             new Core\Pagination\PaginationExtension(),
             new OrderingExtension(),
         );
-        return new \FSi\Component\DataSource\DataSourceFactory($extensions);
+
+        return new DataSourceFactory($driverFactoryManager, $extensions);
     }
 
     /**
-     * Loads test data to EntityManager
-     *
-     * @param EntityManager
+     * @param EntityManager $em
      */
     private function load(EntityManager $em)
     {

@@ -20,7 +20,7 @@ interface DriverFactoryManagerInterface
 
     /**
      * @param $driverType
-     * @return null
+     * @return null|DriverFactoryInterface
      */
     public function getFactory($driverType);
 

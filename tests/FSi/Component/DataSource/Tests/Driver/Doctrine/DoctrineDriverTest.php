@@ -13,7 +13,9 @@ namespace FSi\Component\DataSource\Tests\Driver\Doctrine;
 
 use Doctrine\ORM\Tools\Setup;
 use Doctrine\ORM\EntityManager;
+use FSi\Component\DataSource\DataSourceFactory;
 use FSi\Component\DataSource\DataSourceInterface;
+use FSi\Component\DataSource\Driver\DriverFactoryManager;
 use FSi\Component\DataSource\Tests\Fixtures\News;
 use FSi\Component\DataSource\Tests\Fixtures\Category;
 use FSi\Component\DataSource\Tests\Fixtures\Group;
@@ -66,27 +68,22 @@ class DoctrineDriverTest extends \PHPUnit_Framework_TestCase
      */
     public function testGeneral()
     {
-        $driverFactory = $this->getDoctrineFactory();
+        $datasourceFactory = $this->getDataSourceFactory();
         $datasources = array();
-
-        $options = array(
+        $driverOptions = array(
             'entity' => 'FSi\Component\DataSource\Tests\Fixtures\News',
-            'name' => 'datasource'
         );
-        $datasources[] = $driverFactory->createDataSource($options);
 
-        $qb = $this->em
-            ->createQueryBuilder()
+        $datasources[] = $datasourceFactory->createDataSource('doctrine', $driverOptions, 'datasource');
+        $qb = $this->em->createQueryBuilder()
             ->select('n')
-            ->from('FSi\Component\DataSource\Tests\Fixtures\News', 'n')
-        ;
+            ->from('FSi\Component\DataSource\Tests\Fixtures\News', 'n');
 
-        $options = array(
-            'entity' => $qb,
-            'name' => 'datasource2',
+        $driverOptions = array(
+            'qb' => $qb,
             'alias' => 'n'
         );
-        $datasources[] = $driverFactory->createDataSource($options);
+        $datasources[] = $datasourceFactory->createDataSource('doctrine', $driverOptions, 'datasource2');
 
         foreach ($datasources as $datasource) {
             $datasource
@@ -251,33 +248,28 @@ class DoctrineDriverTest extends \PHPUnit_Framework_TestCase
      */
     public function testQuery()
     {
-        $driverFactory = $this->getDoctrineFactory();
         $dataSourceFactory = $this->getDataSourceFactory();
 
-        $qb = $this->em
-            ->createQueryBuilder()
+        $qb = $this->em->createQueryBuilder()
             ->select('n')
             ->from('FSi\Component\DataSource\Tests\Fixtures\News', 'n')
             ->join('n.category', 'c')
             ->join('n.groups', 'g')
         ;
 
-        $options = array(
-            'entity' => $qb,
+        $driverOptions = array(
+            'qb' => $qb,
             'alias' => 'n'
         );
-        $driver = $driverFactory->createDriver($options);
-        $datasource = $dataSourceFactory->createDataSource($driver);
 
-        $datasource
-            ->addField('author', 'text', 'like')
+        $datasource = $dataSourceFactory->createDataSource('doctrine', $driverOptions, 'datasource');
+        $datasource->addField('author', 'text', 'like')
             ->addField('category', 'text', 'like', array(
                 'field' => 'c.name',
             ))
             ->addField('group', 'text', 'like', array(
                 'field' => 'g.name',
-            ))
-        ;
+            ));
 
         $parameters = array(
             $datasource->getName() => array(
@@ -315,32 +307,20 @@ class DoctrineDriverTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
+     */
+    public function testCreateDriverWithoutEntityAndQbOptions()
+    {
+        $factory = $this->getDoctrineFactory();
+        $factory->createDriver(array());
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function tearDown()
     {
         unset($this->em);
-    }
-
-    /**
-     * Returns mock of FormFactory.
-     *
-     * @return object
-     */
-    private function getFormFactory()
-    {
-        $typeFactory = new Form\ResolvedFormTypeFactory();
-        $registry = new Form\FormRegistry(
-            array(
-                new Form\Extension\Core\CoreExtension(),
-                new Form\Extension\Csrf\CsrfExtension(
-                    new Form\Extension\Csrf\CsrfProvider\DefaultCsrfProvider('secret')
-                ),
-                new DoctrineOrmExtension(new TestManagerRegistry($this->em)),
-            ),
-            $typeFactory
-        );
-        return new Form\FormFactory($registry, $typeFactory);
     }
 
     /**
@@ -354,7 +334,7 @@ class DoctrineDriverTest extends \PHPUnit_Framework_TestCase
             new CoreExtension(),
         );
 
-        return new DoctrineFactory(new TestManagerRegistry($this->em), $this->getDataSourceFactory(), $extensions);
+        return new DoctrineFactory(new TestManagerRegistry($this->em), $extensions);
     }
 
     /**
@@ -364,18 +344,21 @@ class DoctrineDriverTest extends \PHPUnit_Framework_TestCase
      */
     private function getDataSourceFactory()
     {
+        $driverFactoryManager = new DriverFactoryManager(array(
+            $this->getDoctrineFactory()
+        ));
+
         $extensions = array(
             new Symfony\Core\CoreExtension(),
             new Core\Pagination\PaginationExtension(),
             new OrderingExtension(),
         );
-        return new \FSi\Component\DataSource\DataSourceFactory($extensions);
+
+        return new DataSourceFactory($driverFactoryManager, $extensions);
     }
 
     /**
-     * Loads test data to EntityManager
-     *
-     * @param EntityManager
+     * @param EntityManager $em
      */
     private function load(EntityManager $em)
     {

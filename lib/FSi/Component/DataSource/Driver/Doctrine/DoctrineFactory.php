@@ -12,8 +12,9 @@
 namespace FSi\Component\DataSource\Driver\Doctrine;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
-use FSi\Component\DataSource\DataSourceFactoryInterface;
 use FSi\Component\DataSource\Driver\DriverFactoryInterface;
+use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
+use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
@@ -27,11 +28,6 @@ class DoctrineFactory implements DriverFactoryInterface
     private $registry;
 
     /**
-     * @var DataSourceFactoryInterface
-     */
-    private $dataSourceFactory;
-
-    /**
      * Array of extensions.
      *
      * @var array
@@ -41,23 +37,16 @@ class DoctrineFactory implements DriverFactoryInterface
     /**
      * @var \Symfony\Component\OptionsResolver\OptionsResolver
      */
-    private $driverOptionsResolver;
-
-    /**
-     * @var \Symfony\Component\OptionsResolver\OptionsResolver
-     */
-    private $datasourceOptionsResolver;
+    private $optionsResolver;
 
     /**
      * {@inheritdoc}
      */
-    public function __construct(ManagerRegistry $registry, DataSourceFactoryInterface $dataSourceFactory, $extensions = array())
+    public function __construct(ManagerRegistry $registry, $extensions = array())
     {
         $this->registry = $registry;
-        $this->dataSourceFactory = $dataSourceFactory;
         $this->extensions = $extensions;
-        $this->driverOptionsResolver = new OptionsResolver();
-        $this->datasourceOptionsResolver = new OptionsResolver();
+        $this->optionsResolver = new OptionsResolver();
         $this->initOptions();
     }
 
@@ -74,31 +63,19 @@ class DoctrineFactory implements DriverFactoryInterface
      */
     public function createDriver($options = array())
     {
-        $options = $this->driverOptionsResolver->resolve($options);
+        $options = $this->optionsResolver->resolve($options);
 
-        if (empty($entityManager)) {
+        if (empty($options['em'])) {
             $em = $this->registry->getManager($this->registry->getDefaultManagerName());
         } else {
             $em = $this->registry->getManager($options['em']);
         }
 
-        return new DoctrineDriver($this->extensions, $em, $options['entity'], $options['alias']);
-    }
+        $entity = isset($options['entity'])
+            ? $options['entity']
+            : $options['qb'];
 
-    /**
-     * {@inheritdoc}
-     */
-    public function createDataSource($options = array())
-    {
-        $options = $this->datasourceOptionsResolver->resolve($options);
-
-        $driver = $this->createDriver(array(
-            'entity' => $options['entity'],
-            'alias' => $options['alias'],
-            'em' => $options['em']
-        ));
-
-        return $this->dataSourceFactory->createDataSource($driver, $options['name']);
+        return new DoctrineDriver($this->extensions, $em, $entity, $options['alias']);
     }
 
     /**
@@ -106,36 +83,30 @@ class DoctrineFactory implements DriverFactoryInterface
      */
     private function initOptions()
     {
-        $this->driverOptionsResolver->setRequired(array(
-            'entity'
-        ));
-
-        $this->driverOptionsResolver->setDefaults(array(
+        $this->optionsResolver->setDefaults(array(
+            'entity' => null,
+            'qb' => null,
             'alias' => null,
             'em' => null
         ));
 
-        $this->driverOptionsResolver->setAllowedTypes(array(
-            'entity' => array('string', '\Doctrine\ORM\QueryBuilder'),
+        $this->optionsResolver->setAllowedTypes(array(
+            'entity' => array('string', 'null'),
+            'qb' => array('\Doctrine\ORM\QueryBuilder', 'null'),
             'alias' => array('null', 'string'),
             'em' => array('null', 'string')
         ));
 
-        $this->datasourceOptionsResolver->setRequired(array(
-            'entity'
-        ));
+        $entityNormalizer = function(Options $options, $value) {
+            if (is_null($options['qb']) && is_null($value)) {
+                throw new InvalidOptionsException('You must specify at least one option, "qb" or "entity".');
+            }
 
-        $this->datasourceOptionsResolver->setDefaults(array(
-            'name' => 'datasource',
-            'alias' => null,
-            'em' => null
-        ));
+            return $value;
+        };
 
-        $this->datasourceOptionsResolver->setAllowedTypes(array(
-            'entity' => array('string', '\Doctrine\ORM\QueryBuilder'),
-            'name' => 'string',
-            'alias' => array('null', 'string'),
-            'em' => array('null', 'string')
+        $this->optionsResolver->setNormalizers(array(
+            'entity' => $entityNormalizer
         ));
     }
 }

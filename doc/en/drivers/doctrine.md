@@ -25,7 +25,6 @@ or through factory
 
 use FSi\Component\DataSource\Driver\Doctrine\DoctrineFactory;
 use FSi\Component\DataSource\Driver\Doctrine\Extension\Core\CoreExtension;
-use FSi\Component\DataSource\DataSourceFactory;
 
 $extensions = array(
     // (...) Extensions that have to be loaded to every DataSource after creation.
@@ -35,30 +34,8 @@ $factory = new DataSourceFactory($extensions);
 
 $driverExtensions = array(new CoreExtension());
 
-$driverFactory = new DoctrineFactory($ManagerRegistry, $factory, $driverExtensions);
+$driverFactory = new DoctrineFactory($ManagerRegistry, $driverExtensions);
 $driver = $driverFactory->createDriver($entityName); // All drivers created this way will have same set of $driverExtensions loaded.
-
-```
-
-You can also create dataosurce directly from driver factory
-
-``` php
-<?php
-
-use FSi\Component\DataSource\Driver\Doctrine\DoctrineFactory;
-use FSi\Component\DataSource\Driver\Doctrine\Extension\Core\CoreExtension;
-use FSi\Component\DataSource\DataSourceFactory;
-
-$extensions = array(
-    // (...) Extensions that have to be loaded to every DataSource after creation.
-);
-
-$factory = new DataSourceFactory($extensions);
-
-$driverExtensions = array(new CoreExtension());
-
-$driverFactory = new DoctrineFactory($ManagerRegistry, $factory, $driverExtensions);
-$datasource = $driverFactory->createDataSource($entityName, $dataSourceName); // All drivers created this way will have same set of $driverExtensions loaded.
 
 ```
 
@@ -83,26 +60,36 @@ All fields allow by default to set option ``field`` which usage is explained bel
 
 ## Basic usage ##
 
-In the simpliest case you must just create driver with proper entity name and use it to create DataSource:
+In the simpliest use case you must just create DataSource with proper entity name:
 
 ``` php
 <?php
 
-$driverFactory = new DoctrineFactory($entityManager, $driverExtensions);
-$driver = $driverFactory->createDriver('Name\Of\Entity'); // It can be any entity name that is known to Doctrine.
+$driverFactoryManager = new DriverFactoryManager(array(
+    new DoctrineFactory($entityManager, $driverExtensions);
+));
 
-$datasourceFactory = new DataSourceFactory($datasourceExtensions);
-$datasource = $datasourceFactory->createDataSource($driver, 'datasource_name');
+$datasourceFactory = new DataSourceFactory($driverFactoryManager, $datasourceExtensions);
 
-$datasource
-    ->addField('id', 'number', 'eq')
+/**
+ * Available options for driverOptions are:
+ * 'entity' - string
+ * 'qb' - QueryBuilder
+ * 'alias' - string
+ * 'em' - string
+ */
+$driverOptions = array(
+    'entity' => 'Name\Of\Entity' // It can be any entity name that is known to Doctrine.
+);
+$datasource = $datasourceFactory->createDataSource('doctrine', $driverOptions, 'datasource_name');
+
+$datasource->addField('id', 'number', 'eq')
     ->addField('title', 'text', 'like')
     ->addField('author', 'text', 'eq')
     ->addField('create_date', 'datetime', 'between')
     ->addField('content', 'text', 'like')
     ->addField('category', 'entity', 'eq')
-    ->addField('group', 'entity', 'memberof')
-;
+    ->addField('group', 'entity', 'memberof');
 ```
 
 You can use ``field`` option to have different field name, or many DataSource fields referring to one entity field:
@@ -110,8 +97,7 @@ You can use ``field`` option to have different field name, or many DataSource fi
 ``` php
 <?php
 
-$datasource
-    ->addField('veryweirdname' 'number', 'eq', array(
+$datasource->addField('veryweirdname' 'number', 'eq', array(
         'field' => 'id',
     ))
     ->addField('datefrom', 'datetime', 'gte', array(
@@ -119,33 +105,32 @@ $datasource
     ))
     ->addField('dateto', 'datetime', 'lte', array(
         'field' => 'create_date',
-    ))
-;
+    ));
 ```
 
 ## Using predefined QueryBuilder ##
 
-You can also use predefined QueryBuilder, and if so, you can pass it to factory or DoctrineDriver insetad of ``$entityName``.
+You can also use predefined QueryBuilder, and if so, you can pass it to driver options insetad of ``entity``.
 If you do you can also pass an alias of entity as additional argument.
 
 ``` php
 <?php
 
 $queryBuilder = $entityManager->createQueryBuilder();
-$queryBuilder
-    ->select('n')
+$queryBuilder->select('n')
     ->from('Name\Of\Entity', 'n')
-    ->where('n.active = 1') // All results will have additional condition.
-;
+    ->where('n.active = 1') // All results will have additional condition.;
 
-// Factory way:
+$driverFactoryManager = new DriverFactoryManager(array(
+    new DoctrineFactory($entityManager, $driverExtensions);
+));
 
-$factory = new DoctrineFactory($entityManager, $extensions);
-$driver = $factory->createDriver($queryBuilder, 'n'); // Passing alias which otherwise would be guessed from root entity of $queryBuilder.
+$datasourceFactory = new DataSourceFactory($driverFactoryManager, $datasourceExtensions);
 
-// Manual way:
-
-$driver = new DoctrineDriver($extensions, $entityManager, $queryBuilder, 'n'); // Passing alias which otherwise would be guessed from root entity of $queryBuilder.
+$driverOptions = array(
+    'qb' => $queryBuilder
+);
+$datasource = $datasourceFactory->createDataSource('doctrine', $driverOptions, 'datasource_name');
 ```
 
 ## Advanced use with QueryBuilder ##
@@ -163,15 +148,20 @@ $queryBuilder
     ->join('n.category', 'c') // Joining category.
     ->where('n.active = 1')
 ;
-$factory = new DoctrineFactory($entityManager, $extensions);
-$driver = $factory->createDriver($queryBuilder); // We don't need to pass alias, if we specify field mappings.
+$driverFactoryManager = new DriverFactoryManager(array(
+    new DoctrineFactory($entityManager, $driverExtensions);
+));
 
-$datasource
-    ->addField('id', 'number', 'eq', array('field' => 'n.id'))
+$datasourceFactory = new DataSourceFactory($driverFactoryManager, $datasourceExtensions);
+
+$driverOptions = array(
+    'qb' => $queryBuilder
+);
+$datasource = $datasourceFactory->createDataSource('doctrine', $driverOptions, 'datasource_name');
+$datasource->addField('id', 'number', 'eq', array('field' => 'n.id'))
     ->addField('title', 'text', 'like', array('field' => 'n.title'))
     ->addField('category_name', 'text', 'like', array( // It's not entity field anymore.
         'field' => 'c.name', // It allow us to specify condition for category name, not just category (as entity).
-    ))
-;
+    ));
 
 ```
