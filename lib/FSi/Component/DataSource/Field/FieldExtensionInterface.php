@@ -29,9 +29,9 @@ interface FieldExtensionInterface extends EventSubscriberInterface
     public function getExtendedFieldTypes();
 
     /**
-     * Allows extension to load constraints to fields OptionsResolver. Called by field.
+     * Allows extension to load options' constraints to fields OptionsResolver. Called by field.
      *
-     * @param OptionsResolverInterface $optionsResolver
+     * @param FieldTypeInterface $field
      */
-    public function initOptions(OptionsResolverInterface $optionsResolver);
+    public function initOptions(FieldTypeInterface $field);
 }

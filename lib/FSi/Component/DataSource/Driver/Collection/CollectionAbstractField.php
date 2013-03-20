@@ -23,9 +23,9 @@ abstract class CollectionAbstractField extends FieldAbstractType implements Coll
     /**
      * {@inheritdoc}
      */
-    public function initOptions(OptionsResolverInterface $optionsResolver)
+    public function initOptions()
     {
-        $optionsResolver
+        $this->getOptionsResolver()
             ->setOptional(array('field'))
             ->setAllowedTypes(array('field' => 'string'))
         ;

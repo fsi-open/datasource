@@ -102,9 +102,9 @@ abstract class DoctrineAbstractField extends FieldAbstractType implements Doctri
     /**
      * {@inheritdoc}
      */
-    public function initOptions(OptionsResolverInterface $optionsResolver)
+    public function initOptions()
     {
-        $optionsResolver
+        $this->getOptionsResolver()
             ->setOptional(array('field'))
             ->setAllowedTypes(array('field' => 'string'))
         ;

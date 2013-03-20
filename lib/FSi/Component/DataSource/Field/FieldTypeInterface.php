@@ -170,9 +170,18 @@ interface FieldTypeInterface
     public function getDataSource();
 
     /**
-     * Allows to load options constraints.
+     * Sets the default options for this type.
      *
-     * @param OptionsResolverInterface $optionsResolver
+     * In order to access OptionsResolver in this method use $this->getOptionsResolver()
+     * in inherited classes. This method is called in DataSource after loading the field type
+     * from factory.
      */
-    public function initOptions(OptionsResolverInterface $optionsResolver);
+    public function initOptions();
+
+    /**
+     * Returns the configured options resolver used for this field's type.
+     *
+     * @return \Symfony\Component\OptionsResolver\OptionsResolverInterface.
+     */
+    public function getOptionsResolver();
 }

@@ -76,7 +76,7 @@ abstract class FieldAbstractType implements FieldTypeInterface
     /**
      * @var EventDispatcher
      */
-    protected $eventDispatcher;
+    private $eventDispatcher;
 
     /**
      * @var OptionsResolver
@@ -86,7 +86,7 @@ abstract class FieldAbstractType implements FieldTypeInterface
     /*
      * @var array
      */
-    private $extensions;
+    private $extensions = array();
 
     /**
      * {@inheritdoc}
@@ -105,23 +105,11 @@ abstract class FieldAbstractType implements FieldTypeInterface
     }
 
     /**
-     * Constructor.
-     */
-    public function __construct()
-    {
-        $this->eventDispatcher = new EventDispatcher();
-        $this->optionsResolver = new OptionsResolver();
-        $this->extensions = array();
-        $this->initOptions($this->optionsResolver);
-        $this->options = $this->optionsResolver->resolve(array());
-    }
-
-    /**
      * Cloning.
      */
     public function __clone()
     {
-        $this->eventDispatcher = new EventDispatcher();
+        $this->eventDispatcher = null;
     }
 
     /**
@@ -159,7 +147,7 @@ abstract class FieldAbstractType implements FieldTypeInterface
      */
     public function setOptions($options)
     {
-        $this->options = $this->optionsResolver->resolve($options);
+        $this->options = $this->getOptionsResolver()->resolve($options);
     }
 
     /**
@@ -200,7 +188,7 @@ abstract class FieldAbstractType implements FieldTypeInterface
 
         //PreBindParameter event.
         $event = new FieldEvent\ParameterEventArgs($this, $parameter);
-        $this->eventDispatcher->dispatch(FieldEvents::PRE_BIND_PARAMETER, $event);
+        $this->getEventDispatcher()->dispatch(FieldEvents::PRE_BIND_PARAMETER, $event);
         $parameter = $event->getParameter();
 
         $datasourceName = $this->getDataSource() ? $this->getDataSource()->getName() : null;
@@ -214,7 +202,7 @@ abstract class FieldAbstractType implements FieldTypeInterface
 
         //PreBindParameter event.
         $event = new FieldEvent\FieldEventArgs($this);
-        $this->eventDispatcher->dispatch(FieldEvents::POST_BIND_PARAMETER, $event);
+        $this->getEventDispatcher()->dispatch(FieldEvents::POST_BIND_PARAMETER, $event);
     }
 
     /**
@@ -237,7 +225,7 @@ abstract class FieldAbstractType implements FieldTypeInterface
 
         //PostGetParameter event.
         $event = new FieldEvent\ParameterEventArgs($this, $parameter);
-        $this->eventDispatcher->dispatch(FieldEvents::POST_GET_PARAMETER, $event);
+        $this->getEventDispatcher()->dispatch(FieldEvents::POST_GET_PARAMETER, $event);
         $parameter = $event->getParameter();
 
         $parameters = array_merge_recursive($parameters, $parameter);
@@ -260,11 +248,11 @@ abstract class FieldAbstractType implements FieldTypeInterface
             return;
         }
 
-        $this->eventDispatcher->addSubscriber($extension);
-        $extension->initOptions($this->optionsResolver);
+        $this->getEventDispatcher()->addSubscriber($extension);
+        $extension->initOptions($this);
         $this->extensions[] = $extension;
 
-        $this->options = $this->optionsResolver->resolve($this->options);
+        $this->options = $this->getOptionsResolver()->resolve($this->options);
     }
 
     /**
@@ -276,10 +264,10 @@ abstract class FieldAbstractType implements FieldTypeInterface
             if (!($extension instanceof FieldExtensionInterface)) {
                 throw new FieldException(sprintf('Expected instance of FieldExtensionInterface, %s given', get_class($extension)));
             }
-            $this->eventDispatcher->addSubscriber($extension);
-            $extension->initOptions($this->optionsResolver);
+            $this->getEventDispatcher()->addSubscriber($extension);
+            $extension->initOptions($this);
         }
-        $this->options = $this->optionsResolver->resolve($this->options);
+        $this->options = $this->getOptionsResolver()->resolve($this->options);
         $this->extensions = $extensions;
     }
 
@@ -300,7 +288,7 @@ abstract class FieldAbstractType implements FieldTypeInterface
 
         //PostBuildView event.
         $event = new FieldEvent\ViewEventArgs($this, $view);
-        $this->eventDispatcher->dispatch(FieldEvents::POST_BUILD_VIEW, $event);
+        $this->getEventDispatcher()->dispatch(FieldEvents::POST_BUILD_VIEW, $event);
 
         return $view;
     }
@@ -337,11 +325,35 @@ abstract class FieldAbstractType implements FieldTypeInterface
         return $this->datasource;
     }
 
+
     /**
      * {@inheritdoc}
      */
-    public function initOptions(OptionsResolverInterface $optionsResolver)
+    public function initOptions()
     {
+    }
 
+    /**
+     * {@inheritdoc}
+     */
+    public function getOptionsResolver()
+    {
+        if (!isset($this->optionsResolver)) {
+            $this->optionsResolver = new OptionsResolver();
+        }
+
+        return $this->optionsResolver;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getEventDispatcher()
+    {
+        if (!isset($this->eventDispatcher)) {
+            $this->eventDispatcher = new EventDispatcher();
+        }
+
+        return $this->eventDispatcher;
     }
 }
