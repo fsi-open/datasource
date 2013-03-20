@@ -19,11 +19,12 @@ interface DataSourceFactoryInterface
     /**
      * Creates instance of data source with given driver and name.
      *
-     * @param Driver\DriverInterface $driver
-     * @param string $name
-     * @return DataSource
+     * @param $driver string
+     * @param array $driverOptions
+     * @param $name
+     * @return mixed
      */
-    public function createDataSource(Driver\DriverInterface $driver, $name);
+    public function createDataSource($driver, $driverOptions = array(), $name);
 
     /**
      * Adds extension to list.

@@ -11,24 +11,21 @@
 
 namespace FSi\Component\DataSource\Driver\Doctrine;
 
-use Doctrine\ORM\EntityManager;
 use Doctrine\Common\Persistence\ManagerRegistry;
-use FSi\Component\DataSource\DataSourceFactoryInterface;
+use FSi\Component\DataSource\Driver\DriverFactoryInterface;
+use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
+use Symfony\Component\OptionsResolver\Options;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * {@inheritdoc}
  */
-class DoctrineFactory implements DoctrineFactoryInterface
+class DoctrineFactory implements DriverFactoryInterface
 {
     /**
      * @var ManagerRegistry
      */
     private $registry;
-
-    /**
-     * @var DataSourceFactoryInterface
-     */
-    private $dataSourceFactory;
 
     /**
      * Array of extensions.
@@ -38,35 +35,78 @@ class DoctrineFactory implements DoctrineFactoryInterface
     private $extensions;
 
     /**
+     * @var \Symfony\Component\OptionsResolver\OptionsResolver
+     */
+    private $optionsResolver;
+
+    /**
      * {@inheritdoc}
      */
-    public function __construct(ManagerRegistry $registry, DataSourceFactoryInterface $dataSourceFactory, $extensions = array())
+    public function __construct(ManagerRegistry $registry, $extensions = array())
     {
         $this->registry = $registry;
-        $this->dataSourceFactory = $dataSourceFactory;
         $this->extensions = $extensions;
+        $this->optionsResolver = new OptionsResolver();
+        $this->initOptions();
     }
 
     /**
      * {@inheritdoc}
      */
-    public function createDriver($entity, $alias = null, $entityManager = null)
+    public function getDriverType()
     {
-        $entityManager = (string) $entityManager;
-        if (empty($entityManager)) {
+        return 'doctrine';
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function createDriver($options = array())
+    {
+        $options = $this->optionsResolver->resolve($options);
+
+        if (empty($options['em'])) {
             $em = $this->registry->getManager($this->registry->getDefaultManagerName());
         } else {
-            $em = $this->registry->getManager($entityManager);
+            $em = $this->registry->getManager($options['em']);
         }
-        return new DoctrineDriver($this->extensions, $em, $entity, $alias);
+
+        $entity = isset($options['entity'])
+            ? $options['entity']
+            : $options['qb'];
+
+        return new DoctrineDriver($this->extensions, $em, $entity, $options['alias']);
     }
 
     /**
-     * {@inheritdoc}
+     * Initialize Options Resolvers for driver and datasource builder.
      */
-    public function createDataSource($entity, $name = 'datasource', $alias = null, $entityManager = null)
+    private function initOptions()
     {
-        $driver = $this->createDriver($entity, $alias, $entityManager);
-        return $this->dataSourceFactory->createDataSource($driver, $name);
+        $this->optionsResolver->setDefaults(array(
+            'entity' => null,
+            'qb' => null,
+            'alias' => null,
+            'em' => null
+        ));
+
+        $this->optionsResolver->setAllowedTypes(array(
+            'entity' => array('string', 'null'),
+            'qb' => array('\Doctrine\ORM\QueryBuilder', 'null'),
+            'alias' => array('null', 'string'),
+            'em' => array('null', 'string')
+        ));
+
+        $entityNormalizer = function(Options $options, $value) {
+            if (is_null($options['qb']) && is_null($value)) {
+                throw new InvalidOptionsException('You must specify at least one option, "qb" or "entity".');
+            }
+
+            return $value;
+        };
+
+        $this->optionsResolver->setNormalizers(array(
+            'entity' => $entityNormalizer
+        ));
     }
 }

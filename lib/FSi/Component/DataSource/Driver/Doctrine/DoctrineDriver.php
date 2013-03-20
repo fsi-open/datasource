@@ -17,7 +17,6 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use FSi\Component\DataSource\Driver\Doctrine\Exception\DoctrineDriverException;
 use Doctrine\ORM\QueryBuilder;
-use FSi\Component\DataSource\Extension\Core\Ordering\OrderingExtension;
 
 /**
  * Driver to fetch data from databases using Doctrine.
@@ -120,8 +119,6 @@ class DoctrineDriver extends DriverAbstract
      */
     public function buildResult($fields, $first, $max)
     {
-        $ordered = array();
-
         foreach ($fields as $field) {
             if (!$field instanceof DoctrineFieldInterface) {
                 throw new DoctrineDriverException(sprintf('All fields must be instances of FSi\Component\DataSource\Driver\Doctrine\DoctrineFieldInterface.'));

@@ -12,17 +12,14 @@
 namespace FSi\Component\DataSource\Driver\Collection;
 
 use FSi\Component\DataSource\DataSourceFactoryInterface;
+use FSi\Component\DataSource\Driver\DriverFactoryInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * {@inheritdoc}
  */
-class CollectionFactory implements CollectionFactoryInterface
+class CollectionFactory implements DriverFactoryInterface
 {
-    /**
-     * @var DataSourceFactoryInterface
-     */
-    private $dataSourceFactory;
-
     /**
      * Array of extensions.
      *
@@ -31,37 +28,54 @@ class CollectionFactory implements CollectionFactoryInterface
     private $extensions;
 
     /**
+     * @var \Symfony\Component\OptionsResolver\OptionsResolver
+     */
+    private $optionsResolver;
+
+    /**
      * Constructor.
      *
-     * @param DataSourceFactoryInterface $dataSourceFactory
      * @param array $extensions
      */
-    public function __construct(DataSourceFactoryInterface $dataSourceFactory, $extensions = array())
+    public function __construct($extensions = array())
     {
-        $this->dataSourceFactory = $dataSourceFactory;
         $this->extensions = $extensions;
+        $this->optionsResolver = new OptionsResolver();
+        $this->initOptions();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getDriverType()
+    {
+        return 'collection';
     }
 
     /**
      * Creates driver.
      *
-     * @param array $collection
+     * @param array $options
      * @return CollectionDriver
      */
-    public function createDriver(array $collection)
+    public function createDriver($options = array())
     {
-        return new CollectionDriver($this->extensions, $collection);
+        $options = $this->optionsResolver->resolve($options);
+
+        return new CollectionDriver($this->extensions, $options['collection']);
     }
 
     /**
-     * Creates new driver and passes it to create new datasource in one step
-     * @param array $collection
-     * @param string $name
-     * @return DataSourceInterface
+     * Initialize Options Resolvers for driver and datasource builder.
      */
-    public function createDataSource(array $collection, $name = 'datasource')
+    private function initOptions()
     {
-        $driver = $this->createDriver($collection);
-        return $this->dataSourceFactory->createDataSource($driver, $name);
+        $this->optionsResolver->setDefaults(array(
+            'collection' => array(),
+        ));
+
+        $this->optionsResolver->setAllowedTypes(array(
+            'collection' => 'array',
+        ));
     }
 }

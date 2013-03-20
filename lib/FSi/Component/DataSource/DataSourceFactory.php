@@ -11,6 +11,7 @@
 
 namespace FSi\Component\DataSource;
 
+use FSi\Component\DataSource\Driver\DriverFactoryManagerInterface;
 use FSi\Component\DataSource\Exception\DataSourceException;
 
 /**
@@ -27,6 +28,11 @@ class DataSourceFactory implements DataSourceFactoryInterface
     protected $datasources;
 
     /**
+     * @var Driver\DriverFactoryManagerInterface
+     */
+    protected $driverFactoryManager;
+
+    /**
      * Array of factory extensions.
      *
      * @var array
@@ -34,12 +40,14 @@ class DataSourceFactory implements DataSourceFactoryInterface
     protected $extensions = array();
 
     /**
-     * Constructor.
-     *
-     * @param array $extensions array of extensions that implements DataSourceExtensionInterface
+     * @param DriverFactoryManagerInterface $driverFactoryManager
+     * @param array $extensions
+     * @throws Exception\DataSourceException
      */
-    public function __construct($extensions = array())
+    public function __construct(DriverFactoryManagerInterface $driverFactoryManager, $extensions = array())
     {
+        $this->driverFactoryManager = $driverFactoryManager;
+
         foreach ($extensions as $extension) {
             if (!($extension instanceof DataSourceExtensionInterface)) {
                 throw new DataSourceException(sprintf('Instance of DataSourceExtensionInterface expected, "%s" given.', is_object($extension) ? get_class($extension) : gettype($extension)));
@@ -52,9 +60,16 @@ class DataSourceFactory implements DataSourceFactoryInterface
     /**
      * {@inheritdoc}
      */
-    public function createDataSource(Driver\DriverInterface $driver, $name = 'datasource')
+    public function createDataSource($driver, $driverOptions = array(), $name = 'datasource')
     {
         $name = (string) $name;
+
+        if (!$this->driverFactoryManager->hasFactory($driver)) {
+            throw new DataSourceException('Driver "%s" doesn\'t exist.');
+        }
+
+        $driverFactory = $this->driverFactoryManager->getFactory($driver);
+        $driver = $driverFactory->createDriver($driverOptions);
 
         $this->checkDataSourceName($name);
 

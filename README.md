@@ -17,21 +17,29 @@ id, title, author, create date, short content and content. We will need only a `
 ``` php
 <?php
 
+use FSi\Component\DataSource\Driver\DriverFactoryManager;
 use FSi\Component\DataSource\Driver\Doctrine\DoctrineFactory;
 use FSi\Component\DataSource\Driver\Doctrine\Extension\Core\CoreExtension;
 use FSi\Component\DataSource\DataSourceFactory;
+
+$managerRegistry = $this->getDoctrine()->getManager();
+
+$driverExtensions = array(new CoreExtension());
+
+$driverFactoryManager = new DriverFactoryManager(array(
+    new DoctrineFactory($managerRegistry, $driverExtensions);
+));
 
 $extensions = array(
     //(...) Extensions that have to be loaded to DataSource after creation.
 );
 
-$factory = new DataSourceFactory($extensions);
+$factory = new DataSourceFactory($driverFactoryManager, $extensions);
 
-$driverExtensions = array(new CoreExtension());
-
-$driverFactory = new DoctrineFactory($managerRegistry, $factory, $driverExtensions);
-
-$datasource = $driverFactory->createDataSource('News', 'datasource_name');
+$driverOptions = array(
+    'entity' => 'FSiDemoBundle:News'
+);
+$datasource = $factory->createDataSource('doctrine',  $driverOptions, 'datasource_name');
 
 ```
 
