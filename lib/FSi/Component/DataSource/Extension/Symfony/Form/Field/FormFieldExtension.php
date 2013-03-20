@@ -78,9 +78,9 @@ class FormFieldExtension extends FieldAbstractExtension
     /**
      * {@inheritdoc}
      */
-    public function initOptions(OptionsResolverInterface $optionsResolver)
+    public function initOptions(FieldTypeInterface $field)
     {
-        $optionsResolver
+        $field->getOptionsResolver()
             ->setDefaults(array(
                 'form_filter' => true,
                 'form_options' => array(),

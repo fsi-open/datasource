@@ -21,7 +21,6 @@ use FSi\Component\DataSource\Event\FieldEvents;
 use FSi\Component\DataSource\Event\FieldEvent;
 use FSi\Component\DataSource\Event\DataSourceFieldEventInterface;
 use FSi\Component\DataSource\Extension\Core\Pagination\PaginationExtension;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 /**
  * Extension for fields.
@@ -54,9 +53,9 @@ class FieldExtension extends FieldAbstractExtension
     /**
      * {@inheritdoc}
      */
-    public function initOptions(OptionsResolverInterface $optionsResolver)
+    public function initOptions(FieldTypeInterface $field)
     {
-        $optionsResolver
+        $field->getOptionsResolver()
             ->setOptional(array('default_sort_priority'))
             ->setDefaults(array(
                 'default_sort' => null,

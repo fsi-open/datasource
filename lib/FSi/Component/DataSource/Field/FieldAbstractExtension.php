@@ -40,7 +40,7 @@ class FieldAbstractExtension implements FieldExtensionInterface
     /**
      * {@inheritdoc}
      */
-    public function initOptions(OptionsResolverInterface $optionsResolver)
+    public function initOptions(FieldTypeInterface $field)
     {
 
     }

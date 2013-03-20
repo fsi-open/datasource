@@ -127,6 +127,7 @@ abstract class DriverAbstractExtension implements DriverExtensionInterface
                 throw new DataSourceException(sprintf('Error during field types loading. Name "%s" already in use.', $fieldType->getType()));
             }
 
+            $fieldType->initOptions();
             $this->fieldTypes[$fieldType->getType()] = $fieldType;
         }
     }
