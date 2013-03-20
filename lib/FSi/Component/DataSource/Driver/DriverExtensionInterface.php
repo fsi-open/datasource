@@ -11,10 +11,12 @@
 
 namespace FSi\Component\DataSource\Driver;
 
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+
 /**
  * Extension of driver.
  */
-interface DriverExtensionInterface
+interface DriverExtensionInterface extends EventSubscriberInterface
 {
     /**
      * Returns types of extended drivers
@@ -54,14 +56,4 @@ interface DriverExtensionInterface
      * @return \Traversable
      */
     public function getFieldTypeExtensions($type);
-
-    /**
-     * Loads events subscribers.
-     *
-     * Each subscriber must implements Symfony\Component\EventDispatcher\EventSubscriberInterface.
-     *
-     * @return array
-     */
-    public function loadSubscribers();
 }
-

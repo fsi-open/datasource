@@ -115,7 +115,7 @@ class DoctrineDriverBasicTest extends \PHPUnit_Framework_TestCase
      */
     public function testCreationException2()
     {
-        $this->setExpectedException('FSi\Component\DataSource\Exception\DataSourceException');
+        $this->setExpectedException('Exception');
         $em = $this->getEntityManagerMock();
         $qb = $this->getQueryBuilderMock($em);
         new DoctrineDriver('scalar', $em, 'entity');
@@ -126,7 +126,7 @@ class DoctrineDriverBasicTest extends \PHPUnit_Framework_TestCase
      */
     public function testCreationException3()
     {
-        $this->setExpectedException('FSi\Component\DataSource\Exception\DataSourceException');
+        $this->setExpectedException('Exception');
         $em = $this->getEntityManagerMock();
         $qb = $this->getQueryBuilderMock($em);
         new DoctrineDriver(array(new \stdClass()), $em, 'entity');
