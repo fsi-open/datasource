@@ -36,11 +36,6 @@ abstract class DriverExtension extends DriverAbstractExtension
         );
     }
 
-    public function loadSubscribers()
-    {
-        return array($this);
-    }
-
     /**
      * {@inheritdoc}
      */

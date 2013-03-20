@@ -158,7 +158,7 @@ abstract class DriverAbstractExtension implements DriverExtensionInterface
     /**
      * {@inheritdoc}
      */
-    public function loadSubscribers()
+    public static function getSubscribedEvents()
     {
         return array();
     }

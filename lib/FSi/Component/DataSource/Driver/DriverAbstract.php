@@ -46,7 +46,7 @@ abstract class DriverAbstract implements DriverInterface
     /**
      * @var EventDispatcher
      */
-    protected $eventDispatcher;
+    private $eventDispatcher;
 
     /**
      * Constructor.
@@ -54,14 +54,8 @@ abstract class DriverAbstract implements DriverInterface
      * @throws DataSourceException
      * @param $extensions array with extensions
      */
-    public function __construct($extensions = array())
+    public function __construct(array $extensions = array())
     {
-        if (!is_array($extensions)) {
-            throw new DataSourceException(sprintf('Array of extensions expected, "%s" given.', gettype($extensions)));
-        }
-
-        $this->eventDispatcher = new EventDispatcher();
-
         foreach ($extensions as $extension) {
             if (!($extension instanceof DriverExtensionInterface)) {
                 throw new DataSourceException(sprintf('Instance of DriverExtensionInterface expected, "%s" given.', get_class($extension)));
@@ -170,10 +164,7 @@ abstract class DriverAbstract implements DriverInterface
         if (in_array($extension, $this->extensions, true))
             return;
 
-        $eventDispatcher = $this->getEventDispatcher();
-        foreach ($extension->loadSubscribers() as $subscriber) {
-            $eventDispatcher->addSubscriber($subscriber);
-        }
+        $this->getEventDispatcher()->addSubscriber($extension);
 
         $this->extensions[] = $extension;
     }
@@ -185,6 +176,10 @@ abstract class DriverAbstract implements DriverInterface
      */
     protected function getEventDispatcher()
     {
+        if (!isset($this->eventDispatcher)) {
+            $this->eventDispatcher = new EventDispatcher();
+        }
+
         return $this->eventDispatcher;
     }
 
@@ -212,13 +207,13 @@ abstract class DriverAbstract implements DriverInterface
 
         //preGetResult event.
         $event = new DriverEvent\DriverEventArgs($this, $fields);
-        $this->eventDispatcher->dispatch(DriverEvents::PRE_GET_RESULT, $event);
+        $this->getEventDispatcher()->dispatch(DriverEvents::PRE_GET_RESULT, $event);
 
         $result = $this->buildResult($fields, $first, $max);
 
         //postGetResult event.
         $event = new DriverEvent\ResultEventArgs($this, $fields, $result);
-        $this->eventDispatcher->dispatch(DriverEvents::POST_GET_RESULT, $event);
+        $this->getEventDispatcher()->dispatch(DriverEvents::POST_GET_RESULT, $event);
         $result = $event->getResult();
 
         return $result;
