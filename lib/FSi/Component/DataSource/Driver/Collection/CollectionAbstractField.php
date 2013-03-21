@@ -25,9 +25,17 @@ abstract class CollectionAbstractField extends FieldAbstractType implements Coll
      */
     public function initOptions()
     {
+        $field = $this;
         $this->getOptionsResolver()
             ->setOptional(array('field'))
-            ->setAllowedTypes(array('field' => 'string'))
+            ->setAllowedTypes(array('field' => array('string', 'null')))
+            ->setNormalizers(array('field' => function($options, $value) use ($field) {
+                if (!isset($value) && $field->getName()) {
+                    return $field->getName();
+                } else {
+                    return $value;
+                }
+            }))
         ;
     }
 

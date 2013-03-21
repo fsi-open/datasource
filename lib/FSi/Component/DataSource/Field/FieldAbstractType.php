@@ -110,6 +110,7 @@ abstract class FieldAbstractType implements FieldTypeInterface
     public function __clone()
     {
         $this->eventDispatcher = null;
+        $this->optionsResolver = null;
     }
 
     /**
