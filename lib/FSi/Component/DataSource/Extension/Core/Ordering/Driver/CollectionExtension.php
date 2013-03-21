@@ -45,11 +45,6 @@ class CollectionExtension extends DriverExtension implements EventSubscriberInte
         );
     }
 
-    public function loadSubscribers()
-    {
-        return array($this);
-    }
-
     /**
      * {@inheritdoc}
      */

@@ -45,11 +45,6 @@ class DoctrineExtension extends DriverExtension implements EventSubscriberInterf
         );
     }
 
-    public function loadSubscribers()
-    {
-        return array($this);
-    }
-
     /**
      * {@inheritdoc}
      */

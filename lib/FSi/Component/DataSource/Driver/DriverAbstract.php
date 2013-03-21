@@ -165,7 +165,10 @@ abstract class DriverAbstract implements DriverInterface
         if (in_array($extension, $this->extensions, true))
             return;
 
-        $this->getEventDispatcher()->addSubscriber($extension);
+        $eventDispatcher = $this->getEventDispatcher();
+        foreach ($extension->loadSubscribers() as $subscriber) {
+            $eventDispatcher->addSubscriber($subscriber);
+        }
 
         $this->extensions[] = $extension;
     }

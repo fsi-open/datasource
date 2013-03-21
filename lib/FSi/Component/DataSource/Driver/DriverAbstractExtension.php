@@ -11,6 +11,7 @@
 
 namespace FSi\Component\DataSource\Driver;
 
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use FSi\Component\DataSource\Exception\DataSourceException;
 use FSi\Component\DataSource\Field\FieldTypeInterface;
 use FSi\Component\DataSource\Field\FieldExtensionInterface;
@@ -19,7 +20,7 @@ use FSi\Component\DataSource\Driver\DriverInterface;
 /**
  * {@inheritdoc}
  */
-abstract class DriverAbstractExtension implements DriverExtensionInterface
+abstract class DriverAbstractExtension implements DriverExtensionInterface, EventSubscriberInterface
 {
     /**
      * Array of fields types.
@@ -152,6 +153,14 @@ abstract class DriverAbstractExtension implements DriverExtensionInterface
                 $this->fieldTypesExtensions[$type][] = $extension;
             }
         }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function loadSubscribers()
+    {
+        return array($this);
     }
 
     /**
