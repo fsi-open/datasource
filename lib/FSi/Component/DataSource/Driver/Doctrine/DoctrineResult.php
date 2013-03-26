@@ -23,17 +23,20 @@ class DoctrineResult extends ArrayCollection
 
     public function __construct(ManagerRegistry $registry, Paginator $paginator)
     {
+        $result = array();
         $this->count = $paginator->count();
         $data = $paginator->getIterator();
-        $firstElement = current($data);
-        $dataIndexer = new DoctrineDataIndexer($registry, get_class($firstElement));
 
-        $result = array();
-        foreach ($data as $element) {
-            $index = $dataIndexer->getIndex($element);
-            $result[$index] = $element;
+        if (count($data)) {
+            $firstElement = current($data);
+            $dataIndexer = new DoctrineDataIndexer($registry, get_class($firstElement));
+
+            foreach ($data as $element) {
+                $index = $dataIndexer->getIndex($element);
+                $result[$index] = $element;
+            }
         }
-
+        
         parent::__construct($result);
     }
 
