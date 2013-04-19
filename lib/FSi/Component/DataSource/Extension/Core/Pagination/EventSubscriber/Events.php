@@ -46,27 +46,43 @@ class Events implements EventSubscriberInterface
         $datasource = $event->getDataSource();
         $parameters = $event->getParameters();
 
-        $page = isset($parameters[$datasource->getName()][PaginationExtension::PARAMETER_PAGE]) ? (int) $parameters[$datasource->getName()][PaginationExtension::PARAMETER_PAGE] : 1;
+        $resultsPerPage = isset($parameters[$datasource->getName()][PaginationExtension::PARAMETER_RESULTS_PER_PAGE])
+            ? (int) $parameters[$datasource->getName()][PaginationExtension::PARAMETER_RESULTS_PER_PAGE]
+            : $datasource->getMaxResults();
+
+        $datasource->setMaxResults($resultsPerPage);
+
+        $page = isset($parameters[$datasource->getName()][PaginationExtension::PARAMETER_PAGE])
+            ? (int) $parameters[$datasource->getName()][PaginationExtension::PARAMETER_PAGE]
+            : 1;
+
         $datasource->setFirstResult(($page - 1) * $datasource->getMaxResults());
     }
 
     public function postGetParameters(DataSourceEvent\ParametersEventArgs $event)
     {
         $datasource = $event->getDataSource();
-        $datasource_oid = spl_object_hash($datasource);
         $datasourceName = $datasource->getName();
 
         $parameters = $event->getParameters();
         $maxresults = $datasource->getMaxResults();
+
+        if ($maxresults) {
+            $parameters[$datasourceName][PaginationExtension::PARAMETER_RESULTS_PER_PAGE] = $maxresults;
+        }
+
         if ($maxresults == 0) {
             $page = 1;
         } else {
             $current = $datasource->getFirstResult();
             $page = (int) floor($current/$maxresults) + 1;
         }
+
         unset($parameters[$datasourceName][PaginationExtension::PARAMETER_PAGE]);
-        if ($page > 1)
+        if ($page > 1) {
             $parameters[$datasourceName][PaginationExtension::PARAMETER_PAGE] = $page;
+        }
+
         $event->setParameters($parameters);
     }
 
@@ -81,8 +97,8 @@ class Events implements EventSubscriberInterface
         $datasourceName = $datasource->getName();
         $view = $event->getView();
         $parameters = $view->getParameters();
-
         $maxresults = $datasource->getMaxResults();
+
         if ($maxresults == 0) {
             $all = 1;
             $page = 1;
@@ -94,12 +110,16 @@ class Events implements EventSubscriberInterface
 
         unset($parameters[$datasourceName][PaginationExtension::PARAMETER_PAGE]);
         $pages = array();
+
         for ($i = 1; $i <= $all; $i++) {
-            if ($i > 1)
+            if ($i > 1) {
                 $parameters[$datasourceName][PaginationExtension::PARAMETER_PAGE] = $i;
+            }
+
             $pages[$i] = $parameters;
         }
 
+        $view->setAttribute('max_results', $maxresults);
         $view->setAttribute('page', $page);
         $view->setAttribute('parameters_pages', $pages);
     }
