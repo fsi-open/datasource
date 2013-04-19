@@ -81,7 +81,7 @@ class PaginationExtensionTest extends \PHPUnit_Framework_TestCase
                 $this->assertSame(
                     array(
                         'datasource' => array(
-                            PaginationExtension::PARAMETER_RESULTS_PER_PAGE => 20,
+                            PaginationExtension::PARAMETER_MAX_RESULTS => 20,
                             PaginationExtension::PARAMETER_PAGE => 2
                         )
                     ),

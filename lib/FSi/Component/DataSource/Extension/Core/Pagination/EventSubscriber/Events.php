@@ -46,8 +46,8 @@ class Events implements EventSubscriberInterface
         $datasource = $event->getDataSource();
         $parameters = $event->getParameters();
 
-        $resultsPerPage = isset($parameters[$datasource->getName()][PaginationExtension::PARAMETER_RESULTS_PER_PAGE])
-            ? (int) $parameters[$datasource->getName()][PaginationExtension::PARAMETER_RESULTS_PER_PAGE]
+        $resultsPerPage = isset($parameters[$datasource->getName()][PaginationExtension::PARAMETER_MAX_RESULTS])
+            ? (int) $parameters[$datasource->getName()][PaginationExtension::PARAMETER_MAX_RESULTS]
             : $datasource->getMaxResults();
 
         $datasource->setMaxResults($resultsPerPage);
@@ -68,7 +68,7 @@ class Events implements EventSubscriberInterface
         $maxresults = $datasource->getMaxResults();
 
         if ($maxresults) {
-            $parameters[$datasourceName][PaginationExtension::PARAMETER_RESULTS_PER_PAGE] = $maxresults;
+            $parameters[$datasourceName][PaginationExtension::PARAMETER_MAX_RESULTS] = $maxresults;
         }
 
         if ($maxresults == 0) {

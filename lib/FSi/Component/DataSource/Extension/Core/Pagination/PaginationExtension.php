@@ -29,7 +29,7 @@ class PaginationExtension extends DataSourceAbstractExtension
     /**
      * Key for results per page.
      */
-    const PARAMETER_RESULTS_PER_PAGE = 'results_per_page';
+    const PARAMETER_MAX_RESULTS = 'max_results';
 
     /**
      * {@inheritdoc}
