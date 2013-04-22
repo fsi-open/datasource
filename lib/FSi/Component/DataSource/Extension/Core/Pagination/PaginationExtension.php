@@ -27,6 +27,11 @@ class PaginationExtension extends DataSourceAbstractExtension
     const PARAMETER_PAGE = 'page';
 
     /**
+     * Key for results per page.
+     */
+    const PARAMETER_MAX_RESULTS = 'max_results';
+
+    /**
      * {@inheritdoc}
      */
     public function loadSubscribers()

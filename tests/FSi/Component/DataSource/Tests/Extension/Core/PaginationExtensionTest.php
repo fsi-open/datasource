@@ -11,10 +11,11 @@
 
 namespace FSi\Component\DataSource\Tests\Extension\Core;
 
-use FSi\Component\DataSource\DataSourceView;
-
+use FSi\Component\DataSource\DataSourceFactory;
+use FSi\Component\DataSource\Driver\Collection\CollectionFactory;
+use FSi\Component\DataSource\Driver\Collection\Extension\Core\CoreExtension;
+use FSi\Component\DataSource\Driver\DriverFactoryManager;
 use FSi\Component\DataSource\Extension\Core\Pagination\PaginationExtension;
-use FSi\Component\DataSource\DataSourceInterface;
 use FSi\Component\DataSource\Event\DataSourceEvent;
 
 /**
@@ -81,6 +82,7 @@ class PaginationExtensionTest extends \PHPUnit_Framework_TestCase
                 $this->assertSame(
                     array(
                         'datasource' => array(
+                            PaginationExtension::PARAMETER_MAX_RESULTS => 20,
                             PaginationExtension::PARAMETER_PAGE => 2
                         )
                     ),
@@ -107,5 +109,25 @@ class PaginationExtensionTest extends \PHPUnit_Framework_TestCase
 
             $subscriber->postBuildView(new DataSourceEvent\ViewEventArgs($datasource, $view));
         }
+    }
+
+    public function testSetMaxResultsByBindRequest()
+    {
+        $extensions = array(
+            new PaginationExtension()
+        );
+        $driverExtensions = array(new CoreExtension());
+        $driverFactory = new CollectionFactory($driverExtensions);
+        $driverFactoryManager = new DriverFactoryManager(array($driverFactory));
+        $factory = new DataSourceFactory($driverFactoryManager, $extensions);
+        $dataSource = $factory->createDataSource('collection',  array(), 'foo_source');
+
+        $dataSource->bindParameters(array(
+            'foo_source' => array(
+                PaginationExtension::PARAMETER_MAX_RESULTS => 105
+            )
+        ));
+
+        $this->assertEquals(105, $dataSource->getMaxResults());
     }
 }
