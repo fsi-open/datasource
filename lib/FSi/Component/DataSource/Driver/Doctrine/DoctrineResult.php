@@ -29,10 +29,12 @@ class DoctrineResult extends ArrayCollection
 
         if (count($data)) {
             $firstElement = current($data);
-            $dataIndexer = new DoctrineDataIndexer($registry, get_class($firstElement));
+            $dataIndexer =  is_object($firstElement)
+                ? new DoctrineDataIndexer($registry, get_class($firstElement))
+                : null;
 
-            foreach ($data as $element) {
-                $index = $dataIndexer->getIndex($element);
+            foreach ($data as $key => $element) {
+                $index = isset($dataIndexer) ? $dataIndexer->getIndex($element) : $key;
                 $result[$index] = $element;
             }
         }
