@@ -34,7 +34,7 @@ class DoctrineResult extends ArrayCollection
                 : null;
 
             foreach ($data as $key => $element) {
-                $index = is_object($element) ? $dataIndexer->getIndex($element) : $key;
+                $index = isset($dataIndexer) ? $dataIndexer->getIndex($element) : $key;
                 $result[$index] = $element;
             }
         }
