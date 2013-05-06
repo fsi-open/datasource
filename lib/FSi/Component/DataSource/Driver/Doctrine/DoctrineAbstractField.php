@@ -94,6 +94,10 @@ abstract class DoctrineAbstractField extends FieldAbstractType implements Doctri
                 $qb->setParameter($this->getName(), "%$data%");
                 break;
 
+            case 'isNull':
+                $qb->andWhere($fieldName . ' IS ' . ($data === 'null' ? '' : 'NOT ') . 'NULL');
+                break;
+
             default:
                 throw new DoctrineDriverException(sprintf('Unexpected comparison type ("%s").', $comparison));
         }

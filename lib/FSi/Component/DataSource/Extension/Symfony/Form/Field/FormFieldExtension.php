@@ -110,8 +110,9 @@ class FormFieldExtension extends FieldAbstractExtension
         $field = $event->getField();
         $view = $event->getView();
 
-        if ($form = $this->getForm($field))
+        if ($form = $this->getForm($field)) {
             $view->setAttribute('form', $form->createView());
+        }
     }
 
     /**
@@ -123,14 +124,16 @@ class FormFieldExtension extends FieldAbstractExtension
         $field_oid = spl_object_hash($field);
         $parameter = $event->getParameter();
 
-        if (!$form = $this->getForm($field))
+        if (!$form = $this->getForm($field)) {
             return;
+        }
 
         if ($form->isBound()) {
             $form = $this->getForm($field, true);
         }
 
         $datasourceName = $field->getDataSource() ? $field->getDataSource()->getName() : null;
+
         if (empty($datasourceName)) {
             return;
         }
@@ -222,6 +225,30 @@ class FormFieldExtension extends FieldAbstractExtension
                 $form2->add('from', $type, $fromOptions);
                 $form2->add('to', $type, $toOptions);
                 $builder->add($form2);
+                break;
+
+            case 'isNull':
+                $defaultOptions = array(
+                    'choices' => array(
+                        'null' => 'datasource.form.choices.isnull',
+                        'notnull' => 'datasource.form.choices.isnotnull'
+                    ),
+                    'multiple' => false,
+                    'empty_value' => '',
+                    'translation_domain' => 'DataSourceBundle'
+                );
+
+                if (isset($options['choices'])) {
+                    $options['choices'] = array_merge(
+                        $defaultOptions['choices'],
+                        array_intersect_key($options['choices'], $defaultOptions['choices'])
+                    );
+                }
+
+                $options = array_merge($defaultOptions, $options);
+
+                $builder->add($field->getName(), 'choice', $options);
+
                 break;
 
             default:

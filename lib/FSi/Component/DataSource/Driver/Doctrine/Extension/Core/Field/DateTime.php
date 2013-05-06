@@ -21,7 +21,7 @@ class DateTime extends DoctrineAbstractField
     /**
      * {@inheritdoc}
      */
-    protected $comparisons = array('eq', 'neq', 'lt', 'lte', 'gt', 'gte', 'in', 'notIn', 'between');
+    protected $comparisons = array('eq', 'neq', 'lt', 'lte', 'gt', 'gte', 'in', 'notIn', 'between', 'isNull');
 
     /**
      * {@inheritdoc}

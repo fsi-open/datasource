@@ -26,7 +26,7 @@ class Entity extends DoctrineAbstractField
     /**
      * {@inheritdoc}
      */
-    protected $comparisons = array('eq', 'memberof', 'in');
+    protected $comparisons = array('eq', 'memberof', 'in', 'isNull');
 
     /**
      * {@inheritdoc}
@@ -68,6 +68,10 @@ class Entity extends DoctrineAbstractField
             case 'in':
                 $qb->andWhere("$fieldName IN (:$name)");
                 $qb->setParameter($name, $data);
+                break;
+
+            case 'isNull':
+                $qb->andWhere($fieldName . ' IS ' . ($data === 'null' ? '' : 'NOT ') . 'NULL');
                 break;
 
             default:
