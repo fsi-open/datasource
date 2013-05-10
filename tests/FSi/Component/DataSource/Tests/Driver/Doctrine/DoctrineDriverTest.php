@@ -93,10 +93,13 @@ class DoctrineDriverTest extends \PHPUnit_Framework_TestCase
                     'field' => 'create_date',
                 ))
                 ->addField('category', 'entity', 'eq')
+                ->addField('category2', 'entity', 'isNull')
                 ->addField('group', 'entity', 'memberof', array(
                     'field' => 'groups',
                 ))
-            ;
+                ->addField('tags', 'text', 'isNull', array(
+                    'field' => 'tags'
+                ));
 
             $result1 = $datasource->getResult();
             $this->assertEquals(100, count($result1));
@@ -225,6 +228,80 @@ class DoctrineDriverTest extends \PHPUnit_Framework_TestCase
                 $this->assertEquals('title99', $news->getTitle());
                 break;
             }
+
+            //checking isnull & notnull
+            $parameters = array(
+                $datasource->getName() => array(
+                    DataSourceInterface::PARAMETER_FIELDS => array(
+                        'tags' => 'null'
+                    ),
+                ),
+            );
+
+            $datasource->bindParameters($parameters);
+            $result1 = $datasource->getResult();
+            $this->assertEquals(50, count($result1));
+            $ids = array();
+
+            foreach($result1 as $item) {
+                $ids[] = $item->getId();
+            }
+
+            $parameters = array(
+                $datasource->getName() => array(
+                    DataSourceInterface::PARAMETER_FIELDS => array(
+                        'tags' => 'notnull'
+                    ),
+                ),
+            );
+
+            $datasource->bindParameters($parameters);
+            $result2 = $datasource->getResult();
+            $this->assertEquals(50, count($result2));
+
+            foreach($result2 as $item) {
+                $this->assertTrue(!in_array($item->getId(),$ids));
+            }
+
+            unset($result1);
+            unset($result2);
+
+             $parameters = array(
+                $datasource->getName() => array(
+                    DataSourceInterface::PARAMETER_FIELDS => array(
+                        'category2' => 'null'
+                    ),
+                ),
+            );
+
+            //checking isnull & notnull - field type entity
+            $datasource->bindParameters($parameters);
+            $result1 = $datasource->getResult();
+            $this->assertEquals(50, count($result1));
+            $ids = array();
+
+            foreach($result1 as $item) {
+                $ids[] = $item->getId();
+            }
+
+            $parameters = array(
+                $datasource->getName() => array(
+                    DataSourceInterface::PARAMETER_FIELDS => array(
+                        'category2' => 'notnull'
+                    ),
+                ),
+            );
+
+            $datasource->bindParameters($parameters);
+            $result2 = $datasource->getResult();
+            $this->assertEquals(50, count($result2));
+
+            foreach($result2 as $item) {
+                $this->assertTrue(!in_array($item->getId(),$ids));
+            }
+
+            unset($result1);
+            unset($result2);
 
             //Test for clearing fields.
             $datasource->clearFields();
@@ -390,6 +467,8 @@ class DoctrineDriverTest extends \PHPUnit_Framework_TestCase
                 $news->setAuthor('author'.$i.'@domain1.com');
                 $news->setShortContent('Lorem ipsum.');
                 $news->setContent('Content lorem ipsum.');
+                $news->setTags('lorem ipsum');
+                $news->setCategory2($categories[($i + 1) % 5]);
             } else {
                 $news->setAuthor('author'.$i.'@domain2.com');
                 $news->setShortContent('Dolor sit amet.');

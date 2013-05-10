@@ -62,9 +62,19 @@ class News
     private $category;
 
     /**
+     * @ORM\ManyToOne(targetEntity="FSi\Component\DataSource\Tests\Fixtures\Category")
+     */
+    private $category2;
+
+    /**
      * @ORM\ManyToMany(targetEntity="FSi\Component\DataSource\Tests\Fixtures\Group")
      */
     private $groups;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $tags;
 
     /**
      * Constructor.
@@ -225,6 +235,26 @@ class News
     }
 
     /**
+     * Set category2.
+     *
+     * @param Category $category
+     */
+    public function setCategory2(Category $category2)
+    {
+        $this->category2 = $category2;
+    }
+
+    /**
+     * Get category2.
+     *
+     * @return null|Category
+     */
+    public function getCategory2()
+    {
+        return $this->category2;
+    }
+
+    /**
      * Get groups.
      *
      * @return ArrayCollection
@@ -233,5 +263,25 @@ class News
     {
         return $this->groups;
     }
-}
 
+    /**
+     * Set tags.
+     *
+     * @param string $tags
+    */
+    public function setTags($tags)
+    {
+        $this->tags = $tags;
+    }
+
+    /**
+     * Get tags.
+     *
+     * @return string
+     */
+    public function getTags()
+    {
+        return $this->tags;
+    }
+
+}

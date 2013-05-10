@@ -15,6 +15,7 @@ use FSi\Component\DataSource\Extension\Symfony\Form\FormExtension;
 use FSi\Component\DataSource\Extension\Symfony\Form\Driver\DriverExtension;
 use FSi\Component\DataSource\Extension\Symfony\Form\EventSubscriber\Events;
 use FSi\Component\DataSource\Field\FieldAbstractExtension;
+use FSi\Component\DataSource\Field\FieldView;
 use Symfony\Component\Form;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Bridge\Doctrine\Form\DoctrineOrmExtension;
@@ -22,6 +23,7 @@ use FSi\Component\DataSource\Tests\Fixtures\TestManagerRegistry;
 use FSi\Component\DataSource\DataSourceInterface;
 use FSi\Component\DataSource\Event\FieldEvent;
 use FSi\Component\DataSource\Event\DataSourceEvent\ViewEventArgs;
+use FSi\Component\DataSource\Tests\Fixtures\Form as TestForm;
 
 /**
  * Tests for Symfony Form Extension.
@@ -45,6 +47,27 @@ class FormExtensionTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * Provides field types, comparison types and expected form input types.
+     *
+     * @return array
+     */
+    public static function fieldTypesProvider()
+    {
+        return array(
+            array('text', 'isNull', 'choice'),
+            array('text', 'eq', 'text'),
+            array('number', 'isNull', 'choice'),
+            array('number', 'eq', 'text'),
+            array('datetime', 'isNull', 'choice'),
+            array('datetime', 'eq', 'datetime'),
+            array('time', 'isNull', 'choice'),
+            array('time', 'eq', 'time'),
+            array('date', 'isNull', 'choice'),
+            array('date', 'eq', 'date'),
+        );
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function setUp()
@@ -64,6 +87,7 @@ class FormExtensionTest extends \PHPUnit_Framework_TestCase
         $typeFactory = new Form\ResolvedFormTypeFactory();
         $registry = new Form\FormRegistry(
             array(
+                new TestForm\Extension\TestCore\TestCoreExtension(),
                 new Form\Extension\Core\CoreExtension(),
                 new Form\Extension\Csrf\CsrfExtension(
                     new Form\Extension\Csrf\CsrfProvider\DefaultCsrfProvider('secret')
@@ -339,5 +363,96 @@ class FormExtensionTest extends \PHPUnit_Framework_TestCase
         foreach ($extensions as $ext) {
             $ext->postBuildView($args);
         }
+    }
+
+    /**
+     * Checks types of generated fields
+     *
+     * @dataProvider fieldTypesProvider
+     */
+    public function testFormFields($type, $comparison, $expected)
+    {
+        $self = $this;
+        $formFactory = $this->getFormFactory();
+        $extension = new DriverExtension($formFactory);
+        $field = $this->getMock('FSi\Component\DataSource\Field\FieldTypeInterface');
+        $driver = $this->getMock('FSi\Component\DataSource\Driver\DriverInterface');
+        $datasource = $this->getMock('FSi\Component\DataSource\DataSource', array(), array($driver));
+
+        $datasource
+            ->expects($this->any())
+            ->method('getName')
+            ->will($this->returnValue('datasource'))
+        ;
+
+        $field
+            ->expects($this->atLeastOnce())
+            ->method('getName')
+            ->will($this->returnValue('name'))
+        ;
+
+        $field
+            ->expects($this->any())
+            ->method('getDataSource')
+            ->will($this->returnValue($datasource))
+        ;
+
+        $field
+            ->expects($this->any())
+            ->method('getType')
+            ->will($this->returnValue($type))
+        ;
+
+        $field
+            ->expects($this->any())
+            ->method('hasOption')
+            ->will($this->returnCallback(function($option) use ($type) {
+                return (($type == 'number') && ($option =='form_type'));
+            }))
+        ;
+
+        $field
+            ->expects($this->any())
+            ->method('getComparison')
+            ->will($this->returnValue($comparison))
+        ;
+
+        $field
+            ->expects($this->any())
+            ->method('getOption')
+            ->will($this->returnCallback(function($option) use ($type) {
+                switch ($option) {
+                    case 'form_filter':
+                        return true;
+                    case 'form_type':
+                        if ($type == 'number') {
+                            return 'text';
+                        } else {
+                            return null;
+                        }
+                    case 'form_options':
+                        return array();
+                }
+            }))
+        ;
+        $extensions = $extension->getFieldTypeExtensions($type);
+
+        $parameters = array('datasource' => array(DataSourceInterface::PARAMETER_FIELDS => array('name' =>
+            'null'
+        )));
+
+        $args = new FieldEvent\ParameterEventArgs($field, $parameters);
+
+        $view = new FieldView($field);
+        $viewEventArgs = new FieldEvent\ViewEventArgs($field, $view);
+
+        foreach ($extensions as $ext) {
+            $ext->preBindParameter($args);
+            $ext->postBuildView($viewEventArgs);
+        }
+
+        $form = $viewEventArgs->getView()->getAttribute('form');
+
+        $this->assertEquals($expected, $form['fields']['name']->vars['type']);
     }
 }
