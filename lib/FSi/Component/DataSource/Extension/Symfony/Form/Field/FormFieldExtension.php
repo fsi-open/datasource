@@ -211,7 +211,7 @@ class FormFieldExtension extends FieldAbstractExtension
 
         switch ($field->getComparison()) {
             case 'between':
-                $form2 = $this->getFormFactory()->createNamedBuilder($field->getName());
+                $form2 = $this->getFormFactory()->createNamedBuilder($field->getName(), 'form', null, $options);
 
                 $fromOptions = $field->getOption('form_from_options');
                 $toOptions = $field->getOption('form_to_options');
