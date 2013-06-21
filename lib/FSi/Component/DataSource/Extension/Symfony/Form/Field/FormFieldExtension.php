@@ -12,16 +12,13 @@
 namespace FSi\Component\DataSource\Extension\Symfony\Form\Field;
 
 use FSi\Component\DataSource\Field\FieldAbstractExtension;
-use FSi\Component\DataSource\Field\FieldViewInterface;
 use FSi\Component\DataSource\Field\FieldTypeInterface;
 use FSi\Component\DataSource\DataSourceInterface;
 use Symfony\Component\Form\FormFactory;
 use Symfony\Component\Form\FormBuilder;
-use FSi\Component\DataSource\Extension\Symfony\Form\FormExtension;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Form\FormInterface;
 use FSi\Component\DataSource\Event\FieldEvents;
 use FSi\Component\DataSource\Event\FieldEvent;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 /**
  * Fields extension.
@@ -128,7 +125,7 @@ class FormFieldExtension extends FieldAbstractExtension
             return;
         }
 
-        if ($form->isBound()) {
+        if ($form->isSubmitted()) {
             $form = $this->getForm($field, true);
         }
 
@@ -146,7 +143,7 @@ class FormFieldExtension extends FieldAbstractExtension
             );
             $this->parameters[$field_oid] = $parameter[$datasourceName][DataSourceInterface::PARAMETER_FIELDS][$field->getName()];
 
-            $form->bind($dataToBind);
+            $form->submit($dataToBind);
             $data = $form->getData();
 
             if (isset($data[DataSourceInterface::PARAMETER_FIELDS][$field->getName()])) {
@@ -206,59 +203,78 @@ class FormFieldExtension extends FieldAbstractExtension
         $options = $field->getOption('form_options');
         $options = array_merge($options, array('required' => false));
 
-        $form = $this->formFactory->createNamedBuilder($datasource->getName(), 'collection', array(), array('csrf_protection' => false))->getForm();
-        $builder = $this->formFactory->createNamedBuilder(DataSourceInterface::PARAMETER_FIELDS);
+        $form = $this->formFactory->createNamed($datasource->getName(), 'collection', null, array('csrf_protection' => false));
+        $fieldsForm = $this->formFactory->createNamed(DataSourceInterface::PARAMETER_FIELDS, 'form', null, array('auto_initialize' => false));
 
         switch ($field->getComparison()) {
             case 'between':
-                $form2 = $this->getFormFactory()->createNamedBuilder($field->getName(), 'form', null, $options);
-
-                $fromOptions = $field->getOption('form_from_options');
-                $toOptions = $field->getOption('form_to_options');
-                $fromOptions = array_merge($options, $fromOptions);
-                $toOptions = array_merge($options, $toOptions);
-
-                $type = $field->getType();
-                if ($field->hasOption('form_type')) {
-                    $type = $field->getOption('form_type');
-                }
-                $form2->add('from', $type, $fromOptions);
-                $form2->add('to', $type, $toOptions);
-                $builder->add($form2);
+                $this->buildBetweenComparisonForm($fieldsForm, $field, $options);
                 break;
-
             case 'isNull':
-                $defaultOptions = array(
-                    'choices' => array(
-                        'null' => 'datasource.form.choices.isnull',
-                        'notnull' => 'datasource.form.choices.isnotnull'
-                    ),
-                    'multiple' => false,
-                    'empty_value' => '',
-                    'translation_domain' => 'DataSourceBundle'
-                );
-
-                if (isset($options['choices'])) {
-                    $options['choices'] = array_merge(
-                        $defaultOptions['choices'],
-                        array_intersect_key($options['choices'], $defaultOptions['choices'])
-                    );
-                }
-
-                $options = array_merge($defaultOptions, $options);
-
-                $builder->add($field->getName(), 'choice', $options);
-
+                $this->buildIsNullComparisonForm($fieldsForm, $field, $options);
                 break;
-
             default:
-                $type = $field->hasOption('form_type')?$field->getOption('form_type'):$field->getType();
-                $builder->add($field->getName(), $type, $options);
+                $type = $field->hasOption('form_type') ? $field->getOption('form_type') : $field->getType();
+                $fieldsForm->add($field->getName(), $type, $options);
         }
 
-        $form->add($builder->getForm());
+        $form->add($fieldsForm);
         $this->forms[$field_oid] = $form;
-        return $form;
+
+        return $this->forms[$field_oid];
+    }
+
+    /**
+     * @param FormInterface $form
+     * @param FieldTypeInterface $field
+     * @param array $options
+     */
+    protected function buildBetweenComparisonForm(FormInterface $form, FieldTypeInterface $field, $options = array())
+    {
+        $betweenBuilder = $this->getFormFactory()->createNamedBuilder($field->getName(), 'form', null, $options);
+
+        $fromOptions = $field->getOption('form_from_options');
+        $toOptions = $field->getOption('form_to_options');
+        $fromOptions = array_merge($options, $fromOptions);
+        $toOptions = array_merge($options, $toOptions);
+        $type = $field->getType();
+
+        if ($field->hasOption('form_type')) {
+            $type = $field->getOption('form_type');
+        }
+
+        $betweenBuilder->add('from', $type, $fromOptions);
+        $betweenBuilder->add('to', $type, $toOptions);
+
+        $form->add($betweenBuilder);
+    }
+
+    /**
+     * @param FormInterface $form
+     * @param FieldTypeInterface $field
+     * @param array $options
+     */
+    protected function buildIsNullComparisonForm(FormInterface $form, FieldTypeInterface $field, $options = array())
+    {
+        $defaultOptions = array(
+            'choices' => array(
+                'null' => 'datasource.form.choices.isnull',
+                'notnull' => 'datasource.form.choices.isnotnull'
+            ),
+            'multiple' => false,
+            'empty_value' => '',
+            'translation_domain' => 'DataSourceBundle'
+        );
+
+        if (isset($options['choices'])) {
+            $options['choices'] = array_merge(
+                $defaultOptions['choices'],
+                array_intersect_key($options['choices'], $defaultOptions['choices'])
+            );
+        }
+
+        $options = array_merge($defaultOptions, $options);
+        $form->add($field->getName(), 'choice', $options);
     }
 
     /**
