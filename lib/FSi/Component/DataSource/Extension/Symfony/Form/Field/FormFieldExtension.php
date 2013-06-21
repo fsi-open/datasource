@@ -201,7 +201,7 @@ class FormFieldExtension extends FieldAbstractExtension
         }
 
         $options = $field->getOption('form_options');
-        $options = array_merge($options, array('required' => false));
+        $options = array_merge($options, array('required' => false, 'auto_initialize' => false));
 
         $form = $this->formFactory->createNamed($datasource->getName(), 'collection', null, array('csrf_protection' => false));
         $fieldsForm = $this->formFactory->createNamed(DataSourceInterface::PARAMETER_FIELDS, 'form', null, array('auto_initialize' => false));
@@ -246,7 +246,7 @@ class FormFieldExtension extends FieldAbstractExtension
         $betweenBuilder->add('from', $type, $fromOptions);
         $betweenBuilder->add('to', $type, $toOptions);
 
-        $form->add($betweenBuilder);
+        $form->add($betweenBuilder->getForm());
     }
 
     /**

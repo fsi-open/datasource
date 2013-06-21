@@ -60,6 +60,7 @@ class FormExtensionTest extends \PHPUnit_Framework_TestCase
             array('number', 'eq', 'text'),
             array('datetime', 'isNull', 'choice'),
             array('datetime', 'eq', 'datetime'),
+            array('datetime', 'between', 'form'),
             array('time', 'isNull', 'choice'),
             array('time', 'eq', 'time'),
             array('date', 'isNull', 'choice'),
@@ -299,6 +300,8 @@ class FormExtensionTest extends \PHPUnit_Framework_TestCase
                         } else {
                             return null;
                         }
+                    case 'form_from_options':
+                    case 'form_to_options':
                     case 'form_options':
                         return array();
                 }
@@ -430,6 +433,8 @@ class FormExtensionTest extends \PHPUnit_Framework_TestCase
                         } else {
                             return null;
                         }
+                    case 'form_from_options':
+                    case 'form_to_options':
                     case 'form_options':
                         return array();
                 }
