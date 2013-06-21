@@ -16,17 +16,17 @@
     ],
     "require": {
         "php": ">=5.3.0",
-        "symfony/event-dispatcher": "2.2.*",
-        "symfony/options-resolver": "2.2.*",
+        "symfony/event-dispatcher": "~2.2",
+        "symfony/options-resolver": "~2.2",
         "fsi/data-indexer" : "0.9.*"
     },
     "require-dev": {
-        "symfony/form" : "2.2.*",
-        "symfony/http-foundation": "2.2.*",
+        "symfony/form" : "~2.2",
+        "symfony/http-foundation": "~2.2",
         "doctrine/orm": "2.3.x-dev",
         "doctrine/collections": "dev-master",
-        "symfony/doctrine-bridge": "2.3.x-dev",
-        "symfony/property-access": "2.2.x-dev"
+        "symfony/doctrine-bridge": "~2.2",
+        "symfony/property-access": "~2.2"
     },
     "autoload": {
         "psr-0": {
