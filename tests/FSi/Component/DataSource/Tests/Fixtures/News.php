@@ -57,7 +57,7 @@ class News
     private $create_time;
 
     /**
-     * @ORM\ManyToOne(targetEntity="FSi\Component\DataSource\Tests\Fixtures\Category")
+     * @ORM\ManyToOne(targetEntity="FSi\Component\DataSource\Tests\Fixtures\Category", inversedBy="news")
      */
     private $category;
 

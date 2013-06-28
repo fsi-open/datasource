@@ -29,12 +29,18 @@ use FSi\Component\DataSource\Extension\Core\Ordering\OrderingExtension;
 use Symfony\Component\Form;
 use Symfony\Bridge\Doctrine\Form\DoctrineOrmExtension;
 use FSi\Component\DataSource\Extension\Core\Pagination\PaginationExtension;
+use FSi\Component\DataSource\Tests\Fixtures\DoctrineDriverExtension;
 
 /**
  * Tests for Doctrine driver.
  */
 class DoctrineDriverTest extends \PHPUnit_Framework_TestCase
 {
+    /**
+     * @var \FSi\Component\DataSource\Tests\Fixtures\DoctrineDriverExtension
+     */
+    protected $testDoctrineExtension;
+
     /**
      * {@inheritdoc}
      */
@@ -323,7 +329,7 @@ class DoctrineDriverTest extends \PHPUnit_Framework_TestCase
     /**
      * Checks DataSource wtih DoctrineDriver using more sophisticated QueryBuilder.
      */
-    public function testQuery()
+    public function testQueryWithJoins()
     {
         $dataSourceFactory = $this->getDataSourceFactory();
 
@@ -384,6 +390,53 @@ class DoctrineDriverTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * Checks DataSource wtih DoctrineDriver using more sophisticated QueryBuilder.
+     */
+    public function testQueryWithAggregates()
+    {
+        $dataSourceFactory = $this->getDataSourceFactory();
+
+        $qb = $this->em->createQueryBuilder()
+            ->select('c', 'COUNT(n) AS newscount')
+            ->from('FSi\Component\DataSource\Tests\Fixtures\Category', 'c')
+            ->join('c.news', 'n')
+            ->groupBy('c')
+        ;
+
+        $driverOptions = array(
+            'qb' => $qb,
+            'alias' => 'c'
+        );
+
+        $datasource = $dataSourceFactory->createDataSource('doctrine', $driverOptions, 'datasource');
+        $datasource
+            ->addField('category', 'text', 'like', array(
+                'field' => 'c.name',
+            ))
+            ->addField('newscount', 'number', 'gt', array(
+                'field' => 'newscount',
+                'auto_alias' => false,
+                'clause' => 'having'
+            ));
+
+        $parameters = array(
+            $datasource->getName() => array(
+                DataSourceInterface::PARAMETER_FIELDS => array(
+                    'newscount' => 3,
+                ),
+            ),
+        );
+
+        $datasource->bindParameters($parameters);
+        $datasource->getResult();
+
+        $this->assertEquals(
+            $this->testDoctrineExtension->getQueryBuilder()->getQuery()->getDQL(),
+            'SELECT c, COUNT(n) AS newscount FROM FSi\Component\DataSource\Tests\Fixtures\Category c INNER JOIN c.news n GROUP BY c HAVING newscount > :newscount'
+        );
+    }
+
+    /**
      * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
      */
     public function testCreateDriverWithoutEntityAndQbOptions()
@@ -407,8 +460,11 @@ class DoctrineDriverTest extends \PHPUnit_Framework_TestCase
      */
     private function getDoctrineFactory()
     {
+        $this->testDoctrineExtension = new DoctrineDriverExtension();
+
         $extensions = array(
             new CoreExtension(),
+            $this->testDoctrineExtension
         );
 
         return new DoctrineFactory(new TestManagerRegistry($this->em), $extensions);
@@ -428,7 +484,7 @@ class DoctrineDriverTest extends \PHPUnit_Framework_TestCase
         $extensions = array(
             new Symfony\Core\CoreExtension(),
             new Core\Pagination\PaginationExtension(),
-            new OrderingExtension(),
+            new OrderingExtension()
         );
 
         return new DataSourceFactory($driverFactoryManager, $extensions);
