@@ -124,13 +124,18 @@ abstract class DoctrineAbstractField extends FieldAbstractType implements Doctri
                 'field' => array('string', 'null'),
                 'auto_alias' => 'bool'
             ))
-            ->setNormalizers(array('field' => function($options, $value) use ($field) {
-                if (!isset($value) && $field->getName()) {
-                    return $field->getName();
-                } else {
-                    return $value;
+            ->setNormalizers(array(
+                'field' => function($options, $value) use ($field) {
+                    if (!isset($value) && $field->getName()) {
+                        return $field->getName();
+                    } else {
+                        return $value;
+                    }
+                },
+                'clause' => function($options, $value) {
+                    return strtolower($value);
                 }
-            }))
+            ))
         ;
     }
 

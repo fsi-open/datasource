@@ -416,7 +416,7 @@ class DoctrineDriverTest extends \PHPUnit_Framework_TestCase
             ->addField('newscount', 'number', 'gt', array(
                 'field' => 'newscount',
                 'auto_alias' => false,
-                'clause' => 'having'
+                'clause' => 'HAVING'
             ));
 
         $parameters = array(
