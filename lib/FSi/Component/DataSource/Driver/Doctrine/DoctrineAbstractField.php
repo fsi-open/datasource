@@ -40,13 +40,15 @@ abstract class DoctrineAbstractField extends FieldAbstractType implements Doctri
             throw new DoctrineDriverException(sprintf('Unexpected comparison type ("%s").', $comparison));
         }
 
+        $func = sprintf('and%s', ucfirst($this->getOption('clause')));
+
         if ($comparison == 'between') {
             if (!is_array($data)) {
                 throw new DoctrineDriverException('Given data must be an array.');
             }
 
-            $from = count($data) ? array_shift($data) : null;
-            $to = count($data) ? array_shift($data) : null;
+            $from = array_shift($data);
+            $to = array_shift($data);
 
             if (!$from && ($from !== 0)) {
                 $from = null;
@@ -65,7 +67,7 @@ abstract class DoctrineAbstractField extends FieldAbstractType implements Doctri
                 $comparison = 'gte';
                 $data = $from;
             } else {
-                $qb->andWhere($qb->expr()->between($fieldName, ":{$name}_from", ":{$name}_to"));
+                $qb->$func($qb->expr()->between($fieldName, ":{$name}_from", ":{$name}_to"));
                 $qb->setParameter("{$name}_from", $from);
                 $qb->setParameter("{$name}_to", $to);
                 return;
@@ -84,18 +86,18 @@ abstract class DoctrineAbstractField extends FieldAbstractType implements Doctri
             case 'lte':
             case 'gt':
             case 'gte':
-                $qb->andWhere($qb->expr()->$comparison($fieldName, ":$name"));
+                $qb->$func($qb->expr()->$comparison($fieldName, ":$name"));
                 $qb->setParameter($this->getName(), $data);
                 break;
 
             case 'like':
             case 'contains':
-                $qb->andWhere($qb->expr()->like($fieldName, ":$name"));
+                $qb->$func($qb->expr()->like($fieldName, ":$name"));
                 $qb->setParameter($this->getName(), "%$data%");
                 break;
 
             case 'isNull':
-                $qb->andWhere($fieldName . ' IS ' . ($data === 'null' ? '' : 'NOT ') . 'NULL');
+                $qb->$func($fieldName . ' IS ' . ($data === 'null' ? '' : 'NOT ') . 'NULL');
                 break;
 
             default:
@@ -111,14 +113,29 @@ abstract class DoctrineAbstractField extends FieldAbstractType implements Doctri
         $field = $this;
         $this->getOptionsResolver()
             ->setOptional(array('field'))
-            ->setAllowedTypes(array('field' => array('string', 'null')))
-            ->setNormalizers(array('field' => function($options, $value) use ($field) {
-                if (!isset($value) && $field->getName()) {
-                    return $field->getName();
-                } else {
-                    return $value;
+            ->setDefaults(array(
+                'auto_alias' => true,
+                'clause' => 'where'
+            ))
+            ->setAllowedValues(array(
+                'clause' => array('where', 'having')
+            ))
+            ->setAllowedTypes(array(
+                'field' => array('string', 'null'),
+                'auto_alias' => 'bool'
+            ))
+            ->setNormalizers(array(
+                'field' => function($options, $value) use ($field) {
+                    if (!isset($value) && $field->getName()) {
+                        return $field->getName();
+                    } else {
+                        return $value;
+                    }
+                },
+                'clause' => function($options, $value) {
+                    return strtolower($value);
                 }
-            }))
+            ))
         ;
     }
 
@@ -133,7 +150,7 @@ abstract class DoctrineAbstractField extends FieldAbstractType implements Doctri
     {
         $name = $this->getOption('field');
 
-        if (!preg_match('/\./', $name)) {
+        if ($this->getOption('auto_alias') && !preg_match('/\./', $name)) {
             $name = "$alias.$name";
         }
 

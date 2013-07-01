@@ -31,6 +31,11 @@ class Category
     private $name;
 
     /**
+     * @ORM\OneToMany(targetEntity="FSi\Component\DataSource\Tests\Fixtures\News", mappedBy="category")
+     */
+    private $news;
+
+    /**
      * Get id.
      *
      * @return integer

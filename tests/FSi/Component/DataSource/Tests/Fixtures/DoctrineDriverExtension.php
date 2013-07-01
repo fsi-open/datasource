@@ -25,6 +25,11 @@ class DoctrineDriverExtension extends DriverAbstractExtension implements EventSu
      */
     private $calls = array();
 
+    /**
+     * @var Doctrine\ORM\QueryBuilder
+     */
+    private $queryBuilder;
+
     public function getExtendedDriverTypes()
     {
         return array('doctrine');
@@ -69,7 +74,7 @@ class DoctrineDriverExtension extends DriverAbstractExtension implements EventSu
     {
         if ($name == 'preGetResult') {
             $args = array_shift($arguments);
-            $args->getDriver()->getQueryBuilder();
+            $this->queryBuilder = $args->getDriver()->getQueryBuilder();
         }
         $this->calls[] = $name;
     }
@@ -82,5 +87,13 @@ class DoctrineDriverExtension extends DriverAbstractExtension implements EventSu
     public function loadSubscribers()
     {
         return array($this);
+    }
+
+    /**
+     * @return Doctrine\ORM\QueryBuilder
+     */
+    public function getQueryBuilder()
+    {
+        return $this->queryBuilder;
     }
 }
