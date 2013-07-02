@@ -434,6 +434,49 @@ class DoctrineDriverTest extends \PHPUnit_Framework_TestCase
             $this->testDoctrineExtension->getQueryBuilder()->getQuery()->getDQL(),
             'SELECT c, COUNT(n) AS newscount FROM FSi\Component\DataSource\Tests\Fixtures\Category c INNER JOIN c.news n GROUP BY c HAVING newscount > :newscount'
         );
+
+        $parameters = array(
+            $datasource->getName() => array(
+                DataSourceInterface::PARAMETER_FIELDS => array(
+                    'newscount' => 0,
+                ),
+            ),
+        );
+
+        $datasource->bindParameters($parameters);
+        $datasource->getResult();
+
+        $this->assertEquals(
+            $this->testDoctrineExtension->getQueryBuilder()->getQuery()->getDQL(),
+            'SELECT c, COUNT(n) AS newscount FROM FSi\Component\DataSource\Tests\Fixtures\Category c INNER JOIN c.news n GROUP BY c HAVING newscount > :newscount'
+        );
+
+        $datasource = $dataSourceFactory->createDataSource('doctrine', $driverOptions, 'datasource2');
+        $datasource
+            ->addField('category', 'text', 'like', array(
+                'field' => 'c.name',
+            ))
+            ->addField('newscount', 'number', 'between', array(
+                'field' => 'newscount',
+                'auto_alias' => false,
+                'clause' => 'HAVING'
+            ));
+
+        $parameters = array(
+            $datasource->getName() => array(
+                DataSourceInterface::PARAMETER_FIELDS => array(
+                    'newscount' => array(0, 1),
+                ),
+            ),
+        );
+
+        $datasource->bindParameters($parameters);
+        $datasource->getResult();
+
+        $this->assertEquals(
+            $this->testDoctrineExtension->getQueryBuilder()->getQuery()->getDQL(),
+            'SELECT c, COUNT(n) AS newscount FROM FSi\Component\DataSource\Tests\Fixtures\Category c INNER JOIN c.news n GROUP BY c HAVING newscount BETWEEN :newscount_from AND :newscount_to'
+        );
     }
 
     /**
