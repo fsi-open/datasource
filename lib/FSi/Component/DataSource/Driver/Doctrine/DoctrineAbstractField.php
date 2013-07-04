@@ -31,7 +31,7 @@ abstract class DoctrineAbstractField extends FieldAbstractType implements Doctri
         $fieldName = $this->getFieldName($alias);
         $name = $this->getName();
 
-        if (empty($data)) {
+        if (empty($data) && ($data !== 0)) {
             return;
         }
 
@@ -50,11 +50,11 @@ abstract class DoctrineAbstractField extends FieldAbstractType implements Doctri
             $from = array_shift($data);
             $to = array_shift($data);
 
-            if (!$from && ($from !== 0)) {
+            if (empty($from) && ($from !== 0)) {
                 $from = null;
             }
 
-            if (!$to && ($to !== 0)) {
+            if (empty($to) && ($to !== 0)) {
                 $to = null;
             }
 
