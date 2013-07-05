@@ -48,6 +48,7 @@ class DoctrineDriverBasicTest extends \PHPUnit_Framework_TestCase
             array('date'),
             array('time'),
             array('datetime'),
+            array('boolean'),
         );
     }
 
@@ -223,6 +224,7 @@ class DoctrineDriverBasicTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($driver->hasFieldType('date'));
         $this->assertTrue($driver->hasFieldType('time'));
         $this->assertTrue($driver->hasFieldType('datetime'));
+        $this->assertTrue($driver->hasFieldType('boolean'));
         $this->assertFalse($driver->hasFieldType('wrong'));
         $this->assertFalse($driver->hasFieldType(null));
 

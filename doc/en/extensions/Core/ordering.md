@@ -30,7 +30,7 @@ $factory = new DataSourceFactory($extensions);
 
 ## Extended field types ##
 
-``text``, ``number``, ``date``, ``time``, ``datetime``
+``text``, ``number``, ``date``, ``time``, ``datetime``, ``boolean``
 
 ## Available field options ##
 

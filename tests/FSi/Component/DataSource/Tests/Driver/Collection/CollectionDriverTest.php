@@ -217,6 +217,104 @@ class CollectionDriverTest extends \PHPUnit_Framework_TestCase
             $datasource->bindParameters($parameters);
             $result = $datasource->getResult();
             $this->assertEquals(100, count($result));
+
+            //Test boolean field
+            $datasource
+                ->addField('is_active', 'boolean', 'eq')
+            ;
+            $datasource->setMaxResults(null);
+            $parameters = array(
+                $datasource->getName() => array(
+                    DataSourceInterface::PARAMETER_FIELDS => array(
+                        'is_active' => 1,
+                    ),
+                )
+            );
+
+            $datasource->bindParameters($parameters);
+            $view = $datasource->createView();
+            $result = $datasource->getResult();
+            $this->assertEquals(50, count($result));
+
+            $parameters = array(
+                $datasource->getName() => array(
+                    DataSourceInterface::PARAMETER_FIELDS => array(
+                        'is_active' => 0,
+                    ),
+                )
+            );
+
+            $datasource->bindParameters($parameters);
+            $view = $datasource->createView();
+            $result = $datasource->getResult();
+            $this->assertEquals(50, count($result));
+
+            $parameters = array(
+                $datasource->getName() => array(
+                    DataSourceInterface::PARAMETER_FIELDS => array(
+                        'is_active' => true,
+                    ),
+                )
+            );
+
+            $datasource->bindParameters($parameters);
+            $view = $datasource->createView();
+            $result = $datasource->getResult();
+            $this->assertEquals(50, count($result));
+
+            $parameters = array(
+                $datasource->getName() => array(
+                    DataSourceInterface::PARAMETER_FIELDS => array(
+                        'is_active' => false,
+                    ),
+                )
+            );
+
+            $datasource->bindParameters($parameters);
+            $view = $datasource->createView();
+            $result = $datasource->getResult();
+            $this->assertEquals(50, count($result));
+
+            $parameters = array(
+                $datasource->getName() => array(
+                    DataSourceInterface::PARAMETER_FIELDS => array(
+                        'is_active' => null,
+                    ),
+                )
+            );
+
+            $datasource->bindParameters($parameters);
+            $view = $datasource->createView();
+            $result = $datasource->getResult();
+            $this->assertEquals(100, count($result));
+
+            $parameters = array(
+                $datasource->getName() => array(
+                    OrderingExtension::PARAMETER_SORT => array(
+                        'is_active' => 'desc'
+                    ),
+                ),
+            );
+
+            $datasource->bindParameters($parameters);
+            foreach ($datasource->getResult() as $news) {
+                $this->assertEquals(true, $news->getIs_Active());
+                break;
+            }
+
+            $parameters = array(
+                $datasource->getName() => array(
+                    OrderingExtension::PARAMETER_SORT => array(
+                        'is_active' => 'asc'
+                    ),
+                ),
+            );
+
+            $datasource->bindParameters($parameters);
+            foreach ($datasource->getResult() as $news) {
+                $this->assertEquals(false, $news->getIs_Active());
+                break;
+            }
         }
     }
 
@@ -299,6 +397,7 @@ class CollectionDriverTest extends \PHPUnit_Framework_TestCase
                 $news->setAuthor('author'.$i.'@domain2.com');
                 $news->setShortContent('Dolor sit amet.');
                 $news->setContent('Content dolor sit amet.');
+                $news->setIsActive(true);
             }
 
             //Each entity has different date of creation and one of four hours of creation.

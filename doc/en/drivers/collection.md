@@ -52,6 +52,7 @@ Provided field types:
 * ``date`` - allowed comparisons: eq, neq, lt, lte, gt, gte, in, nin (not in), between.
 * ``time`` - allowed comparisons: eq, neq, lt, lte, gt, gte, in, nin (not in), between.
 * ``datetime`` - allowed comparisons: eq, neq, lt, lte, gt, gte, in, nin (not in), between.
+* ``boolean`` - allowed comparisons: eq.
 
 Note: When using ``between`` comparison, you must bind parameters as array('from' => $value1, 'to' => $value2), 
 

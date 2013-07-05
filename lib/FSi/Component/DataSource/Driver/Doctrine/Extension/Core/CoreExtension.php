@@ -38,6 +38,7 @@ class CoreExtension extends DriverAbstractExtension
             new Field\Time(),
             new Field\DateTime(),
             new Field\Entity(),
+            new Field\Boolean(),
         );
     }
 }
