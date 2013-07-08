@@ -79,6 +79,8 @@ class FormFieldExtension extends FieldAbstractExtension
     {
         $field->getOptionsResolver()
             ->setDefaults(array(
+                'form_null_value' => 'empty',
+                'form_not_null_value' => 'not empty',
                 'form_filter' => true,
                 'form_options' => array(),
                 'form_from_options' => array(),
@@ -89,6 +91,8 @@ class FormFieldExtension extends FieldAbstractExtension
                 'form_order'
             ))
             ->setAllowedTypes(array(
+                'form_null_value' => 'string',
+                'form_not_null_value' => 'string',
                 'form_filter' => 'bool',
                 'form_options' => 'array',
                 'form_from_options' => 'array',
@@ -258,8 +262,8 @@ class FormFieldExtension extends FieldAbstractExtension
     {
         $defaultOptions = array(
             'choices' => array(
-                'null' => 'datasource.form.choices.isnull',
-                'notnull' => 'datasource.form.choices.isnotnull'
+                'null' => $field->getOption('form_null_value'),
+                'notnull' => $field->getOption('form_not_null_value'),
             ),
             'multiple' => false,
             'empty_value' => '',

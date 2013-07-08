@@ -425,6 +425,10 @@ class FormExtensionTest extends \PHPUnit_Framework_TestCase
             ->method('getOption')
             ->will($this->returnCallback(function($option) use ($type) {
                 switch ($option) {
+                    case 'form_null_value':
+                        return 'null value';
+                    case 'form_not_null_value':
+                        return 'not null value';
                     case 'form_filter':
                         return true;
                     case 'form_type':
@@ -459,5 +463,16 @@ class FormExtensionTest extends \PHPUnit_Framework_TestCase
         $form = $viewEventArgs->getView()->getAttribute('form');
 
         $this->assertEquals($expected, $form['fields']['name']->vars['type']);
+
+        if ($comparison == 'isNull') {
+            $this->assertEquals(
+                'null value',
+                $form['fields']['name']->vars['choices'][0]->label
+            );
+            $this->assertEquals(
+                'not null value',
+                $form['fields']['name']->vars['choices'][1]->label
+            );
+        }
     }
 }
