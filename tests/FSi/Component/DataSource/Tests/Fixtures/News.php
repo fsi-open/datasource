@@ -79,7 +79,7 @@ class News
     /**
      * @ORM\Column(type="boolean")
      */
-    private $is_active = false;
+    private $active = false;
 
     /**
      * Constructor.
@@ -290,22 +290,22 @@ class News
     }
 
     /**
-     * Set is active
+     * Set active
      *
-     * @param mixed $is_active
+     * @param boolean $active
      */
-    public function setIsActive($is_active)
+    public function setActive($active = true)
     {
-        $this->is_active = $is_active;
+        $this->active = $active;
     }
 
     /**
-     * Get is active
+     * Is active
      *
-     * @return mixed
+     * @return boolean
      */
-    public function getIs_Active()
+    public function isActive()
     {
-        return $this->is_active;
+        return $this->active;
     }
 }

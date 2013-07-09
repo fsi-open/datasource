@@ -106,7 +106,7 @@ class DoctrineDriverTest extends \PHPUnit_Framework_TestCase
                 ->addField('tags', 'text', 'isNull', array(
                     'field' => 'tags'
                 ))
-                ->addField('is_active', 'boolean', 'eq')
+                ->addField('active', 'boolean', 'eq')
             ;
 
             $result1 = $datasource->getResult();
@@ -315,7 +315,7 @@ class DoctrineDriverTest extends \PHPUnit_Framework_TestCase
             $parameters = array(
                 $datasource->getName() => array(
                     DataSourceInterface::PARAMETER_FIELDS => array(
-                        'is_active' => null
+                        'active' => null
                     ),
                 ),
             );
@@ -327,7 +327,7 @@ class DoctrineDriverTest extends \PHPUnit_Framework_TestCase
             $parameters = array(
                 $datasource->getName() => array(
                     DataSourceInterface::PARAMETER_FIELDS => array(
-                        'is_active' => 1
+                        'active' => 1
                     ),
                 ),
             );
@@ -344,7 +344,7 @@ class DoctrineDriverTest extends \PHPUnit_Framework_TestCase
             $parameters = array(
                 $datasource->getName() => array(
                     DataSourceInterface::PARAMETER_FIELDS => array(
-                        'is_active' => 0
+                        'active' => 0
                     ),
                 ),
             );
@@ -360,7 +360,7 @@ class DoctrineDriverTest extends \PHPUnit_Framework_TestCase
             $parameters = array(
                 $datasource->getName() => array(
                     DataSourceInterface::PARAMETER_FIELDS => array(
-                        'is_active' => true
+                        'active' => true
                     ),
                 ),
             );
@@ -376,7 +376,7 @@ class DoctrineDriverTest extends \PHPUnit_Framework_TestCase
             $parameters = array(
                 $datasource->getName() => array(
                     DataSourceInterface::PARAMETER_FIELDS => array(
-                        'is_active' => false
+                        'active' => false
                     ),
                 ),
             );
@@ -396,28 +396,28 @@ class DoctrineDriverTest extends \PHPUnit_Framework_TestCase
             $parameters = array(
                 $datasource->getName() => array(
                     OrderingExtension::PARAMETER_SORT => array(
-                        'is_active' => 'desc'
+                        'active' => 'desc'
                     ),
                 ),
             );
 
             $datasource->bindParameters($parameters);
             foreach ($datasource->getResult() as $news) {
-                $this->assertEquals(true, $news->getIs_Active());
+                $this->assertEquals(true, $news->isActive());
                 break;
             }
 
             $parameters = array(
                 $datasource->getName() => array(
                     OrderingExtension::PARAMETER_SORT => array(
-                        'is_active' => 'asc'
+                        'active' => 'asc'
                     ),
                 ),
             );
 
             $datasource->bindParameters($parameters);
             foreach ($datasource->getResult() as $news) {
-                $this->assertEquals(false, $news->getIs_Active());
+                $this->assertEquals(false, $news->isActive());
                 break;
             }
 
@@ -684,7 +684,7 @@ class DoctrineDriverTest extends \PHPUnit_Framework_TestCase
                 $news->setAuthor('author'.$i.'@domain2.com');
                 $news->setShortContent('Dolor sit amet.');
                 $news->setContent('Content dolor sit amet.');
-                $news->setIsActive(true);
+                $news->setActive();
             }
 
             //Each entity has different date of creation and one of four hours of creation.
