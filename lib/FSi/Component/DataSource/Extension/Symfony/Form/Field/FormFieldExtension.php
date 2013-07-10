@@ -69,7 +69,7 @@ class FormFieldExtension extends FieldAbstractExtension
      */
     public function getExtendedFieldTypes()
     {
-        return array('text', 'number', 'date', 'time', 'datetime', 'entity');
+        return array('text', 'number', 'date', 'time', 'datetime', 'entity', 'boolean');
     }
 
     /**
@@ -81,6 +81,10 @@ class FormFieldExtension extends FieldAbstractExtension
             ->setDefaults(array(
                 'form_null_value' => 'empty',
                 'form_not_null_value' => 'not empty',
+                'form_true_value' => 'yes',
+                'form_false_value' => 'no',
+                // Deprecated: form_translation_domain default value will be changed to null in version 1.2
+                'form_translation_domain' => 'DataSourceBundle',
                 'form_filter' => true,
                 'form_options' => array(),
                 'form_from_options' => array(),
@@ -93,6 +97,9 @@ class FormFieldExtension extends FieldAbstractExtension
             ->setAllowedTypes(array(
                 'form_null_value' => 'string',
                 'form_not_null_value' => 'string',
+                'form_true_value' => 'string',
+                'form_false_value' => 'string',
+                'form_translation_domain' => array('null', 'string'),
                 'form_filter' => 'bool',
                 'form_options' => 'array',
                 'form_from_options' => 'array',
@@ -219,7 +226,14 @@ class FormFieldExtension extends FieldAbstractExtension
                 break;
             default:
                 $type = $field->hasOption('form_type') ? $field->getOption('form_type') : $field->getType();
-                $fieldsForm->add($field->getName(), $type, $options);
+
+                switch ($type) {
+                    case 'boolean':
+                        $this->buildBooleanForm($fieldsForm, $field, $options);
+                        break;
+                    default:
+                        $fieldsForm->add($field->getName(), $type, $options);
+                }
         }
 
         $form->add($fieldsForm);
@@ -266,9 +280,43 @@ class FormFieldExtension extends FieldAbstractExtension
                 'notnull' => $field->getOption('form_not_null_value'),
             ),
             'multiple' => false,
-            'empty_value' => '',
-            'translation_domain' => 'DataSourceBundle'
+            'empty_value' => ''
         );
+
+        if ($field->hasOption('form_translation_domain')) {
+            $defaultOptions['translation_domain'] = $field->getOption('form_translation_domain');
+        }
+
+        if (isset($options['choices'])) {
+            $options['choices'] = array_merge(
+                $defaultOptions['choices'],
+                array_intersect_key($options['choices'], $defaultOptions['choices'])
+            );
+        }
+
+        $options = array_merge($defaultOptions, $options);
+        $form->add($field->getName(), 'choice', $options);
+    }
+
+    /**
+     * @param FormInterface $form
+     * @param FieldTypeInterface $field
+     * @param array $options
+     */
+    protected function buildBooleanForm(FormInterface $form, FieldTypeInterface $field, $options = array())
+    {
+        $defaultOptions = array(
+            'choices' => array(
+                '1' => $field->getOption('form_true_value'),
+                '0' => $field->getOption('form_false_value')
+            ),
+            'multiple' => false,
+            'empty_value' => ''
+        );
+
+        if ($field->hasOption('form_translation_domain')) {
+            $defaultOptions['translation_domain'] = $field->getOption('form_translation_domain');
+        }
 
         if (isset($options['choices'])) {
             $options['choices'] = array_merge(

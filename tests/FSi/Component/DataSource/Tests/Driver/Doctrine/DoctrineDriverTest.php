@@ -105,7 +105,9 @@ class DoctrineDriverTest extends \PHPUnit_Framework_TestCase
                 ))
                 ->addField('tags', 'text', 'isNull', array(
                     'field' => 'tags'
-                ));
+                ))
+                ->addField('active', 'boolean', 'eq')
+            ;
 
             $result1 = $datasource->getResult();
             $this->assertEquals(100, count($result1));
@@ -308,6 +310,116 @@ class DoctrineDriverTest extends \PHPUnit_Framework_TestCase
 
             unset($result1);
             unset($result2);
+
+            //checking - field type boolean
+            $parameters = array(
+                $datasource->getName() => array(
+                    DataSourceInterface::PARAMETER_FIELDS => array(
+                        'active' => null
+                    ),
+                ),
+            );
+
+            $datasource->bindParameters($parameters);
+            $result1 = $datasource->getResult();
+            $this->assertEquals(100, count($result1));
+
+            $parameters = array(
+                $datasource->getName() => array(
+                    DataSourceInterface::PARAMETER_FIELDS => array(
+                        'active' => 1
+                    ),
+                ),
+            );
+
+            $datasource->bindParameters($parameters);
+            $result2 = $datasource->getResult();
+            $this->assertEquals(50, count($result2));
+            $ids = array();
+
+            foreach($result2 as $item) {
+                $ids[] = $item->getId();
+            }
+
+            $parameters = array(
+                $datasource->getName() => array(
+                    DataSourceInterface::PARAMETER_FIELDS => array(
+                        'active' => 0
+                    ),
+                ),
+            );
+
+            $datasource->bindParameters($parameters);
+            $result3 = $datasource->getResult();
+            $this->assertEquals(50, count($result3));
+
+            foreach($result3 as $item) {
+                $this->assertTrue(!in_array($item->getId(),$ids));
+            }
+
+            $parameters = array(
+                $datasource->getName() => array(
+                    DataSourceInterface::PARAMETER_FIELDS => array(
+                        'active' => true
+                    ),
+                ),
+            );
+
+            $datasource->bindParameters($parameters);
+            $result2 = $datasource->getResult();
+            $this->assertEquals(50, count($result2));
+
+            foreach($result2 as $item) {
+                $this->assertTrue(in_array($item->getId(),$ids));
+            }
+
+            $parameters = array(
+                $datasource->getName() => array(
+                    DataSourceInterface::PARAMETER_FIELDS => array(
+                        'active' => false
+                    ),
+                ),
+            );
+
+            $datasource->bindParameters($parameters);
+            $result3 = $datasource->getResult();
+            $this->assertEquals(50, count($result3));
+
+            foreach($result3 as $item) {
+                $this->assertTrue(!in_array($item->getId(),$ids));
+            }
+
+            unset($result1);
+            unset($result2);
+            unset($result3);
+
+            $parameters = array(
+                $datasource->getName() => array(
+                    OrderingExtension::PARAMETER_SORT => array(
+                        'active' => 'desc'
+                    ),
+                ),
+            );
+
+            $datasource->bindParameters($parameters);
+            foreach ($datasource->getResult() as $news) {
+                $this->assertEquals(true, $news->isActive());
+                break;
+            }
+
+            $parameters = array(
+                $datasource->getName() => array(
+                    OrderingExtension::PARAMETER_SORT => array(
+                        'active' => 'asc'
+                    ),
+                ),
+            );
+
+            $datasource->bindParameters($parameters);
+            foreach ($datasource->getResult() as $news) {
+                $this->assertEquals(false, $news->isActive());
+                break;
+            }
 
             //Test for clearing fields.
             $datasource->clearFields();
@@ -572,6 +684,7 @@ class DoctrineDriverTest extends \PHPUnit_Framework_TestCase
                 $news->setAuthor('author'.$i.'@domain2.com');
                 $news->setShortContent('Dolor sit amet.');
                 $news->setContent('Content dolor sit amet.');
+                $news->setActive();
             }
 
             //Each entity has different date of creation and one of four hours of creation.

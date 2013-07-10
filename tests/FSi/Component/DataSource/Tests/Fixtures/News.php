@@ -77,6 +77,11 @@ class News
     private $tags;
 
     /**
+     * @ORM\Column(type="boolean")
+     */
+    private $active = false;
+
+    /**
      * Constructor.
      */
     public function __construct()
@@ -284,4 +289,23 @@ class News
         return $this->tags;
     }
 
+    /**
+     * Set active
+     *
+     * @param boolean $active
+     */
+    public function setActive($active = true)
+    {
+        $this->active = $active;
+    }
+
+    /**
+     * Is active
+     *
+     * @return boolean
+     */
+    public function isActive()
+    {
+        return $this->active;
+    }
 }
