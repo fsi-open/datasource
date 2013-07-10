@@ -16,7 +16,7 @@ Added new options:
 'form_not_null_value' => 'not empty', // string
 'form_true_value' => 'yes', // string
 'form_false_value' => 'no', // string
-'form_translation_domain => 'DataSourceBundle', // null or string
+'form_translation_domain' => 'DataSourceBundle', // null or string
 ...
 ```
 
