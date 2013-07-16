@@ -29,20 +29,17 @@ abstract class DoctrineAbstractField extends FieldAbstractType implements Doctri
         $fieldName = $this->getFieldName($alias);
         $name = $this->getName();
 
-        if (empty($data) && ($data !== 0)) {
+        if (empty($data) && ($data !== 0) && ($data !== false)) {
             return;
         }
 
+        $type = $this->getDBALType();
         $comparison = $this->getComparison();
-        if (!in_array($comparison, $this->comparisons)) {
-            throw new DoctrineDriverException(sprintf('Unexpected comparison type ("%s").', $comparison));
-        }
-
         $func = sprintf('and%s', ucfirst($this->getOption('clause')));
 
         if ($comparison == 'between') {
             if (!is_array($data)) {
-                throw new DoctrineDriverException('Given data must be an array.');
+                throw new DoctrineDriverException('Fields with \'between\' comparison require to bind an array.');
             }
 
             $from = array_shift($data);
@@ -66,41 +63,25 @@ abstract class DoctrineAbstractField extends FieldAbstractType implements Doctri
                 $data = $from;
             } else {
                 $qb->$func($qb->expr()->between($fieldName, ":{$name}_from", ":{$name}_to"));
-                $qb->setParameter("{$name}_from", $from);
-                $qb->setParameter("{$name}_to", $to);
+                $qb->setParameter("{$name}_from", $from, $type);
+                $qb->setParameter("{$name}_to", $to, $type);
                 return;
             }
         }
 
-        switch ($comparison) {
-            case 'in':
-            case 'notIn':
-                if (!is_array($data)) {
-                    throw new DoctrineDriverException('Fields with \'in\' and \'notIn\' comparisons require to bind an array.');
-                }
-            case 'eq':
-            case 'neq':
-            case 'lt':
-            case 'lte':
-            case 'gt':
-            case 'gte':
-                $qb->$func($qb->expr()->$comparison($fieldName, ":$name"));
-                $qb->setParameter($this->getName(), $data);
-                break;
-
-            case 'like':
-            case 'contains':
-                $qb->$func($qb->expr()->like($fieldName, ":$name"));
-                $qb->setParameter($this->getName(), "%$data%");
-                break;
-
-            case 'isNull':
-                $qb->$func($fieldName . ' IS ' . ($data === 'null' ? '' : 'NOT ') . 'NULL');
-                break;
-
-            default:
-                throw new DoctrineDriverException(sprintf('Unexpected comparison type ("%s").', $comparison));
+        if ($comparison == 'isNull') {
+            $qb->$func($fieldName . ' IS ' . ($data === 'null' ? '' : 'NOT ') . 'NULL');
+            return;
         }
+
+        if (in_array($comparison, array('in', 'notIn')) && !is_array($data)) {
+            throw new DoctrineDriverException('Fields with \'in\' and \'notIn\' comparisons require to bind an array.');
+        } elseif (in_array($comparison, array('like', 'contains'))) {
+            $data = "%$data%";
+            $comparison = 'like';
+        }
+        $qb->$func($qb->expr()->$comparison($fieldName, ":$name"));
+        $qb->setParameter($this->getName(), $data, $type);
     }
 
     /**
@@ -153,5 +134,13 @@ abstract class DoctrineAbstractField extends FieldAbstractType implements Doctri
         }
 
         return $name;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getDBALType()
+    {
+        return null;
     }
 }

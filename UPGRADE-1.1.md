@@ -21,3 +21,15 @@ Added new options:
 ```
 
 **NB!!! form_translation_domain default value ``DataSourceBundle`` will be changed to ``null`` in version 1.2**
+
+## New method ``getDBALType()`` in DoctrineFieldInterface
+
+New method was added in order to allow type casting in DQL queries. Field implementation can return null or one of class
+constants from Doctrine\DBAL\Types\Type. If null is returned, which is the default behaviour of DoctrineAbstractField,
+then field's value will not be casted in DQL.
+
+## New method ``getPHPType()`` in CollectionFieldInterface
+
+New method was added in order to allow type casting before comparison. Field implementation can return null or one of types
+accepted by ``settype()``. If null is returned, which is the default behaviour of CollectionAbstractField, then field's
+value will not be casted before comparison.

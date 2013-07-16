@@ -10,7 +10,7 @@
 namespace FSi\Component\DataSource\Driver\Doctrine\Extension\Core\Field;
 
 use FSi\Component\DataSource\Driver\Doctrine\DoctrineAbstractField;
-use FSi\Component\DataSource\Driver\Doctrine\Exception\DoctrineDriverException;
+use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\QueryBuilder;
 
 /**
@@ -34,24 +34,8 @@ class Boolean extends DoctrineAbstractField
     /**
      * {@inheritdoc}
      */
-    public function buildQuery(QueryBuilder $qb, $alias)
+    public function getDBALType()
     {
-        $data = $this->getCleanParameter();
-        $fieldName = $this->getFieldName($alias);
-        $name = $this->getName();
-
-        if (empty($data) && ($data !== 0 && $data !== false)) {
-            return;
-        }
-
-        $comparison = $this->getComparison();
-        if (!in_array($comparison, $this->comparisons)) {
-            throw new DoctrineDriverException(sprintf('Unexpected comparison type ("%s").', $comparison));
-        }
-
-        $func = sprintf('and%s', ucfirst($this->getOption('clause')));
-
-        $qb->$func($qb->expr()->$comparison($fieldName, ":$name"));
-        $qb->setParameter($this->getName(), $data, \Doctrine\DBAL\Types\Type::BOOLEAN);
+        return Type::BOOLEAN;
     }
 }

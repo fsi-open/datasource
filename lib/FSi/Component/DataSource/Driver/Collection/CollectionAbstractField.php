@@ -37,23 +37,27 @@ abstract class CollectionAbstractField extends FieldAbstractType implements Coll
         ;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function buildCriteria(Criteria $c)
     {
         $data = $this->getCleanParameter();
 
-        if (empty($data)) {
+        if (empty($data) && ($data !== 0) && ($data !== false)) {
             return;
         }
 
         $field = $this->hasOption('field')
             ? $this->getOption('field')
             : $this->getName();
+        $type = $this->getPHPType();
         $comparison = $this->getComparison();
         $eb = Criteria::expr();
 
         if ($comparison == 'between') {
             if (!is_array($data)) {
-                throw new CollectionDriverException('Given data must be an array.');
+                throw new CollectionDriverException('Fields with \'between\' comparison require to bind an array.');
             }
 
             $from = count($data) ? array_shift($data) : null;
@@ -76,27 +80,30 @@ abstract class CollectionAbstractField extends FieldAbstractType implements Coll
                 $comparison = 'gte';
                 $data = $from;
             } else {
+                if (isset($type)) {
+                    settype($from, $type);
+                    settype($to, $type);
+                }
                 $c->andWhere($eb->andX($eb->lte($field, $to), $eb->gte($field, $from)));
                 return;
             }
         }
 
-        switch ($comparison) {
-            case 'in':
-            case 'nin':
-                $data = (array) $data;
-            case 'eq':
-            case 'neq':
-            case 'lt':
-            case 'lte':
-            case 'gt':
-            case 'gte':
-            case 'contains':
-                $c->andWhere($eb->$comparison($field, $data));
-                break;
-
-            default:
-                throw new CollectionDriverException(sprintf('Unexpected comparison type ("%s").', $comparison));
+        if (in_array($comparison, array('in', 'nin')) && !is_array($data)) {
+            throw new CollectionDriverException('Fields with \'in\' and \'nin\' comparisons require to bind an array.');
         }
+
+        if (isset($type)) {
+            settype($data, $type);
+        }
+        $c->andWhere($eb->$comparison($field, $data));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getPHPType()
+    {
+        return null;
     }
 }
