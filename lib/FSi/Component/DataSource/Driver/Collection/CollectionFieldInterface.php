@@ -22,4 +22,11 @@ interface CollectionFieldInterface
      * @param Criteria $c
      */
     public function buildCriteria(Criteria $c);
+
+    /**
+     * Returns PHP type that this field's value will be casted to before comparisons.
+     *
+     * @return null|string
+     */
+    public function getPHPType();
 }

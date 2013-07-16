@@ -46,9 +46,17 @@ $factory = new DataSourceFactory($extensions);
   comparison; it's merged with ``form_options``.
 * ``form_to_options`` - optional array of options passed to the ``to`` form field in datasource fields with ``between``
   comparison; it's merged with ``form_options``.
+* ``form_null_value`` - label of the null value for ``isNull`` comparison forms, ``'empty'`` by default.
+* ``form_not_null_value`` - label of the not null value for ``isNull`` comparison forms, ``'not empty'`` by default.
+* ``form_true_value`` - label of the ``true`` value for ``boolean`` fields, ``'yes'`` by default.
+* ``form_false_value`` - label of the ``false`` value for ``boolean`` fields, ``'no'`` by default.
+* ``form_translation_domain`` - translation domain passed to the form, ``DataSourceBundle`` by default.
 
 **Note**: Remember that for fields of type ``entity`` you **must** always pass ``class`` option in ``form_option`` in order to
 specify class of associated entity. Otherwise an exception will be thrown from Symfony Form component.
+
+**Note**: The default value of ``form_translation_domain` is deprecated since version 1.1 and will be changed to null in
+version 1.2
 
 ``` php
 <?php

@@ -23,4 +23,11 @@ interface DoctrineFieldInterface
      * @param string $alias
      */
     public function buildQuery(QueryBuilder $qb, $alias);
+
+    /**
+     * Returns DQL type that this field's value will be casted to.
+     *
+     * @return null|string
+     */
+    public function getDBALType();
 }

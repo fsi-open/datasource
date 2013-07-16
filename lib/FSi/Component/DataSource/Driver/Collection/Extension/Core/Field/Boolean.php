@@ -33,21 +33,8 @@ class Boolean extends CollectionAbstractField
     /**
      * {@inheritdoc}
      */
-    public function buildCriteria(Criteria $c)
+    public function getPHPType()
     {
-        $data = $this->getCleanParameter();
-
-        if (empty($data) && ($data !== 0 && $data !== false)) {
-            return;
-        }
-
-        $field = $this->hasOption('field')
-            ? $this->getOption('field')
-            : $this->getName();
-        $comparison = $this->getComparison();
-        $eb = Criteria::expr();
-
-        // need to convert 1 and 0 to boolean, or the comparison will fail
-        $c->andWhere($eb->$comparison($field, (boolean) $data));
+        return 'boolean';
     }
 }
