@@ -61,7 +61,7 @@ class DoctrineExtension extends DriverExtension implements EventSubscriberInterf
             $name = $field->getName();
         }
 
-        if (!preg_match('/\./', $name)) {
+        if ($field->getOption('auto_alias') && !preg_match('/\./', $name)) {
             $name = "$alias.$name";
         }
 
