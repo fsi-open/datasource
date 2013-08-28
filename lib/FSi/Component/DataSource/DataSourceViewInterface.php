@@ -92,4 +92,9 @@ interface DataSourceViewInterface extends AttributesContainerInterface, \ArrayAc
      * @param Field\FieldViewInterface[] $fieldView
      */
     public function setFields(array $fields);
+
+    /**
+     * @return \Doctrine\Common\Collections\ArrayCollection
+     */
+    public function getResult();
 }

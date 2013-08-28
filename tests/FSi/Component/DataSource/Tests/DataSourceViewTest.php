@@ -9,6 +9,7 @@
 
 namespace FSi\Component\DataSource\Tests;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use FSi\Component\DataSource\DataSourceView;
 
 /**
@@ -65,6 +66,25 @@ class DataSourceViewTest extends \PHPUnit_Framework_TestCase
                 'other_datasource' => array()
             )
         );
+    }
+
+    /**
+     * Checks if view properly proxy some requests to datasource.
+     */
+    public function testGetResults()
+    {
+        $driver = $this->getMock('FSi\Component\DataSource\Driver\DriverInterface');
+        $datasource = $this->getMock('FSi\Component\DataSource\DataSource', array(), array($driver));
+
+        $datasource
+            ->expects($this->once())
+            ->method('getResult')
+            ->will($this->returnValue(new ArrayCollection()));
+
+        $view = new DataSourceView($datasource);
+        $view->getParameters();
+
+        $this->assertInstanceOf('Doctrine\Common\Collections\ArrayCollection', $view->getResult());
     }
 
     /**
