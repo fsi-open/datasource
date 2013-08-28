@@ -48,6 +48,12 @@ class DataSourceView extends AttributesContainer implements DataSourceViewInterf
      */
     private $iterator;
 
+
+    /**
+     * @var \Doctrine\Common\Collections\ArrayCollection
+     */
+    private $result;
+
     /**
      * Constructor.
      *
@@ -58,6 +64,7 @@ class DataSourceView extends AttributesContainer implements DataSourceViewInterf
         $this->name = $datasource->getName();
         $this->parameters = $datasource->getParameters();
         $this->otherParameters = $datasource->getOtherParameters();
+        $this->result = $datasource->getResult();
     }
 
     /**
@@ -302,5 +309,13 @@ class DataSourceView extends AttributesContainer implements DataSourceViewInterf
         if (!isset($this->iterator)) {
             $this->iterator = new \ArrayIterator($this->fields);
         }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getResult()
+    {
+        return $this->result;
     }
 }

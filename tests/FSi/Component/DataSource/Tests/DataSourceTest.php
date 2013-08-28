@@ -11,6 +11,7 @@
 
 namespace FSi\Component\DataSource\Tests;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use FSi\Component\DataSource\DataSource;
 use FSi\Component\DataSource\DataSourceInterface;
 use FSi\Component\DataSource\DataSourceViewInterface;
@@ -404,6 +405,11 @@ class DataSourceTest extends \PHPUnit_Framework_TestCase
     public function testViewCreation()
     {
         $driver = $this->getMock('FSi\Component\DataSource\Driver\DriverInterface');
+        $driver
+            ->expects($this->once())
+            ->method('getResult')
+            ->will($this->returnValue(new ArrayCollection()));
+
         $datasource = new DataSource($driver);
         $view = $datasource->createView();
         $this->assertTrue($view instanceof DataSourceViewInterface);
