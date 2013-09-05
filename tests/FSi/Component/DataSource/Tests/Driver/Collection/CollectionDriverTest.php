@@ -256,6 +256,7 @@ class CollectionDriverTest extends \PHPUnit_Framework_TestCase
         $this->setExpectedException('FSi\Component\DataSource\Driver\Collection\Exception\CollectionDriverException');
         $driver->getCriteria();
     }
+
     /**
      * {@inheritdoc}
      */
