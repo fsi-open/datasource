@@ -220,6 +220,42 @@ class CollectionDriverTest extends \PHPUnit_Framework_TestCase
         }
     }
 
+    public function testExceptions()
+    {
+        $datasourceFactory = $this->getDataSourceFactory();
+
+        $driverFactory = $this->getCollectionFactory();
+        $driver = $driverFactory->createDriver();
+
+        $driverOptions = array(
+            'collection' => $this->em->getRepository('FSi\Component\DataSource\Tests\Fixtures\News')->findAll(),
+        );
+
+        $datasource = $datasourceFactory->createDataSource('collection', $driverOptions, 'datasource');
+        $field = $this->getMock('FSi\Component\DataSource\Field\FieldTypeInterface');
+
+        $field
+            ->expects($this->any())
+            ->method('getName')
+            ->will($this->returnValue('example'))
+        ;
+
+        $datasource->addField($field);
+
+        $this->setExpectedException('FSi\Component\DataSource\Driver\Collection\Exception\CollectionDriverException');
+        $result1 = $datasource->getResult();
+    }
+
+    public function testExceptions2()
+    {
+        $datasourceFactory = $this->getDataSourceFactory();
+
+        $driverFactory = $this->getCollectionFactory();
+        $driver = $driverFactory->createDriver();
+
+        $this->setExpectedException('FSi\Component\DataSource\Driver\Collection\Exception\CollectionDriverException');
+        $driver->getCriteria();
+    }
     /**
      * {@inheritdoc}
      */
