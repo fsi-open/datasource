@@ -12,8 +12,6 @@
 namespace FSi\Component\DataSource\Extension\Symfony\Form;
 
 use FSi\Component\DataSource\DataSourceAbstractExtension;
-use FSi\Component\DataSource\DataSourceInterface;
-use FSi\Component\DataSource\DataSourceViewInterface;
 use Symfony\Component\Form\FormFactory;
 
 /**
@@ -26,14 +24,12 @@ use Symfony\Component\Form\FormFactory;
 class FormExtension extends DataSourceAbstractExtension
 {
     /**
-     * @var FormFactory
+     * @var \Symfony\Component\Form\FormFactory
      */
     private $formFactory;
 
     /**
-     * Constructor.
-     *
-     * @param FormFactory $formFactory
+     * @param \Symfony\Component\Form\FormFactory $formFactory
      */
     public function __construct(FormFactory $formFactory)
     {

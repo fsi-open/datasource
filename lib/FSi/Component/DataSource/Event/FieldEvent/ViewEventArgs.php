@@ -20,15 +20,15 @@ use FSi\Component\DataSource\Field\FieldViewInterface;
 class ViewEventArgs extends FieldEventArgs
 {
     /**
-     * @var DataSourceViewInterface
+     * @var \FSi\Component\DataSource\Field\FieldViewInterface
      */
     private $view;
 
     /**
      * Constructor.
      *
-     * @param FieldTypeInterface $field
-     * @param FieldViewInterface $view
+     * @param \FSi\Component\DataSource\Field\FieldTypeInterface $field
+     * @param \FSi\Component\DataSource\Field\FieldViewInterface $view
      */
     public function __construct(FieldTypeInterface $field, FieldViewInterface $view)
     {
@@ -37,7 +37,7 @@ class ViewEventArgs extends FieldEventArgs
     }
 
     /**
-     * @return FieldViewInterface
+     * @return \FSi\Component\DataSource\Field\FieldViewInterface
      */
     public function getView()
     {

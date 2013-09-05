@@ -16,5 +16,4 @@ namespace FSi\Component\DataSource\Exception;
  */
 class DataSourceViewException extends DataSourceException
 {
-
 }

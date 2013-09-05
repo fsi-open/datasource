@@ -15,7 +15,6 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use FSi\Component\DataSource\Exception\DataSourceException;
 use FSi\Component\DataSource\Field\FieldTypeInterface;
 use FSi\Component\DataSource\Field\FieldExtensionInterface;
-use FSi\Component\DataSource\Driver\DriverInterface;
 
 /**
  * {@inheritdoc}
@@ -111,7 +110,7 @@ abstract class DriverAbstractExtension implements DriverExtensionInterface, Even
     /**
      * Initializes every field type in extension.
      *
-     * @throws DataSourceException
+     * @throws \FSi\Component\DataSource\Exception\DataSourceException
      */
     private function initFieldsTypes()
     {
@@ -135,7 +134,7 @@ abstract class DriverAbstractExtension implements DriverExtensionInterface, Even
     /**
      * Initializes every field extension if extension.
      *
-     * @throws DataSourceExceptio
+     * @throws \FSi\Component\DataSource\Exception\DataSourceException
      */
     private function initFieldTypesExtensions()
     {

@@ -19,12 +19,26 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  */
 class DependencyInjectionExtension extends DataSourceAbstractExtension
 {
+    /**
+     * @var \Symfony\Component\DependencyInjection\ContainerInterface
+     */
     protected $container;
 
+    /**
+     * @var array
+     */
     protected $driverExtensionServiceIds;
 
+    /**
+     * @var array
+     */
     protected $subscriberServiceIds;
 
+    /**
+     * @param \Symfony\Component\DependencyInjection\ContainerInterface $container
+     * @param array $driverExtensionServiceIds
+     * @param array $subscriberServiceIds
+     */
     public function __construct(ContainerInterface $container, $driverExtensionServiceIds, $subscriberServiceIds)
     {
         $this->container = $container;
@@ -32,6 +46,9 @@ class DependencyInjectionExtension extends DataSourceAbstractExtension
         $this->subscriberServiceIds = $subscriberServiceIds;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function loadDriverExtensions()
     {
         $extensions = array();
@@ -44,6 +61,9 @@ class DependencyInjectionExtension extends DataSourceAbstractExtension
         return $extensions;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function loadSubscribers()
     {
         $subscribers = array();

@@ -14,13 +14,8 @@ namespace FSi\Component\DataSource\Extension\Symfony\Form\EventSubscriber;
 use FSi\Component\DataSource\Field\FieldViewInterface;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use FSi\Component\DataSource\DataSourceInterface;
 use FSi\Component\DataSource\Event\DataSourceEvents;
 use FSi\Component\DataSource\Event\DataSourceEvent;
-use FSi\Component\DataSource\Exception\DataSourceException;
-use FSi\Component\DataSource\Extension\Symfony\Form\FormExtension;
-use FSi\Component\DataSource\Extension\Symfony\Form\Field\FormFieldExtension;
-use FSi\Component\DataSource\Field\FieldTypeInterface;
 
 /**
  * Class contains method called during DataSource events.
@@ -37,6 +32,9 @@ class Events implements EventSubscriberInterface
         );
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function postBuildView(DataSourceEvent\ViewEventArgs $event)
     {
         $fieldViews = $event->getView()->getFields();

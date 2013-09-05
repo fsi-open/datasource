@@ -19,16 +19,38 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  */
 class DriverExtension extends DriverAbstractExtension
 {
+    /**
+     * @var \Symfony\Component\DependencyInjection\ContainerInterface
+     */
     protected $container;
 
+    /**
+     * @var string
+     */
     protected $driverType;
 
+    /**
+     * @var array
+     */
     protected $fieldServiceIds;
 
+    /**
+     * @var array
+     */
     protected $fieldExtensionServiceIds;
 
+    /**
+     * @var array
+     */
     protected $subscriberServiceIds;
 
+    /**
+     * @param \Symfony\Component\DependencyInjection\ContainerInterface $container
+     * @param string $driverType
+     * @param array $fieldServiceIds
+     * @param array $fieldExtensionServiceIds
+     * @param array $subscriberServiceIds
+     */
     public function __construct(ContainerInterface $container, $driverType, array $fieldServiceIds, array $fieldExtensionServiceIds, array $subscriberServiceIds)
     {
         $this->container = $container;
@@ -83,6 +105,9 @@ class DriverExtension extends DriverAbstractExtension
         return false;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getFieldTypeExtensions($type)
     {
         $fieldExtension = array();
@@ -91,7 +116,7 @@ class DriverExtension extends DriverAbstractExtension
             $extension = $this->container->get($this->fieldExtensionServiceIds[$alias]);
             $types = $extension->getExtendedFieldTypes();
             if (in_array($type, $types)) {
-                $fieldExtension[] = $extension;;
+                $fieldExtension[] = $extension;
             }
         }
 

@@ -24,9 +24,7 @@ class ResultEventArgs extends DriverEventArgs
     private $result;
 
     /**
-     * Constructor.
-     *
-     * @param DriverInterface $driver
+     * @param \FSi\Component\DataSource\Driver\DriverInterface $driver
      * @param array $fields
      * @param mixed $result
      */

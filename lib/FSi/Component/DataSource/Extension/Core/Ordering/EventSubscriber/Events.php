@@ -13,7 +13,6 @@ namespace FSi\Component\DataSource\Extension\Core\Ordering\EventSubscriber;
 
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use FSi\Component\DataSource\DataSourceInterface;
 use FSi\Component\DataSource\Event\DataSourceEvents;
 use FSi\Component\DataSource\Event\DataSourceEvent;
 use FSi\Component\DataSource\Exception\DataSourceException;
@@ -42,6 +41,9 @@ class Events implements EventSubscriberInterface
         );
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function preBindParameters(DataSourceEvent\ParametersEventArgs $event)
     {
         $datasource = $event->getDataSource();
@@ -64,6 +66,9 @@ class Events implements EventSubscriberInterface
         }
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function postGetParameters(DataSourceEvent\ParametersEventArgs $event)
     {
         $datasource = $event->getDataSource();
@@ -77,6 +82,11 @@ class Events implements EventSubscriberInterface
         $event->setParameters($parameters);
     }
 
+    /**
+     * @param \FSi\Component\DataSource\Field\FieldTypeInterface $field
+     * @return \FSi\Component\DataSource\Field\FieldExtensionsInterface
+     * @throws \FSi\Component\DataSource\Exception\DataSourceException
+     */
     protected function getFieldExtension(FieldTypeInterface $field)
     {
         $extensions = $field->getExtensions();

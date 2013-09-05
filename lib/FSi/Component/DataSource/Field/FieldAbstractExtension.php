@@ -42,6 +42,5 @@ class FieldAbstractExtension implements FieldExtensionInterface
      */
     public function initOptions(FieldTypeInterface $field)
     {
-
     }
 }

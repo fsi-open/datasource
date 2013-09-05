@@ -36,7 +36,7 @@ class DriverFactoryManager implements DriverFactoryManagerInterface
     }
 
     /**
-     * @param DriverFactoryInterface $factory
+     * @param \FSi\Component\DataSource\Driver\DriverFactoryInterface $factory
      */
     public function addFactory(DriverFactoryInterface $factory)
     {
@@ -45,12 +45,12 @@ class DriverFactoryManager implements DriverFactoryManagerInterface
 
     /**
      * @param $driverType
-     * @return null
+     * @return null|\FSi\Component\DataSource\Driver\DriverFactoryInterface
      */
     public function getFactory($driverType)
     {
         if (!$this->hasFactory($driverType)) {
-            return null;
+            return;
         }
 
         return $this->factories[$driverType];

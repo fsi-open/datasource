@@ -12,9 +12,6 @@
 namespace FSi\Component\DataSource\Extension\Core\Pagination;
 
 use FSi\Component\DataSource\DataSourceAbstractExtension;
-use FSi\Component\DataSource\DataSourceInterface;
-use FSi\Component\DataSource\DataSourceViewInterface;
-use Symfony\Component\Form\FormFactory;
 
 /**
  * Pagination extension adds to view some options helpfull during view rendering.
