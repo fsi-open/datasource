@@ -27,7 +27,7 @@ interface DataSourceFactoryInterface
     /**
      * Adds extension to list.
      *
-     * @param DataSourceExtensionInterface $extension
+     * @param \FSi\Component\DataSource\DataSourceExtensionInterface $extension
      */
     public function addExtension(DataSourceExtensionInterface $extension);
 
@@ -48,7 +48,7 @@ interface DataSourceFactoryInterface
     /**
      * Return array of all parameters form all datasources except given.
      *
-     * @param DataSourceInterface $datasource
+     * @param \FSi\Component\DataSource\DataSourceInterface $datasource
      * @return array
      */
     public function getOtherParameters(DataSourceInterface $datasource);
@@ -59,7 +59,7 @@ interface DataSourceFactoryInterface
      *
      * Factory also automatically sets its (datasource) factory to itself.
      *
-     * @param DataSourceInterface $datasource
+     * @param \FSi\Component\DataSource\DataSourceInterface $datasource
      */
     public function addDataSource(DataSourceInterface $datasource);
 }

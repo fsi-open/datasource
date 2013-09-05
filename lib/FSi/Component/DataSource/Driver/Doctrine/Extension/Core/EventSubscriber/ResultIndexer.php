@@ -9,15 +9,12 @@
 
 namespace FSi\Component\DataSource\Driver\Doctrine\Extension\Core\EventSubscriber;
 
-use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use FSi\Component\DataSource\Driver\Doctrine\DoctrineResult;
-use FSi\Component\DataSource\Event\DataSourceEvent;
 use FSi\Component\DataSource\Event\DriverEvent\ResultEventArgs;
 use FSi\Component\DataSource\Event\DriverEvents;
 use Symfony\Bridge\Doctrine\ManagerRegistry;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Class contains method called at BindParameters events.
@@ -30,7 +27,7 @@ class ResultIndexer implements EventSubscriberInterface
     protected $registry;
 
     /**
-     * @param ManagerRegistry $registry
+     * @param \Symfony\Bridge\Doctrine\ManagerRegistry $registry
      */
     public function __construct(ManagerRegistry $registry)
     {
@@ -46,7 +43,7 @@ class ResultIndexer implements EventSubscriberInterface
     }
 
     /**
-     * @param ResultEventArgs $event
+     * @param \FSi\Component\DataSource\Event\DriverEvent\ResultEventArgs $event
      */
     public function postGetResult(ResultEventArgs $event)
     {

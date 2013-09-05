@@ -24,9 +24,7 @@ class ResultEventArgs extends DataSourceEventArgs
     private $result;
 
     /**
-     * Constructor.
-     *
-     * @param DataSourceInterface $datasource
+     * @param \FSi\Component\DataSource\DataSourceInterface $datasource
      * @param mixed $result
      */
     public function __construct(DataSourceInterface $datasource, $result)

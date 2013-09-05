@@ -11,13 +11,9 @@ namespace FSi\Component\DataSource\Extension\Core\Ordering\Field;
 
 use FSi\Component\DataSource\Field\FieldAbstractExtension;
 use FSi\Component\DataSource\Field\FieldTypeInterface;
-use FSi\Component\DataSource\Field\FieldViewInterface;
-use FSi\Component\DataSource\DataSourceViewInterface;
 use FSi\Component\DataSource\Extension\Core\Ordering\OrderingExtension;
-use FSi\Component\DataSource\Event\DataSourceEvents;
 use FSi\Component\DataSource\Event\FieldEvents;
 use FSi\Component\DataSource\Event\FieldEvent;
-use FSi\Component\DataSource\Event\DataSourceFieldEventInterface;
 use FSi\Component\DataSource\Extension\Core\Pagination\PaginationExtension;
 
 /**
@@ -69,19 +65,26 @@ class FieldExtension extends FieldAbstractExtension
         ;
     }
 
+    /**
+     * @param \FSi\Component\DataSource\Field\FieldTypeInterface $field
+     * @param string $ordering
+     */
     public function setOrdering(FieldTypeInterface $field, $ordering)
     {
         $field_oid = spl_object_hash($field);
         $this->ordering[$field_oid] = $ordering;
     }
 
+    /**
+     * @param \FSi\Component\DataSource\Field\FieldTypeInterface $field
+     * @return string|null
+     */
     public function getOrdering(FieldTypeInterface $field)
     {
         $field_oid = spl_object_hash($field);
-        if (isset($this->ordering[$field_oid]))
+        if (isset($this->ordering[$field_oid])) {
             return $this->ordering[$field_oid];
-        else
-            return null;
+        }
     }
 
     /**

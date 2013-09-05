@@ -12,9 +12,6 @@ namespace FSi\Component\DataSource\Driver\Doctrine\Extension\Core\Field;
 use FSi\Component\DataSource\Driver\Doctrine\DoctrineAbstractField;
 use FSi\Component\DataSource\Driver\Doctrine\Exception\DoctrineDriverException;
 use Doctrine\ORM\QueryBuilder;
-use FSi\Component\DataSource\DataSourceInterface;
-use FSi\Component\DataSource\Event\FieldEvents;
-use FSi\Component\DataSource\Event\FieldEvent;
 
 /**
  * Entity field.
@@ -36,6 +33,8 @@ class Entity extends DoctrineAbstractField
 
     /**
      * {@inheritdoc}
+     *
+     * @throws \FSi\Component\DataSource\Driver\Doctrine\Exception\DoctrineDriverException
      */
     public function buildQuery(QueryBuilder $qb, $alias)
     {

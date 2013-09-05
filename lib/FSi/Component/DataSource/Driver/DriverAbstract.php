@@ -42,20 +42,18 @@ abstract class DriverAbstract implements DriverInterface
     protected $fieldExtensions = array();
 
     /**
-     * @var EventDispatcher
+     * @var \Symfony\Component\EventDispatcher\EventDispatcher
      */
     private $eventDispatcher;
 
     /**
-     * Constructor.
-     *
-     * @throws DataSourceException
      * @param $extensions array with extensions
+     * @throws \FSi\Component\DataSource\Exception\DataSourceException
      */
     public function __construct(array $extensions = array())
     {
         foreach ($extensions as $extension) {
-            if (!($extension instanceof DriverExtensionInterface)) {
+            if (!$extension instanceof DriverExtensionInterface) {
                 throw new DataSourceException(sprintf('Instance of DriverExtensionInterface expected, "%s" given.', get_class($extension)));
             }
             $this->addExtension($extension);
@@ -174,7 +172,7 @@ abstract class DriverAbstract implements DriverInterface
     /**
      * Returns reference to EventDispatcher.
      *
-     * @return EventDispatcher
+     * @return \Symfony\Component\EventDispatcher\EventDispatcher
      */
     protected function getEventDispatcher()
     {
@@ -186,7 +184,7 @@ abstract class DriverAbstract implements DriverInterface
     }
 
     /**
-     * Initialize building results i.e. prepare DQL query or initial XPath expression object
+     * Initialize building results i.e. prepare DQL query or initial XPath expression object.
      */
     abstract protected function initResult();
 
@@ -196,7 +194,7 @@ abstract class DriverAbstract implements DriverInterface
      * @param array $fields
      * @param int $first
      * @param int $max
-     * @return Countable, IteratorAggregate
+     * @return \Countable, \IteratorAggregate
      */
     abstract protected function buildResult($fields, $first, $max);
 

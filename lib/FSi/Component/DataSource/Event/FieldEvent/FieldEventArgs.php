@@ -20,14 +20,12 @@ use FSi\Component\DataSource\Field\FieldTypeInterface;
 class FieldEventArgs extends Event
 {
     /**
-     * @var FieldTypeInterface
+     * @var \FSi\Component\DataSource\Field\FieldTypeInterface
      */
     private $field;
 
     /**
-     * Constructor.
-     *
-     * @param FieldTypeInterface $field
+     * @param \FSi\Component\DataSource\Field\FieldTypeInterface $field
      */
     public function __construct(FieldTypeInterface $field)
     {
@@ -35,7 +33,7 @@ class FieldEventArgs extends Event
     }
 
     /**
-     * @return FieldTypeInterface
+     * @return \FSi\Component\DataSource\Field\FieldTypeInterface
      */
     public function getField()
     {

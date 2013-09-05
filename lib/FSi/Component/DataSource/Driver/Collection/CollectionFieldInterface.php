@@ -19,7 +19,7 @@ interface CollectionFieldInterface
     /**
      * Builds criteria.
      *
-     * @param Criteria $c
+     * @param \Doctrine\Common\Collections\Criteria $c
      */
     public function buildCriteria(Criteria $c);
 

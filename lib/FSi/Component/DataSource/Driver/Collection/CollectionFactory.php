@@ -31,8 +31,6 @@ class CollectionFactory implements DriverFactoryInterface
     private $optionsResolver;
 
     /**
-     * Constructor.
-     *
      * @param array $extensions
      */
     public function __construct($extensions = array())
@@ -54,7 +52,7 @@ class CollectionFactory implements DriverFactoryInterface
      * Creates driver.
      *
      * @param array $options
-     * @return CollectionDriver
+     * @return \FSi\Component\DataSource\Driver\Collection\CollectionDriver
      */
     public function createDriver($options = array())
     {

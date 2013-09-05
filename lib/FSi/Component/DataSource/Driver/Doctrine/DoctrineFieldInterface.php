@@ -19,7 +19,7 @@ interface DoctrineFieldInterface
     /**
      * Builds query.
      *
-     * @param QueryBuilder $qb
+     * @param \Doctrine\ORM\QueryBuilder $qb
      * @param string $alias
      */
     public function buildQuery(QueryBuilder $qb, $alias);

@@ -56,7 +56,7 @@ interface DriverExtensionInterface
     /**
      * Loads events subscribers.
      *
-     * Each subscriber must implements Symfony\Component\EventDispatcher\EventSubscriberInterface.
+     * Each subscriber must implements \Symfony\Component\EventDispatcher\EventSubscriberInterface.
      *
      * @return array
      */

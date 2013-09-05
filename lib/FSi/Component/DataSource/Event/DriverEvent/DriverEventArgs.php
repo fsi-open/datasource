@@ -20,7 +20,7 @@ use FSi\Component\DataSource\Driver\DriverInterface;
 class DriverEventArgs extends Event
 {
     /**
-     * @var DriverInterface
+     * @var \FSi\Component\DataSource\Driver\DriverInterface
      */
     private $driver;
 
@@ -30,9 +30,7 @@ class DriverEventArgs extends Event
     private $fields;
 
     /**
-     * Constructor.
-     *
-     * @param DriverInterface $driver
+     * @param \FSi\Component\DataSource\Driver\DriverInterface $driver
      * @param array $fields
      */
     public function __construct(DriverInterface $driver, array $fields)
@@ -42,7 +40,7 @@ class DriverEventArgs extends Event
     }
 
     /**
-     * @return DriverInterface
+     * @return \FSi\Component\DataSource\Driver\DriverInterface
      */
     public function getDriver()
     {

@@ -9,15 +9,10 @@
 
 namespace FSi\Component\DataSource\Extension\Core\Ordering\Driver;
 
-use FSi\Component\DataSource\Exception\DataSourceException;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use FSi\Component\DataSource\Extension\Core\Ordering\OrderingExtension;
-use FSi\Component\DataSource\Event\DriverEvent\DriverEventArgs;
 use FSi\Component\DataSource\Field\FieldTypeInterface;
 use FSi\Component\DataSource\Driver\DriverAbstractExtension;
 use FSi\Component\DataSource\Extension\Core\Ordering\Field\FieldExtension;
 use FSi\Component\DataSource\Event\DriverEvents;
-use FSi\Component\DataSource\Event\DriverEvent;
 
 /**
  * Driver extension for ordering that loads fields extension.
@@ -44,6 +39,10 @@ abstract class DriverExtension extends DriverAbstractExtension
         );
     }
 
+    /**
+     * @param \FSi\Component\DataSource\Field\FieldTypeInterface $field
+     * @return \FSi\Component\DataSource\Extension\Core\Ordering\Field\FieldExtension|null
+     */
     protected function getFieldExtension(FieldTypeInterface $field)
     {
         $extensions = (array) $field->getExtensions();
@@ -52,9 +51,12 @@ abstract class DriverExtension extends DriverAbstractExtension
                 return $extension;
             }
         }
-        return null;
     }
 
+    /**
+     * @param array $fields
+     * @return array
+     */
     protected function sortFields(array $fields)
     {
         $sortedFields = array();
@@ -80,8 +82,10 @@ abstract class DriverExtension extends DriverAbstractExtension
             switch (true) {
                 case $a->hasOption('default_sort') && !$b->hasOption('default_sort'):
                     return -1;
+
                 case !$a->hasOption('default_sort') && $b->hasOption('default_sort'):
                     return 1;
+
                 case $a->hasOption('default_sort') && $b->hasOption('default_sort'):
                     switch (true) {
                         case $a->hasOption('default_sort_priority') && !$b->hasOption('default_sort_priority'):
@@ -93,6 +97,7 @@ abstract class DriverExtension extends DriverAbstractExtension
                             $bPriority = $b->getOption('default_sort_priority');
                             return ($aPriority != $bPriority) ? (($aPriority > $bPriority) ? -1 : 1) : 0;
                     }
+
                 default:
                     return 0;
             }

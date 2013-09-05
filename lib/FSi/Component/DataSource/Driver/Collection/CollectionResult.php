@@ -14,8 +14,15 @@ use Doctrine\Common\Collections\Criteria;
 
 class CollectionResult extends ArrayCollection
 {
+    /**
+     * @var int
+     */
     private $count;
 
+    /**
+     * @param array $elements
+     * @param \Doctrine\Common\Collections\Criteria $criteria
+     */
     public function __construct(array $elements = array(), Criteria $criteria)
     {
         $collection = new ArrayCollection($elements);
@@ -28,6 +35,9 @@ class CollectionResult extends ArrayCollection
         parent::__construct($collection->slice($firstResult, $maxResults));
     }
 
+    /**
+     * @return int
+     */
     public function count()
     {
         return $this->count;

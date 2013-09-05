@@ -47,6 +47,8 @@ interface DataSourceInterface
      * @param string $type
      * @param string $comparison
      * @param array $options
+     * @return \FSi\Component\DataSource\DataSourceInterface
+     * @throws \FSi\Component\DataSource\Exception\DataSourceException
      */
     public function addField($name, $type = null, $comparison = null, $options = array());
 
@@ -71,11 +73,14 @@ interface DataSourceInterface
      * Returns array of all fields.
      *
      * @return array
+     * @throws \FSi\Component\DataSource\Exception\DataSourceException
      */
     public function getFields();
 
     /**
      * Removes all fields from datasource.
+     *
+     * @return \FSi\Component\DataSource\DataSourceInterface
      */
     public function clearFields();
 
@@ -128,14 +133,15 @@ interface DataSourceInterface
      *
      * It should just proxy request to driver.
      *
-     * @return Countable, IteratorAggregate
+     * @return \Countable, \IteratorAggregate
+     * @throws \FSi\Component\DataSource\Exception\DataSourceException
      */
     public function getResult();
 
     /**
      * Adds extension.
      *
-     * @param DataSourceExtensionInterface $extension
+     * @param \FSi\Component\DataSource\DataSourceExtensionInterface $extension
      */
     public function addExtension(DataSourceExtensionInterface $extension);
 
@@ -149,7 +155,7 @@ interface DataSourceInterface
     /**
      * Return ready view.
      *
-     * @return DataSourceViewInterface
+     * @return \FSi\Component\DataSource\DataSourceViewInterface
      */
     public function createView();
 
@@ -187,14 +193,14 @@ interface DataSourceInterface
      *
      * DataSource needs that reference for example during getAllParameters method.
      *
-     * @param DataSourceFactoryInterface $factory
+     * @param \FSi\Component\DataSource\DataSourceFactoryInterface $factory
      */
     public function setFactory(DataSourceFactoryInterface $factory);
 
     /**
      * Return assigned factory.
      *
-     * @return DataSourceFactoryInterface|null
+     * @return \FSi\Component\DataSource\DataSourceFactoryInterface|null
      */
     public function getFactory();
 }

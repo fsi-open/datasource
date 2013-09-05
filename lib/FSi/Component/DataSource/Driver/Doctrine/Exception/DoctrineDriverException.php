@@ -16,5 +16,4 @@ use FSi\Component\DataSource\Exception\DataSourceException;
  */
 class DoctrineDriverException extends DataSourceException
 {
-
 }

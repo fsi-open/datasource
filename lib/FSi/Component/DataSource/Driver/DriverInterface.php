@@ -26,14 +26,14 @@ interface DriverInterface
     /**
      * Sets reference to DataSource.
      *
-     * @param DataSourceInterface $datasource
+     * @param \FSi\Component\DataSource\DataSourceInterface $datasource
      */
     public function setDataSource(DataSourceInterface $datasource);
 
     /**
      * Return reference to assigned DataSource.
      *
-     * @return DataSourceInterface
+     * @return \FSi\Component\DataSource\DataSourceInterface
      */
     public function getDataSource();
 
@@ -61,7 +61,7 @@ interface DriverInterface
      * @param array $fields
      * @param int $first
      * @param int $max
-     * @return Countable, IteratorAggregate
+     * @return \Countable, \IteratorAggregate
      */
     public function getResult($fields, $first, $max);
 
@@ -75,7 +75,7 @@ interface DriverInterface
     /**
      * Adds extension to driver.
      *
-     * @param unknown_type $extension
+     * @param \FSi\Component\DataSource\Driver\DriverExtensionInterface $extension
      */
     public function addExtension(DriverExtensionInterface $extension);
 }

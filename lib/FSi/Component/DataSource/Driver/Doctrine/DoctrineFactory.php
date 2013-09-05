@@ -21,7 +21,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 class DoctrineFactory implements DriverFactoryInterface
 {
     /**
-     * @var ManagerRegistry
+     * @var \Doctrine\Common\Persistence\ManagerRegistry
      */
     private $registry;
 
@@ -69,15 +69,15 @@ class DoctrineFactory implements DriverFactoryInterface
             $em = $this->registry->getManager($options['em']);
         }
 
-        $entity = isset($options['entity'])
-            ? $options['entity']
-            : $options['qb'];
+        $entity = isset($options['entity']) ? $options['entity'] : $options['qb'];
 
         return new DoctrineDriver($this->extensions, $em, $entity, $options['alias']);
     }
 
     /**
      * Initialize Options Resolvers for driver and datasource builder.
+     *
+     * @throws \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
      */
     private function initOptions()
     {
@@ -85,14 +85,14 @@ class DoctrineFactory implements DriverFactoryInterface
             'entity' => null,
             'qb' => null,
             'alias' => null,
-            'em' => null
+            'em' => null,
         ));
 
         $this->optionsResolver->setAllowedTypes(array(
             'entity' => array('string', 'null'),
             'qb' => array('\Doctrine\ORM\QueryBuilder', 'null'),
             'alias' => array('null', 'string'),
-            'em' => array('null', 'string')
+            'em' => array('null', 'string'),
         ));
 
         $entityNormalizer = function(Options $options, $value) {
@@ -104,7 +104,7 @@ class DoctrineFactory implements DriverFactoryInterface
         };
 
         $this->optionsResolver->setNormalizers(array(
-            'entity' => $entityNormalizer
+            'entity' => $entityNormalizer,
         ));
     }
 }

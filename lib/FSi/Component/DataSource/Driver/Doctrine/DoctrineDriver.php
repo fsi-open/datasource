@@ -27,7 +27,7 @@ class DoctrineDriver extends DriverAbstract
     const DEFAULT_ENTITY_ALIAS = 'e';
 
     /**
-     * @var EntityManager
+     * @var \Doctrine\ORM\EntityManager
      */
     private $em;
 
@@ -42,25 +42,23 @@ class DoctrineDriver extends DriverAbstract
     /**
      * Template query builder.
      *
-     * @var QueryBuilder
+     * @var \Doctrine\ORM\QueryBuilder
      */
     private $query;
 
     /**
-     * Query builder available during preGetResult event
+     * Query builder available during preGetResult event.
      *
-     * @var QueryBuilder
+     * @var \Doctrine\ORM\QueryBuilder
      */
     private $currentQuery;
 
     /**
-     * Constructor.
-     *
-     * @throws DoctrineDriverException
      * @param array $extensions
-     * @param EntityManager $em
-     * @param string|QueryBuilder $entity
+     * @param \Doctrine\ORM\EntityManager $em
+     * @param string|\Doctrine\ORM\QueryBuilder $entity
      * @param string $alias
+     * @throws \FSi\Component\DataSource\Driver\Doctrine\Exception\DoctrineDriverException
      */
     public function __construct($extensions, EntityManager $em, $entity, $alias = null)
     {
@@ -99,6 +97,9 @@ class DoctrineDriver extends DriverAbstract
         return 'doctrine';
     }
 
+    /**
+     * @return string
+     */
     public function getAlias()
     {
         return $this->alias;
@@ -142,7 +143,7 @@ class DoctrineDriver extends DriverAbstract
      *
      * If query is set to null (so when getResult method is NOT executed at the moment) exception is throwed.
      *
-     * @return QueryBuilder
+     * @return \Doctrine\ORM\QueryBuilder
      */
     public function getQueryBuilder()
     {

@@ -12,8 +12,6 @@ namespace FSi\Component\DataSource\Driver\Doctrine;
 use FSi\Component\DataSource\Field\FieldAbstractType;
 use FSi\Component\DataSource\Driver\Doctrine\Exception\DoctrineDriverException;
 use Doctrine\ORM\QueryBuilder;
-use FSi\Component\DataSource\Extension\Core\Ordering\OrderingExtension;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 /**
  * {@inheritdoc}
