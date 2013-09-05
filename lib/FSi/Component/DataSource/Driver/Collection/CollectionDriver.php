@@ -12,6 +12,7 @@ namespace FSi\Component\DataSource\Driver\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Criteria;
 use FSi\Component\DataSource\Driver\DriverAbstract;
+use FSi\Component\DataSource\Driver\Collection\Exception\CollectionDriverException;
 
 class CollectionDriver extends DriverAbstract
 {
@@ -68,7 +69,7 @@ class CollectionDriver extends DriverAbstract
     public function getCriteria()
     {
         if (!isset($this->currentCriteria)) {
-            throw new DoctrineDriverException('Criteria is accessible only during preGetResult event.');
+            throw new CollectionDriverException('Criteria is accessible only during preGetResult event.');
         }
 
         return $this->currentCriteria;

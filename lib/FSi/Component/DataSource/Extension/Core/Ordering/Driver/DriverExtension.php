@@ -46,7 +46,7 @@ abstract class DriverExtension extends DriverAbstractExtension
 
     protected function getFieldExtension(FieldTypeInterface $field)
     {
-        $extensions = $field->getExtensions();
+        $extensions = (array) $field->getExtensions();
         foreach ($extensions as $extension) {
             if ($extension instanceof FieldExtension) {
                 return $extension;
