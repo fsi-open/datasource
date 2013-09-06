@@ -17,19 +17,16 @@ use Symfony\Component\Form\FormFactory;
 
 /**
  * Driver extension for form that loads fields extension.
- *
  */
 class DriverExtension extends DriverAbstractExtension
 {
     /**
-     * @var FormFactory
+     * @var \Symfony\Component\Form\FormFactory
      */
     private $formFactory;
 
     /**
-     * Constructor.
-     *
-     * @param FormFactory $formFactory
+     * @param \Symfony\Component\Form\FormFactory $formFactory
      */
     public function __construct(FormFactory $formFactory)
     {

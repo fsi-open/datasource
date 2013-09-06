@@ -11,7 +11,6 @@
 
 namespace FSi\Component\DataSource\Driver\Collection;
 
-use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Criteria;
 use FSi\Component\DataSource\Driver\DriverAbstract;
 use FSi\Component\DataSource\Driver\Collection\Exception\CollectionDriverException;
@@ -21,18 +20,25 @@ class CollectionDriver extends DriverAbstract
     private $collection;
 
     /**
-     * Criteria available during preGetResult event
+     * Criteria available during preGetResult event.
      *
-     * @var Criteria
+     * @var \CriteriDoctrine\Common\Collections\Criteria
      */
     private $currentCriteria;
 
+    /**
+     * @param array $extensions
+     * @param array $collection
+     */
     public function __construct(array $extensions, array $collection)
     {
         parent::__construct($extensions);
         $this->collection = $collection;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getType()
     {
         return 'collection';
@@ -43,6 +49,13 @@ class CollectionDriver extends DriverAbstract
         $this->currentCriteria = new Criteria();
     }
 
+    /**
+     * @param array $fields
+     * @param int $first
+     * @param int $max
+     * @return \FSi\Component\DataSource\Driver\Collection\CollectionResult
+     * @throws \FSi\Component\DataSource\Driver\Collection\Exception\CollectionDriverException
+     */
     protected function buildResult($fields, $first, $max)
     {
         foreach ($fields as $field) {
@@ -66,7 +79,8 @@ class CollectionDriver extends DriverAbstract
      *
      * If criteria is set to null (so when getResult method is NOT executed at the moment) exception is throwed.
      *
-     * @return Criteria
+     * @return \CriteriDoctrine\Common\Collections\Criteria
+     * @throws \FSi\Component\DataSource\Driver\Doctrine\Exception\DoctrineDriverException
      */
     public function getCriteria()
     {

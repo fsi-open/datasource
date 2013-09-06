@@ -57,7 +57,7 @@ class DataSourceView extends AttributesContainer implements DataSourceViewInterf
     /**
      * Constructor.
      *
-     * @param DataSource $datasource
+     * @param \FSi\Component\DataSource\DataSource $datasource
      */
     public function __construct(DataSource $datasource)
     {
@@ -144,6 +144,7 @@ class DataSourceView extends AttributesContainer implements DataSourceViewInterf
     public function clearFields()
     {
         $this->fields = array();
+
         return $this;
     }
 
@@ -170,7 +171,7 @@ class DataSourceView extends AttributesContainer implements DataSourceViewInterf
         $this->fields = array();
 
         foreach ($fields as $field) {
-            if (!($field instanceof Field\FieldViewInterface)) {
+            if (!$field instanceof Field\FieldViewInterface) {
                 throw new \InvalidArgumentException('Field must implement FSi\Component\DataSource\Field\FieldViewInterface');
             }
 
@@ -214,7 +215,6 @@ class DataSourceView extends AttributesContainer implements DataSourceViewInterf
      */
     public function offsetSet($offset, $value)
     {
-        return;
     }
 
     /**
@@ -226,7 +226,6 @@ class DataSourceView extends AttributesContainer implements DataSourceViewInterf
      */
     public function offsetUnset($offset)
     {
-        return;
     }
 
     /**
@@ -247,6 +246,7 @@ class DataSourceView extends AttributesContainer implements DataSourceViewInterf
     public function seek($position)
     {
         $this->checkIterator();
+
         return $this->iterator->seek($position);
     }
 
@@ -258,6 +258,7 @@ class DataSourceView extends AttributesContainer implements DataSourceViewInterf
     public function current()
     {
         $this->checkIterator();
+
         return $this->iterator->current();
     }
 
@@ -269,6 +270,7 @@ class DataSourceView extends AttributesContainer implements DataSourceViewInterf
     public function key()
     {
         $this->checkIterator();
+
         return $this->iterator->key();
     }
 
@@ -278,6 +280,7 @@ class DataSourceView extends AttributesContainer implements DataSourceViewInterf
     public function next()
     {
         $this->checkIterator();
+
         return $this->iterator->next();
     }
 
@@ -287,6 +290,7 @@ class DataSourceView extends AttributesContainer implements DataSourceViewInterf
     public function rewind()
     {
         $this->checkIterator();
+
         return $this->iterator->rewind();
     }
 
@@ -298,11 +302,12 @@ class DataSourceView extends AttributesContainer implements DataSourceViewInterf
     public function valid()
     {
         $this->checkIterator();
+
         return $this->iterator->valid();
     }
 
     /**
-     * Inits iterator.
+     * Init iterator.
      */
     private function checkIterator()
     {

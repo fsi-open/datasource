@@ -10,6 +10,7 @@
  */
 
 namespace FSi\Component\DataSource;
+
 use FSi\Component\DataSource\Util\AttributesContainerInterface;
 
 /**
@@ -84,14 +85,16 @@ interface DataSourceViewInterface extends AttributesContainerInterface, \ArrayAc
     /**
      * Adds new field view.
      *
-     * @param Field\FieldViewInterface $fieldView
+     * @param \FSi\Component\DataSource\Field\FieldViewInterface $fieldView
      */
     public function addField(Field\FieldViewInterface $fieldView);
 
     /**
      * Replace fields with specified ones.
      *
-     * @param Field\FieldViewInterface[] $fieldView
+     * Each of field must be instance of \FSi\Component\DataSource\Field\FieldViewInterface
+     *
+     * @param \FSi\Component\DataSource\Field\FieldViewInterface[] $fieldView
      */
     public function setFields(array $fields);
 

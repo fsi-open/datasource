@@ -26,7 +26,7 @@ class ParametersEventArgs extends DataSourceEventArgs
     /**
      * Constructor.
      *
-     * @param DataSourceInterface $datasource
+     * @param \FSi\Component\DataSource\DataSourceInterface $datasource
      * @param array $parameters
      */
     public function __construct(DataSourceInterface $datasource, $parameters)

@@ -12,8 +12,6 @@
 namespace FSi\Component\DataSource\Extension\Symfony\Core;
 
 use FSi\Component\DataSource\DataSourceAbstractExtension;
-use FSi\Component\DataSource\DataSourceInterface;
-use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Main extension for all Symfony based extensions. Its main purpose is to

@@ -14,13 +14,13 @@ namespace FSi\Component\DataSource\Driver;
 interface DriverFactoryManagerInterface
 {
     /**
-     * @param DriverFactoryInterface $factory
+     * @param \FSi\Component\DataSource\Driver\DriverFactoryInterface $factory
      */
     public function addFactory(DriverFactoryInterface $factory);
 
     /**
      * @param $driverType
-     * @return null|DriverFactoryInterface
+     * @return null|\FSi\Component\DataSource\Driver\DriverFactoryInterface
      */
     public function getFactory($driverType);
 

@@ -14,7 +14,6 @@ namespace FSi\Component\DataSource;
 use FSi\Component\DataSource\Driver\DriverInterface;
 use FSi\Component\DataSource\Exception\DataSourceException;
 use FSi\Component\DataSource\Field\FieldTypeInterface;
-use FSi\Component\DataSource\Field\FieldView;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use FSi\Component\DataSource\Event\DataSourceEvents;
 use FSi\Component\DataSource\Event\DataSourceEvent;
@@ -27,7 +26,7 @@ class DataSource implements DataSourceInterface
     /**
      * Driver.
      *
-     * @var Driver\DriverInterface
+     * @var \FSi\Component\DataSource\Driver\DriverInterface
      */
     private $driver;
 
@@ -53,12 +52,12 @@ class DataSource implements DataSourceInterface
     private $extensions = array();
 
     /**
-     * @var DataSourceView
+     * @var \FSi\Component\DataSource\DataSourceView
      */
     private $view;
 
     /**
-     * @var DataSourceFactoryInterface
+     * @var \FSi\Component\DataSource\DataSourceFactoryInterface
      */
     private $factory;
 
@@ -91,15 +90,14 @@ class DataSource implements DataSourceInterface
     private $dirty = true;
 
     /**
-     * @var EventDispatcher
+     * @var \Symfony\Component\EventDispatcher\EventDispatcher
      */
     private $eventDispatcher;
 
     /**
-     * Constructor.
-     *
-     * @param DriverInterface $driver
+     * @param \FSi\Component\DataSource\Driver\DriverInterface $driver
      * @param string $name
+     * @throws \FSi\Component\DataSource\Exception\DataSourceException
      */
     public function __construct(DriverInterface $driver, $name = 'datasource')
     {
@@ -129,9 +127,6 @@ class DataSource implements DataSourceInterface
 
     /**
      * {@inheritdoc}
-     *
-     * @throws DataSourceException
-     * @return DataSource
      */
     public function addField($name, $type = null, $comparison = null, $options = array())
     {
@@ -189,8 +184,6 @@ class DataSource implements DataSourceInterface
 
     /**
      * {@inheritdoc}
-     *
-     * @throws DataSourceException
      */
     public function getField($name)
     {
@@ -216,6 +209,7 @@ class DataSource implements DataSourceInterface
     {
         $this->fields = array();
         $this->dirty = true;
+
         return $this;
     }
 
@@ -246,8 +240,6 @@ class DataSource implements DataSourceInterface
 
     /**
      * {@inheritdoc}
-     *
-     * @throws DataSourceException
      */
     public function getResult()
     {
@@ -301,6 +293,7 @@ class DataSource implements DataSourceInterface
     {
         $this->dirty = true;
         $this->maxResults = $max;
+
         return $this;
     }
 
@@ -311,6 +304,7 @@ class DataSource implements DataSourceInterface
     {
         $this->dirty = true;
         $this->firstResult = $first;
+
         return $this;
     }
 
@@ -454,6 +448,7 @@ class DataSource implements DataSourceInterface
     public function setFactory(DataSourceFactoryInterface $factory)
     {
         $this->factory = $factory;
+
         return $this;
     }
 

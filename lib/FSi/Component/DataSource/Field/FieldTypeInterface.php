@@ -11,9 +11,7 @@
 
 namespace FSi\Component\DataSource\Field;
 
-use FSi\Component\DataSource\Field\FieldViewInterface;
 use FSi\Component\DataSource\DataSourceInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 /**
  * Field of DataSource.
@@ -116,7 +114,7 @@ interface FieldTypeInterface
     /**
      * Adds extension to field.
      *
-     * @param FieldExtensionInterface $extension
+     * @param \FSi\Component\DataSource\Field\FieldExtensionInterface $extension
      */
     public function addExtension(FieldExtensionInterface $extension);
 
@@ -137,7 +135,7 @@ interface FieldTypeInterface
     /**
      * Builds view.
      *
-     * @return FieldViewInterface
+     * @return \FSi\Component\DataSource\Field\FieldViewInterface\FieldViewInterface
      */
     public function createView();
 
@@ -158,14 +156,14 @@ interface FieldTypeInterface
     /**
      * Sets reference to datasource.
      *
-     * @param DataSourceInterface $datasource
+     * @param \FSi\Component\DataSource\DataSourceInterface $datasource
      */
     public function setDataSource(DataSourceInterface $datasource);
 
     /**
      * Returns datasource.
      *
-     * @return DataSourceInterface|null
+     * @return \FSi\Component\DataSource\DataSourceInterface|null
      */
     public function getDataSource();
 

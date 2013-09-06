@@ -15,7 +15,6 @@ use FSi\Component\DataSource\Field\FieldAbstractExtension;
 use FSi\Component\DataSource\Field\FieldTypeInterface;
 use FSi\Component\DataSource\DataSourceInterface;
 use Symfony\Component\Form\FormFactory;
-use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\FormInterface;
 use FSi\Component\DataSource\Event\FieldEvents;
 use FSi\Component\DataSource\Event\FieldEvent;
@@ -26,7 +25,7 @@ use FSi\Component\DataSource\Event\FieldEvent;
 class FormFieldExtension extends FieldAbstractExtension
 {
     /**
-     * @var FormFactory
+     * @var \Symfony\Component\Form\FormFactory
      */
     protected $formFactory;
 
@@ -57,7 +56,7 @@ class FormFieldExtension extends FieldAbstractExtension
     /**
      * Constructor.
      *
-     * @param FormFactory $formFactory
+     * @param \Symfony\Component\Form\FormFactory $formFactory
      */
     public function __construct(FormFactory $formFactory)
     {
@@ -180,7 +179,7 @@ class FormFieldExtension extends FieldAbstractExtension
     /**
      * Builds form.
      *
-     * @param FieldTypeInterface $field
+     * @param \FSi\Component\DataSource\Field\FieldTypeInterface $field
      * @param bool $force
      * @return \Symfony\Component\Form\Form
      */
@@ -225,8 +224,8 @@ class FormFieldExtension extends FieldAbstractExtension
     }
 
     /**
-     * @param FormInterface $form
-     * @param FieldTypeInterface $field
+     * @param \Symfony\Component\Form\FormInterface $form
+     * @param \FSi\Component\DataSource\Field\FieldTypeInterface $field
      * @param array $options
      */
     protected function buildBetweenComparisonForm(FormInterface $form, FieldTypeInterface $field, $options = array())
@@ -250,8 +249,8 @@ class FormFieldExtension extends FieldAbstractExtension
     }
 
     /**
-     * @param FormInterface $form
-     * @param FieldTypeInterface $field
+     * @param \Symfony\Component\Form\FormInterface $form
+     * @param \FSi\Component\DataSource\Field\FieldTypeInterface $field
      * @param array $options
      */
     protected function buildIsNullComparisonForm(FormInterface $form, FieldTypeInterface $field, $options = array())
@@ -259,7 +258,7 @@ class FormFieldExtension extends FieldAbstractExtension
         $defaultOptions = array(
             'choices' => array(
                 'null' => 'datasource.form.choices.isnull',
-                'notnull' => 'datasource.form.choices.isnotnull'
+                'notnull' => 'datasource.form.choices.isnotnull',
             ),
             'multiple' => false,
             'empty_value' => '',
@@ -278,7 +277,7 @@ class FormFieldExtension extends FieldAbstractExtension
     }
 
     /**
-     * @return FormFactory
+     * @return \Symfony\Component\Form\FormFactory
      */
     protected function getFormFactory()
     {

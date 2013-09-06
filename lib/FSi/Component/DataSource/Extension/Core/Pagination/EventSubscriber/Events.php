@@ -15,7 +15,6 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use FSi\Component\DataSource\Event\DataSourceEvents;
 use FSi\Component\DataSource\Event\DataSourceEvent;
 use FSi\Component\DataSource\Extension\Core\Pagination\PaginationExtension;
-use FSi\Component\DataSource\DataSourceInterface;
 
 /**
  * Class contains method called during DataSource events.
@@ -39,7 +38,7 @@ class Events implements EventSubscriberInterface
      *
      * Sets proper page.
      *
-     * @param DataSourceEvent\ParametersEventArgs $event
+     * @param \FSi\Component\DataSource\Event\DataSourceEvent\ParametersEventArgs $event
      */
     public function preBindParameters(DataSourceEvent\ParametersEventArgs $event)
     {
@@ -59,6 +58,9 @@ class Events implements EventSubscriberInterface
         $datasource->setFirstResult(($page - 1) * $datasource->getMaxResults());
     }
 
+    /**
+     * @param \FSi\Component\DataSource\Event\DataSourceEvent\ParametersEventArgs $event
+     */
     public function postGetParameters(DataSourceEvent\ParametersEventArgs $event)
     {
         $datasource = $event->getDataSource();
@@ -89,7 +91,7 @@ class Events implements EventSubscriberInterface
     /**
      * Method called at PostBuildView event.
      *
-     * @param DataSourceEvent\ViewEventArgs $event
+     * @param \FSi\Component\DataSource\Event\ViewEventArgs $event
      */
     public function postBuildView(DataSourceEvent\ViewEventArgs $event)
     {

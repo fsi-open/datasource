@@ -28,7 +28,7 @@ class DataSourceFactory implements DataSourceFactoryInterface
     protected $datasources;
 
     /**
-     * @var Driver\DriverFactoryManagerInterface
+     * @var \FSi\Component\DataSource\Driver\DriverFactoryManagerInterface
      */
     protected $driverFactoryManager;
 
@@ -40,16 +40,16 @@ class DataSourceFactory implements DataSourceFactoryInterface
     protected $extensions = array();
 
     /**
-     * @param DriverFactoryManagerInterface $driverFactoryManager
+     * @param \FSi\Component\DataSource\Driver\DriverFactoryManagerInterface $driverFactoryManager
      * @param array $extensions
-     * @throws Exception\DataSourceException
+     * @throws \FSi\Component\DataSource\Exception\DataSourceException
      */
     public function __construct(DriverFactoryManagerInterface $driverFactoryManager, $extensions = array())
     {
         $this->driverFactoryManager = $driverFactoryManager;
 
         foreach ($extensions as $extension) {
-            if (!($extension instanceof DataSourceExtensionInterface)) {
+            if (!$extension instanceof DataSourceExtensionInterface) {
                 throw new DataSourceException(sprintf('Instance of DataSourceExtensionInterface expected, "%s" given.', is_object($extension) ? get_class($extension) : gettype($extension)));
             }
         }
@@ -151,9 +151,9 @@ class DataSourceFactory implements DataSourceFactoryInterface
     /**
      * Method to checking datasources name.
      *
-     * @throws DataSourceException
+     * @throws \FSi\Component\DataSource\Exception\DataSourceException
      * @param string $name
-     * @param DataSourceInterface $datasource
+     * @param \FSi\Component\DataSource\DataSourceInterface $datasource
      *
      */
     private function checkDataSourceName($name, DataSourceInterface $datasource = null)

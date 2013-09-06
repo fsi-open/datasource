@@ -11,15 +11,12 @@
 
 namespace FSi\Component\DataSource\Field;
 
-use FSi\Component\DataSource\Field\FieldViewInterface;
 use FSi\Component\DataSource\Exception\FieldException;
 use FSi\Component\DataSource\DataSourceInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use FSi\Component\DataSource\Event\FieldEvents;
 use FSi\Component\DataSource\Event\FieldEvent;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 /**
  * {@inheritdoc}
@@ -69,17 +66,17 @@ abstract class FieldAbstractType implements FieldTypeInterface
     protected $dirty = true;
 
     /**
-     * @var DataSourceInterface
+     * @var \FSi\Component\DataSource\DataSourceInterface
      */
     protected $datasource;
 
     /**
-     * @var EventDispatcher
+     * @var \Symfony\Component\EventDispatcher\EventDispatcher
      */
     private $eventDispatcher;
 
     /**
-     * @var OptionsResolver
+     * @var \Symfony\Component\OptionsResolver\OptionsResolver
      */
     private $optionsResolver;
 
@@ -115,6 +112,8 @@ abstract class FieldAbstractType implements FieldTypeInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @throws \FSi\Component\DataSource\Exception\FieldException
      */
     public function setComparison($comparison)
     {
@@ -143,8 +142,6 @@ abstract class FieldAbstractType implements FieldTypeInterface
 
     /**
      * {@inheritdoc}
-     *
-     * @throws FieldException
      */
     public function setOptions($options)
     {
@@ -162,7 +159,7 @@ abstract class FieldAbstractType implements FieldTypeInterface
     /**
      * {@inheritdoc}
      *
-     * @throws FieldException
+     * @throws \FSi\Component\DataSource\Exception\FieldException
      */
     public function getOption($name)
     {
@@ -262,7 +259,7 @@ abstract class FieldAbstractType implements FieldTypeInterface
     public function setExtensions(array $extensions)
     {
         foreach ($extensions as $extension) {
-            if (!($extension instanceof FieldExtensionInterface)) {
+            if (!$extension instanceof FieldExtensionInterface) {
                 throw new FieldException(sprintf('Expected instance of FieldExtensionInterface, %s given', get_class($extension)));
             }
             $this->getEventDispatcher()->addSubscriber($extension);

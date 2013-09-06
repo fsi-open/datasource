@@ -24,9 +24,7 @@ class ParameterEventArgs extends FieldEventArgs
     private $parameter;
 
     /**
-     * Constructor.
-     *
-     * @param FieldTypeInterface $field
+     * @param \FSi\Component\DataSource\Field\FieldTypeInterface $field
      */
     public function __construct(FieldTypeInterface $field, $parameter)
     {

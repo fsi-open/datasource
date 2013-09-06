@@ -20,14 +20,14 @@ use FSi\Component\DataSource\DataSourceInterface;
 class DataSourceEventArgs extends Event
 {
     /**
-     * @var DataSourceInterface
+     * @var \FSi\Component\DataSource\DataSourceInterface
      */
     private $datasource;
 
     /**
      * Constructor.
      *
-     * @param DataSourceInterface $datasource
+     * @param \FSi\Component\DataSource\DataSourceInterface $datasource
      */
     public function __construct(DataSourceInterface $datasource)
     {
@@ -35,7 +35,7 @@ class DataSourceEventArgs extends Event
     }
 
     /**
-     * @return DataSourceInterface
+     * @return \FSi\Component\DataSource\DataSourceInterface
      */
     public function getDataSource()
     {

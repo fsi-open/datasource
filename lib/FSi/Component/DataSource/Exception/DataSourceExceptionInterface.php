@@ -16,5 +16,4 @@ namespace FSi\Component\DataSource\Exception;
  */
 interface DataSourceExceptionInterface
 {
-
 }

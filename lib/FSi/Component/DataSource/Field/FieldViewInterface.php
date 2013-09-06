@@ -23,7 +23,7 @@ interface FieldViewInterface extends AttributesContainerInterface
     /**
      * Constructor.
      *
-     * @param FieldTypeInterface $field
+     * @param \FSi\Component\DataSource\Field\FieldTypeInterface $field
      */
     public function __construct(FieldTypeInterface $field);
 
@@ -58,14 +58,14 @@ interface FieldViewInterface extends AttributesContainerInterface
     /**
      * Sets DataSource view.
      *
-     * @param DataSourceViewInterface $dataSourceView
+     * @param \FSi\Component\DataSource\DataSourceViewInterface $dataSourceView
      */
     public function setDataSourceView(DataSourceViewInterface $dataSourceView);
 
     /**
      * Return assigned DataSource view.
      *
-     * @return DataSourceViewInterface
+     * @return \FSi\Component\DataSource\DataSourceViewInterface
      */
     public function getDataSourceView();
 }

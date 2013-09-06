@@ -11,10 +11,7 @@
 
 namespace FSi\Component\DataSource\Field;
 
-use FSi\Component\DataSource\DataSourceInterface;
-use FSi\Component\DataSource\DataSourceViewInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 /**
  * Extension of DataSources field.
@@ -31,7 +28,7 @@ interface FieldExtensionInterface extends EventSubscriberInterface
     /**
      * Allows extension to load options' constraints to fields OptionsResolver. Called by field.
      *
-     * @param FieldTypeInterface $field
+     * @param \FSi\Component\DataSource\Field\FieldTypeInterface $field
      */
     public function initOptions(FieldTypeInterface $field);
 }

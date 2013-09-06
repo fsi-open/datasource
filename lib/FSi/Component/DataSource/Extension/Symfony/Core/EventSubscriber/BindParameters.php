@@ -32,7 +32,7 @@ class BindParameters implements EventSubscriberInterface
     /**
      * Method called at PreBindParameters event.
      *
-     * @param DataSourceEvent\ParametersEventArgs $event
+     * @param \FSi\Component\DataSource\Event\DataSourceEvent\ParametersEventArgs $event
      */
     public function preBindParameters(DataSourceEvent\ParametersEventArgs $event)
     {

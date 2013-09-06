@@ -47,9 +47,7 @@ abstract class CollectionAbstractField extends FieldAbstractType implements Coll
             return;
         }
 
-        $field = $this->hasOption('field')
-            ? $this->getOption('field')
-            : $this->getName();
+        $field = $this->hasOption('field') ? $this->getOption('field') : $this->getName();
         $comparison = $this->getComparison();
         $eb = Criteria::expr();
 
