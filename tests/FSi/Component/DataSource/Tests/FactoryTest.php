@@ -1,7 +1,7 @@
 <?php
 
 /**
- * (c) Fabryka Stron Internetowych sp. z o.o <info@fsi.pl>
+ * (c) FSi sp. z o.o. <info@fsi.pl>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -14,7 +14,7 @@ use FSi\Component\DataSource\Driver\Collection\CollectionFactory;
 use FSi\Component\DataSource\Driver\DriverFactoryManager;
 
 /**
- * Tests for DataSourceFactory
+ * Tests for DataSourceFactory.
  */
 class FactoryTest extends \PHPUnit_Framework_TestCase
 {
@@ -56,6 +56,7 @@ class FactoryTest extends \PHPUnit_Framework_TestCase
 
     /**
      * Checks exception thrown when loading inproper extensions.
+     *
      * @expectedException \FSi\Component\DataSource\Exception\DataSourceException
      */
     public function testFactoryException2()
@@ -68,6 +69,7 @@ class FactoryTest extends \PHPUnit_Framework_TestCase
 
     /**
      * Checks exception thrown when loading scalars in place of extensions.
+     *
      * @expectedException \FSi\Component\DataSource\Exception\DataSourceException
      */
     public function testFactoryException3()
@@ -78,8 +80,9 @@ class FactoryTest extends \PHPUnit_Framework_TestCase
         $datasourceFactory = new DataSourceFactory($driveFactoryManager, array('scalar'));
     }
 
-	/**
+    /**
      * Checks exception thrown when loading inproper extensions not in constructor.
+     *
      * @expectedException \Exception
      */
     public function testFactoryException4()
@@ -93,8 +96,9 @@ class FactoryTest extends \PHPUnit_Framework_TestCase
         $factory->addExtension(new \stdClass());
     }
 
-	/**
+    /**
      * Checks exception thrown when loading scalar as extension not in constructor.
+     *
      * @expectedException \Exception
      */
     public function testFactoryException5()
@@ -110,6 +114,7 @@ class FactoryTest extends \PHPUnit_Framework_TestCase
 
     /**
      * Checks exception thrown when creating DataSource with non unique name.
+     *
      * @expectedException \FSi\Component\DataSource\Exception\DataSourceException
      */
     public function testFactoryCreateDataSourceException1()
@@ -126,6 +131,7 @@ class FactoryTest extends \PHPUnit_Framework_TestCase
 
     /**
      * Checks exception thrown when creating DataSource with wrong name.
+     *
      * @expectedException \FSi\Component\DataSource\Exception\DataSourceException
      */
     public function testFactoryCreateDataSourceException2()
@@ -139,6 +145,7 @@ class FactoryTest extends \PHPUnit_Framework_TestCase
 
     /**
      * Checks exception thrown when creating DataSource with empty name.
+     *
      * @expectedException \FSi\Component\DataSource\Exception\DataSourceException
      */
     public function testFactoryCreateDataSourceException3()

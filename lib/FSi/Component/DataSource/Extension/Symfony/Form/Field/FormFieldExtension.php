@@ -1,7 +1,7 @@
 <?php
 
 /**
- * (c) Fabryka Stron Internetowych sp. z o.o <info@fsi.pl>
+ * (c) FSi sp. z o.o. <info@fsi.pl>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -33,7 +33,7 @@ class FormFieldExtension extends FieldAbstractExtension
     protected $forms = array();
 
     /**
-     * Original values of input parameters for each supported field
+     * Original values of input parameters for each supported field.
      *
      * @var array
      */
@@ -52,8 +52,6 @@ class FormFieldExtension extends FieldAbstractExtension
     }
 
     /**
-     * Constructor.
-     *
      * @param \Symfony\Component\Form\FormFactory $formFactory
      */
     public function __construct(FormFactory $formFactory)
@@ -218,9 +216,11 @@ class FormFieldExtension extends FieldAbstractExtension
             case 'between':
                 $this->buildBetweenComparisonForm($fieldsForm, $field, $options);
                 break;
+
             case 'isNull':
                 $this->buildIsNullComparisonForm($fieldsForm, $field, $options);
                 break;
+
             default:
                 $type = $field->hasOption('form_type') ? $field->getOption('form_type') : $field->getType();
 
@@ -296,8 +296,8 @@ class FormFieldExtension extends FieldAbstractExtension
     }
 
     /**
-     * @param FormInterface $form
-     * @param FieldTypeInterface $field
+     * @param \Symfony\Component\Form\FormInterface $form
+     * @param \FSi\Component\DataSource\Field\FieldTypeInterface $field
      * @param array $options
      */
     protected function buildBooleanForm(FormInterface $form, FieldTypeInterface $field, $options = array())

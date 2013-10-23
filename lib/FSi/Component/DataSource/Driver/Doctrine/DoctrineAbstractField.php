@@ -1,7 +1,7 @@
 <?php
 
 /**
- * (c) Fabryka Stron Internetowych sp. z o.o <info@fsi.pl>
+ * (c) FSi sp. z o.o. <info@fsi.pl>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -118,7 +118,7 @@ abstract class DoctrineAbstractField extends FieldAbstractType implements Doctri
 
     /**
      * Constructs proper field name from field mapping or (if absent) from own name.
-     * Optionally adds alias (if missing).
+     * Optionally adds alias (if missing and auto_alias option is set to true).
      *
      * @param string $alias
      * @return string

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * (c) Fabryka Stron Internetowych sp. z o.o <info@fsi.pl>
+ * (c) FSi sp. z o.o. <info@fsi.pl>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -22,7 +22,7 @@ use FSi\Component\DataSource\Tests\Fixtures\DataSourceExtension;
 class DataSourceTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * Basic creation of DataSource
+     * Basic creation of DataSource.
      */
     public function testDataSourceCreate()
     {
@@ -247,7 +247,7 @@ class DataSourceTest extends \PHPUnit_Framework_TestCase
         $datasource->getField('wrong');
     }
 
-	/**
+    /**
      * Checks behaviour when binding arrays and scalars.
      */
     public function testBindParametersException()
@@ -406,7 +406,8 @@ class DataSourceTest extends \PHPUnit_Framework_TestCase
         $driver
             ->expects($this->once())
             ->method('getResult')
-            ->will($this->returnValue(new ArrayCollection()));
+            ->will($this->returnValue(new ArrayCollection()))
+        ;
 
         $datasource = new DataSource($driver);
         $view = $datasource->createView();

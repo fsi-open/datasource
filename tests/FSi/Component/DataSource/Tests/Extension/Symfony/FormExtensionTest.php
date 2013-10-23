@@ -1,7 +1,7 @@
 <?php
 
 /**
- * (c) Fabryka Stron Internetowych sp. z o.o <info@fsi.pl>
+ * (c) FSi sp. z o.o. <info@fsi.pl>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -425,16 +425,20 @@ class FormExtensionTest extends \PHPUnit_Framework_TestCase
                 switch ($option) {
                     case 'form_null_value':
                         return 'null value';
+
                     case 'form_not_null_value':
                         return 'not null value';
+
                     case 'form_filter':
                         return true;
+
                     case 'form_type':
                         if ($type == 'number') {
                             return 'text';
                         } else {
                             return null;
                         }
+
                     case 'form_from_options':
                     case 'form_to_options':
                     case 'form_options':
