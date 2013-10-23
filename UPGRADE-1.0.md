@@ -59,7 +59,7 @@ Before:
 /**
  * Creates instance of data source with given driver and name.
  *
- * @param Driver\DriverInterface $driver
+ * @param \Driver\DriverInterface $driver
  * @param string $name
  * @return DataSource
  */

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * (c) Fabryka Stron Internetowych sp. z o.o <info@fsi.pl>
+ * (c) FSi sp. z o.o. <info@fsi.pl>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -30,20 +30,20 @@ class PaginationExtensionTest extends \PHPUnit_Framework_TestCase
 
         $cases = array(
             array(
-                'first_result'    => 20,
-                'max_results'     => 20,
-                'page'            => 2,
-                'current_page'    => 2
+                'first_result' => 20,
+                'max_results' => 20,
+                'page' => 2,
+                'current_page' => 2
             ),
             array(
-                'first_result'    => 20,
-                'max_results'     => 0,
-                'current_page'    => 1
+                'first_result' => 20,
+                'max_results' => 0,
+                'current_page' => 1
             ),
             array(
-                'first_result'    => 0,
-                'max_results'     => 20,
-                'current_page'    => 1
+                'first_result' => 0,
+                'max_results' => 20,
+                'current_page' => 1
             ),
         );
 

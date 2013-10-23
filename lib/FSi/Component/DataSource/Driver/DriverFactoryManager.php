@@ -1,7 +1,7 @@
 <?php
 
 /**
- * (c) Fabryka Stron Internetowych sp. z o.o <info@fsi.pl>
+ * (c) FSi sp. z o.o. <info@fsi.pl>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -42,20 +42,18 @@ class DriverFactoryManager implements DriverFactoryManagerInterface
     }
 
     /**
-     * @param $driverType
+     * @param string $driverType
      * @return null|\FSi\Component\DataSource\Driver\DriverFactoryInterface
      */
     public function getFactory($driverType)
     {
-        if (!$this->hasFactory($driverType)) {
-            return;
+        if ($this->hasFactory($driverType)) {
+            return $this->factories[$driverType];
         }
-
-        return $this->factories[$driverType];
     }
 
     /**
-     * @param $driverType
+     * @param string $driverType
      * @return bool
      */
     public function hasFactory($driverType)

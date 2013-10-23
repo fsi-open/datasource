@@ -1,7 +1,7 @@
 <?php
 
 /**
- * (c) Fabryka Stron Internetowych sp. z o.o <info@fsi.pl>
+ * (c) FSi sp. z o.o. <info@fsi.pl>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -40,7 +40,7 @@ class CollectionDriverTest extends \PHPUnit_Framework_TestCase
             $this->markTestSkipped('Doctrine needed!');
         }
 
-        // the connection configuration
+        //The connection configuration.
         $dbParams = array(
             'driver' => 'pdo_sqlite',
             'memory' => true,
@@ -396,7 +396,7 @@ class CollectionDriverTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @param EntityManager $em
+     * @param \Doctrine\ORM\EntityManager $em
      */
     private function load(EntityManager $em)
     {
