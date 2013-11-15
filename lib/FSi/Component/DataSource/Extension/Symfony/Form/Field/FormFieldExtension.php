@@ -84,11 +84,6 @@ class FormFieldExtension extends FieldAbstractExtension
                 'form_order'
             ))
             ->setAllowedTypes(array(
-                'form_null_value' => 'string',
-                'form_not_null_value' => 'string',
-                'form_true_value' => 'string',
-                'form_false_value' => 'string',
-                'form_translation_domain' => array('null', 'string'),
                 'form_filter' => 'bool',
                 'form_options' => 'array',
                 'form_from_options' => 'array',
