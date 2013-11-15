@@ -74,11 +74,20 @@ class FormFieldExtension extends FieldAbstractExtension
     {
         $field->getOptionsResolver()
             ->setDefaults(array(
+                /* Deprecated: 'form_null_value' will be removed in version 1.2, instead use translations
+                   of default choices' values or pass 'choices' option in 'form_options' */
                 'form_null_value' => 'empty',
+                /* Deprecated: 'form_null_value' will be removed in version 1.2, instead use translations
+                   of default choices' values or pass 'choices' option in 'form_options' */
                 'form_not_null_value' => 'not empty',
+                /* Deprecated: 'form_null_value' will be removed in version 1.2, instead use translations
+                   of default choices' values or pass 'choices' option in 'form_options' */
                 'form_true_value' => 'yes',
+                /* Deprecated: 'form_null_value' will be removed in version 1.2, instead use translations
+                   of default choices' values or pass 'choices' option in 'form_options' */
                 'form_false_value' => 'no',
-                // Deprecated: form_translation_domain default value will be changed to null in version 1.2
+                /* Deprecated: 'form_null_value' will be removed in version 1.2, instead pass
+                   'translation_domain' option in 'form_options' */
                 'form_translation_domain' => 'DataSourceBundle',
                 'form_filter' => true,
                 'form_options' => array(),
