@@ -74,21 +74,6 @@ class FormFieldExtension extends FieldAbstractExtension
     {
         $field->getOptionsResolver()
             ->setDefaults(array(
-                /* Deprecated: 'form_null_value' will be removed in version 1.2, instead use translations
-                   of default choices' values or pass 'choices' option in 'form_options' */
-                'form_null_value' => 'empty',
-                /* Deprecated: 'form_null_value' will be removed in version 1.2, instead use translations
-                   of default choices' values or pass 'choices' option in 'form_options' */
-                'form_not_null_value' => 'not empty',
-                /* Deprecated: 'form_null_value' will be removed in version 1.2, instead use translations
-                   of default choices' values or pass 'choices' option in 'form_options' */
-                'form_true_value' => 'yes',
-                /* Deprecated: 'form_null_value' will be removed in version 1.2, instead use translations
-                   of default choices' values or pass 'choices' option in 'form_options' */
-                'form_false_value' => 'no',
-                /* Deprecated: 'form_null_value' will be removed in version 1.2, instead pass
-                   'translation_domain' option in 'form_options' */
-                'form_translation_domain' => 'DataSourceBundle',
                 'form_filter' => true,
                 'form_options' => array(),
                 'form_from_options' => array(),
@@ -282,16 +267,12 @@ class FormFieldExtension extends FieldAbstractExtension
     {
         $defaultOptions = array(
             'choices' => array(
-                'null' => $field->getOption('form_null_value'),
-                'notnull' => $field->getOption('form_not_null_value'),
+                'null' => 'empty',
+                'notnull' => 'not empty',
             ),
             'multiple' => false,
             'empty_value' => ''
         );
-
-        if ($field->hasOption('form_translation_domain')) {
-            $defaultOptions['translation_domain'] = $field->getOption('form_translation_domain');
-        }
 
         if (isset($options['choices'])) {
             $options['choices'] = array_merge(
@@ -313,16 +294,12 @@ class FormFieldExtension extends FieldAbstractExtension
     {
         $defaultOptions = array(
             'choices' => array(
-                '1' => $field->getOption('form_true_value'),
-                '0' => $field->getOption('form_false_value')
+                '1' => 'yes',
+                '0' => 'no'
             ),
             'multiple' => false,
             'empty_value' => ''
         );
-
-        if ($field->hasOption('form_translation_domain')) {
-            $defaultOptions['translation_domain'] = $field->getOption('form_translation_domain');
-        }
 
         if (isset($options['choices'])) {
             $options['choices'] = array_merge(
