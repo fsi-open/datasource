@@ -424,10 +424,10 @@ class FormExtensionTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnCallback(function($option) use ($type) {
                 switch ($option) {
                     case 'form_null_value':
-                        return 'null value';
+                        return 'empty';
 
                     case 'form_not_null_value':
-                        return 'not null value';
+                        return 'not empty';
 
                     case 'form_filter':
                         return true;
@@ -468,11 +468,11 @@ class FormExtensionTest extends \PHPUnit_Framework_TestCase
 
         if ($comparison == 'isNull') {
             $this->assertEquals(
-                'null value',
+                'empty',
                 $form['fields']['name']->vars['choices'][0]->label
             );
             $this->assertEquals(
-                'not null value',
+                'not empty',
                 $form['fields']['name']->vars['choices'][1]->label
             );
         }
