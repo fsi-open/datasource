@@ -148,10 +148,6 @@ class DataSource implements DataSourceInterface
             $field->setOptions($options);
         }
 
-        if ($this->hasField($name)) {
-            throw new DataSourceException(sprintf('Name "%s" is already in use by other field.', $name));
-        }
-
         $this->dirty = true;
         $this->fields[$name] = $field;
         $field->setDataSource($this);
