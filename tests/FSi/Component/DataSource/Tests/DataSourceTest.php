@@ -163,26 +163,6 @@ class DataSourceTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * Checks exception during adding two fields with the same name.
-     */
-    public function testWrongFieldAddException5()
-    {
-        $driver = $this->getMock('FSi\Component\DataSource\Driver\DriverInterface');
-        $datasource = new DataSource($driver);
-        $this->setExpectedException('FSi\Component\DataSource\Exception\DataSourceException');
-
-        $field = $this->getMock('FSi\Component\DataSource\Field\FieldTypeInterface');
-        $field
-            ->expects($this->any())
-            ->method('getName')
-            ->will($this->returnValue('somename'))
-        ;
-
-        $datasource->addField($field);
-        $datasource->addField($field);
-    }
-
-    /**
      * Checks creating, adding, getting and deleting fields.
      */
     public function testFieldManipulation()
