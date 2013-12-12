@@ -24,8 +24,8 @@
         "symfony/form" : "~2.2",
         "symfony/security-csrf": "~2.2",
         "symfony/http-foundation": "~2.2",
-        "doctrine/orm": "2.3.x-dev",
-        "doctrine/collections": "dev-master",
+        "doctrine/orm": "~2.3",
+        "doctrine/collections": "~1.0",
         "symfony/doctrine-bridge": "~2.2",
         "symfony/property-access": "~2.2"
     },
