@@ -17,7 +17,7 @@ use FSi\Component\DataSource\Driver\Doctrine\Exception\DoctrineDriverException;
 use Doctrine\ORM\QueryBuilder;
 
 /**
- * Driver to fetch data from databases using Doctrine.
+ * @deprecated since version 1.4
  */
 class DoctrineDriver extends DriverAbstract
 {

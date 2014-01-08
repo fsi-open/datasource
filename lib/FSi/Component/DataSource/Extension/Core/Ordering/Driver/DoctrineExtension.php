@@ -28,7 +28,10 @@ class DoctrineExtension extends DriverExtension implements EventSubscriberInterf
      */
     public function getExtendedDriverTypes()
     {
-        return array('doctrine', 'doctrine-orm');
+        return array(
+            'doctrine', // deprecated since version 1.4
+            'doctrine-orm'
+        );
     }
 
     /**

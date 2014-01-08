@@ -14,7 +14,7 @@ use FSi\Component\DataSource\Driver\Doctrine\Exception\DoctrineDriverException;
 use Doctrine\ORM\QueryBuilder;
 
 /**
- * {@inheritdoc}
+ * @deprecated since version 1.4
  */
 abstract class DoctrineAbstractField extends FieldAbstractType implements DoctrineFieldInterface
 {

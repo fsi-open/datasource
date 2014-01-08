@@ -13,6 +13,7 @@ use FSi\Component\DataSource\Driver\Doctrine\DoctrineAbstractField;
 
 /**
  * Time field.
+ * @deprecated since version 1.4
  */
 class Time extends DoctrineAbstractField
 {

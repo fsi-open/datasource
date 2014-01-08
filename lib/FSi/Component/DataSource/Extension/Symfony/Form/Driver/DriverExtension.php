@@ -36,7 +36,10 @@ class DriverExtension extends DriverAbstractExtension
      */
     public function getExtendedDriverTypes()
     {
-        return array('doctrine', 'doctrine-orm');
+        return array(
+            'doctrine', //deprecated since version 1.4
+            'doctrine-orm'
+        );
     }
 
     /**

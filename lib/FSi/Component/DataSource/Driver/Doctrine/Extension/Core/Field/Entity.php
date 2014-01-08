@@ -15,6 +15,7 @@ use Doctrine\ORM\QueryBuilder;
 
 /**
  * Entity field.
+ * @deprecated since version 1.4
  */
 class Entity extends DoctrineAbstractField
 {

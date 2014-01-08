@@ -13,6 +13,7 @@ use FSi\Component\DataSource\Driver\Doctrine\DoctrineAbstractField;
 
 /**
  * Number field.
+ * @deprecated since version 1.4
  */
 class Number extends DoctrineAbstractField
 {

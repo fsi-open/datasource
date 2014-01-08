@@ -13,6 +13,7 @@ use FSi\Component\DataSource\Driver\Doctrine\DoctrineAbstractField;
 
 /**
  * Date field.
+ * @deprecated since version 1.4
  */
 class Date extends DoctrineAbstractField
 {

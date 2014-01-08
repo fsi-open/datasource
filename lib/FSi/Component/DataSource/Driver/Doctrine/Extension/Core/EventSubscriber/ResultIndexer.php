@@ -18,6 +18,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * Class contains method called at BindParameters events.
+ * @deprecated since version 1.4
  */
 class ResultIndexer implements EventSubscriberInterface
 {

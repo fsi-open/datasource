@@ -13,6 +13,7 @@ use Doctrine\ORM\QueryBuilder;
 
 /**
  * Interface for Doctrine driver's fields.
+ * @deprecated since version 1.4
  */
 interface DoctrineFieldInterface
 {

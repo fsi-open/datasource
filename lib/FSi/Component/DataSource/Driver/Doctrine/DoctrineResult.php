@@ -14,6 +14,9 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use FSi\Component\DataIndexer\DoctrineDataIndexer;
 
+/**
+ * @deprecated since version 1.4
+ */
 class DoctrineResult extends ArrayCollection
 {
     /**

@@ -13,6 +13,7 @@ use FSi\Component\DataSource\Driver\DriverAbstractExtension;
 
 /**
  * Core extension for Doctrine driver.
+ * @deprecated since version 1.4
  */
 class CoreExtension extends DriverAbstractExtension
 {

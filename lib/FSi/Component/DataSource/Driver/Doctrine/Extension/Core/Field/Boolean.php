@@ -15,6 +15,7 @@ use Doctrine\ORM\QueryBuilder;
 
 /**
  * Boolean field.
+ * @deprecated since version 1.4
  */
 class Boolean extends DoctrineAbstractField
 {
