@@ -9,6 +9,8 @@
 
 namespace FSi\Component\DataSource\Extension\Core\Ordering\Driver;
 
+use FSi\Component\DataSource\Driver\Doctrine\DoctrineFieldInterface;
+use \FSi\Component\DataSource\Driver\Doctrine\ORM\DoctrineFieldInterface as DoctrineORMFieldInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use FSi\Component\DataSource\Event\DriverEvent\DriverEventArgs;
 use FSi\Component\DataSource\Driver\Doctrine\DoctrineAbstractField;
@@ -26,7 +28,7 @@ class DoctrineExtension extends DriverExtension implements EventSubscriberInterf
      */
     public function getExtendedDriverTypes()
     {
-        return array('doctrine');
+        return array('doctrine', 'doctrine-orm');
     }
 
     /**
@@ -52,10 +54,16 @@ class DoctrineExtension extends DriverExtension implements EventSubscriberInterf
     /**
      * @param \FSi\Component\DataSource\Driver\Doctrine\DoctrineAbstractField $field
      * @param string $alias
+     * @throws \InvalidArgumentException
      * @return string
      */
-    protected function getFieldName(DoctrineAbstractField $field, $alias)
+    protected function getFieldName($field, $alias)
     {
+        if (!$field instanceof DoctrineFieldInterface &&
+            !$field instanceof DoctrineORMFieldInterface) {
+            throw new \InvalidArgumentException("Field must be an instance of DoctrineField");
+        }
+
         if ($field->hasOption('field')) {
             $name = $field->getOption('field');
         } else {

@@ -30,7 +30,7 @@ class DoctrineDriverExtension extends DriverAbstractExtension implements EventSu
 
     public function getExtendedDriverTypes()
     {
-        return array('doctrine');
+        return array('doctrine', 'doctrine-orm');
     }
 
     /**
