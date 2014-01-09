@@ -9,50 +9,12 @@
 
 namespace FSi\Component\DataSource\Driver\Doctrine\Extension\Core\EventSubscriber;
 
-use Doctrine\ORM\Tools\Pagination\Paginator;
-use FSi\Component\DataSource\Driver\Doctrine\DoctrineResult;
-use FSi\Component\DataSource\Event\DriverEvent\ResultEventArgs;
-use FSi\Component\DataSource\Event\DriverEvents;
-use Symfony\Bridge\Doctrine\ManagerRegistry;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use FSi\Component\DataSource\Driver\Doctrine\ORM\Extension\Core\EventSubscriber\ResultIndexer as BaseIndexer;
 
 /**
  * Class contains method called at BindParameters events.
  * @deprecated since version 1.4
  */
-class ResultIndexer implements EventSubscriberInterface
+class ResultIndexer extends BaseIndexer
 {
-    /**
-     * @var \Symfony\Bridge\Doctrine\ManagerRegistry
-     */
-    protected $registry;
-
-    /**
-     * @param \Symfony\Bridge\Doctrine\ManagerRegistry $registry
-     */
-    public function __construct(ManagerRegistry $registry)
-    {
-        $this->registry = $registry;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedEvents()
-    {
-        return array(DriverEvents::POST_GET_RESULT => array('postGetResult', 1024));
-    }
-
-    /**
-     * @param \FSi\Component\DataSource\Event\DriverEvent\ResultEventArgs $event
-     */
-    public function postGetResult(ResultEventArgs $event)
-    {
-        $result = $event->getResult();
-
-        if ($result instanceof Paginator) {
-            $result = new DoctrineResult($this->registry, $result);
-            $event->setResult($result);
-        }
-    }
 }

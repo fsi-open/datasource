@@ -9,24 +9,13 @@
 
 namespace FSi\Component\DataSource\Driver\Doctrine\Extension\Core\Field;
 
-use FSi\Component\DataSource\Driver\Doctrine\DoctrineAbstractField;
+use FSi\Component\DataSource\Driver\Doctrine\DoctrineFieldInterface;
+use FSi\Component\DataSource\Driver\Doctrine\ORM\Extension\Core\Field\Date as BaseDate;
 
 /**
  * Date field.
  * @deprecated since version 1.4
  */
-class Date extends DoctrineAbstractField
+class Date extends BaseDate implements DoctrineFieldInterface
 {
-    /**
-     * {@inheritdoc}
-     */
-    protected $comparisons = array('eq', 'neq', 'lt', 'lte', 'gt', 'gte', 'in', 'notIn', 'between', 'isNull');
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getType()
-    {
-        return 'date';
-    }
 }

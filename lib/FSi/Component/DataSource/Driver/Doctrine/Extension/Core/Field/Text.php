@@ -9,24 +9,13 @@
 
 namespace FSi\Component\DataSource\Driver\Doctrine\Extension\Core\Field;
 
-use FSi\Component\DataSource\Driver\Doctrine\DoctrineAbstractField;
+use FSi\Component\DataSource\Driver\Doctrine\DoctrineFieldInterface;
+use FSi\Component\DataSource\Driver\Doctrine\ORM\Extension\Core\Field\Text as BaseText;
 
 /**
  * Text field.
  * @deprecated since version 1.4
  */
-class Text extends DoctrineAbstractField
+class Text extends BaseText implements DoctrineFieldInterface
 {
-    /**
-     * {@inheritdoc}
-     */
-    protected $comparisons = array('eq', 'neq', 'in', 'notIn', 'like', 'contains', 'isNull');
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getType()
-    {
-        return 'text';
-    }
 }

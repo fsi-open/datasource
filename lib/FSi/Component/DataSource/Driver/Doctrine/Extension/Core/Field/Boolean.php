@@ -9,34 +9,13 @@
 
 namespace FSi\Component\DataSource\Driver\Doctrine\Extension\Core\Field;
 
-use FSi\Component\DataSource\Driver\Doctrine\DoctrineAbstractField;
-use Doctrine\DBAL\Types\Type;
-use Doctrine\ORM\QueryBuilder;
+use FSi\Component\DataSource\Driver\Doctrine\DoctrineFieldInterface;
+use FSi\Component\DataSource\Driver\Doctrine\ORM\Extension\Core\Field\Boolean as BaseField;
 
 /**
  * Boolean field.
  * @deprecated since version 1.4
  */
-class Boolean extends DoctrineAbstractField
+class Boolean extends BaseField implements DoctrineFieldInterface
 {
-    /**
-     * {@inheritdoc}
-     */
-    protected $comparisons = array('eq');
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getType()
-    {
-        return 'boolean';
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getDBALType()
-    {
-        return Type::BOOLEAN;
-    }
 }
