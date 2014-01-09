@@ -9,28 +9,17 @@
 
 namespace FSi\Component\DataSource\Driver\Doctrine\Extension\Core\Field;
 
-use FSi\Component\DataSource\Driver\Doctrine\DoctrineAbstractField;
-use FSi\Component\DataSource\Driver\Doctrine\Exception\DoctrineDriverException;
 use Doctrine\ORM\QueryBuilder;
+use FSi\Component\DataSource\Driver\Doctrine\DoctrineFieldInterface;
+use FSi\Component\DataSource\Driver\Doctrine\ORM\Exception\DoctrineDriverException;
+use FSi\Component\DataSource\Driver\Doctrine\ORM\Extension\Core\Field\Entity as BaseEntity;
 
 /**
  * Entity field.
+ * @deprecated since version 1.4
  */
-class Entity extends DoctrineAbstractField
+class Entity extends BaseEntity implements DoctrineFieldInterface
 {
-    /**
-     * {@inheritdoc}
-     */
-    protected $comparisons = array('eq', 'memberof', 'in', 'isNull');
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getType()
-    {
-        return 'entity';
-    }
-
     /**
      * {@inheritdoc}
      *
@@ -38,41 +27,12 @@ class Entity extends DoctrineAbstractField
      */
     public function buildQuery(QueryBuilder $qb, $alias)
     {
-        $data = $this->getCleanParameter();
-        $fieldName = $this->getFieldName($alias);
-        $name = $this->getName();
-
-        if (empty($data)) {
-            return;
-        }
-
-        $comparison = $this->getComparison();
-        if (!in_array($comparison, $this->comparisons)) {
-            throw new DoctrineDriverException(sprintf('Unexpected comparison type ("%s").', $comparison));
-        }
-
-        switch ($comparison) {
-            case 'eq':
-                $qb->andWhere($qb->expr()->eq($fieldName, ":$name"));
-                $qb->setParameter($name, $data);
-                break;
-
-            case 'memberof':
-                $qb->andWhere(":$name MEMBER OF $fieldName");
-                $qb->setParameter($name, $data);
-                break;
-
-            case 'in':
-                $qb->andWhere("$fieldName IN (:$name)");
-                $qb->setParameter($name, $data);
-                break;
-
-            case 'isNull':
-                $qb->andWhere($fieldName . ' IS ' . ($data === 'null' ? '' : 'NOT ') . 'NULL');
-                break;
-
-            default:
-                throw new DoctrineDriverException(sprintf('Unexpected comparison type ("%s").', $comparison));
+        try {
+            parent::buildQuery($qb, $alias);
+        } catch (DoctrineDriverException $e) {
+            throw new \FSi\Component\DataSource\Driver\Doctrine\Exception\DoctrineDriverException(
+                $e->getMessage()
+            );
         }
     }
 }

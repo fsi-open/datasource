@@ -7,13 +7,13 @@
  * file that was distributed with this source code.
  */
 
-namespace FSi\Component\DataSource\Driver\Doctrine\Extension\Core;
+namespace FSi\Component\DataSource\Driver\Doctrine\ORM\Extension\Core;
 
+use FSi\Component\DataSource\Driver\Doctrine\ORM\DoctrineFieldInterface;
 use FSi\Component\DataSource\Driver\DriverAbstractExtension;
 
 /**
  * Core extension for Doctrine driver.
- * @deprecated since version 1.4
  */
 class CoreExtension extends DriverAbstractExtension
 {
@@ -22,7 +22,7 @@ class CoreExtension extends DriverAbstractExtension
      */
     public function getExtendedDriverTypes()
     {
-        return array('doctrine');
+        return array('doctrine-orm');
     }
 
     /**

@@ -1,4 +1,4 @@
-# Doctrine Driver #
+# Doctrine ORM Driver #
 
 This driver allows to fetch data from database using Doctrine2 ORM. 
 
@@ -9,8 +9,8 @@ You can create driver manually
 ``` php
 <?php
 
-use FSi\Component\DataSource\Driver\Doctrine\DoctrineDriver;
-use FSi\Component\DataSource\Driver\Doctrine\Extension\Core\CoreExtension;
+use FSi\Component\DataSource\Driver\Doctrine\ORM\DoctrineDriver;
+use FSi\Component\DataSource\Driver\Doctrine\ORM\Extension\Core\CoreExtension;
 
 $driverExtensions = array(new CoreExtension());
 
@@ -23,8 +23,8 @@ or through factory
 ``` php
 <?php
 
-use FSi\Component\DataSource\Driver\Doctrine\DoctrineFactory;
-use FSi\Component\DataSource\Driver\Doctrine\Extension\Core\CoreExtension;
+use FSi\Component\DataSource\Driver\Doctrine\ORM\DoctrineFactory;
+use FSi\Component\DataSource\Driver\Doctrine\ORM\Extension\Core\CoreExtension;
 
 $extensions = array(
     // (...) Extensions that have to be loaded to every DataSource after creation.
@@ -41,7 +41,8 @@ $driver = $driverFactory->createDriver($entityName); // All drivers created this
 
 ## Provided fields ##
 
-Doctrine driver provides some field types through ``FSi\Component\DataSource\Driver\Doctrine\Extension\Core\CoreExtension``
+Doctrine driver provides some field types through
+``FSi\Component\DataSource\Driver\Doctrine\ORM\Extension\Core\CoreExtension``
 so remember to **always load it** to this driver.
 
 Provided field types:
@@ -82,7 +83,7 @@ $datasourceFactory = new DataSourceFactory($driverFactoryManager, $datasourceExt
 $driverOptions = array(
     'entity' => 'Name\Of\Entity' // It can be any entity name that is known to Doctrine.
 );
-$datasource = $datasourceFactory->createDataSource('doctrine', $driverOptions, 'datasource_name');
+$datasource = $datasourceFactory->createDataSource('doctrine-orm', $driverOptions, 'datasource_name');
 
 $datasource->addField('id', 'number', 'eq')
     ->addField('title', 'text', 'like')
@@ -138,7 +139,7 @@ $datasourceFactory = new DataSourceFactory($driverFactoryManager, $datasourceExt
 $driverOptions = array(
     'qb' => $queryBuilder
 );
-$datasource = $datasourceFactory->createDataSource('doctrine', $driverOptions, 'datasource_name');
+$datasource = $datasourceFactory->createDataSource('doctrine-orm', $driverOptions, 'datasource_name');
 ```
 
 ## Advanced use with QueryBuilder ##
@@ -165,7 +166,7 @@ $datasourceFactory = new DataSourceFactory($driverFactoryManager, $datasourceExt
 $driverOptions = array(
     'qb' => $queryBuilder
 );
-$datasource = $datasourceFactory->createDataSource('doctrine', $driverOptions, 'datasource_name');
+$datasource = $datasourceFactory->createDataSource('doctrine-orm', $driverOptions, 'datasource_name');
 $datasource->addField('id', 'number', 'eq', array('field' => 'n.id'))
     ->addField('title', 'text', 'like', array('field' => 'n.title'))
     ->addField('category_name', 'text', 'like', array( // It's not entity field anymore.

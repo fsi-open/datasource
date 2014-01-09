@@ -18,8 +18,8 @@ id, title, author, create date, short content and content. We will need only a `
 <?php
 
 use FSi\Component\DataSource\Driver\DriverFactoryManager;
-use FSi\Component\DataSource\Driver\Doctrine\DoctrineFactory;
-use FSi\Component\DataSource\Driver\Doctrine\Extension\Core\CoreExtension;
+use FSi\Component\DataSource\Driver\Doctrine\ORM\DoctrineFactory;
+use FSi\Component\DataSource\Driver\Doctrine\ORM\Extension\Core\CoreExtension;
 use FSi\Component\DataSource\DataSourceFactory;
 
 $managerRegistry = $this->getDoctrine()->getManager();
@@ -39,7 +39,7 @@ $factory = new DataSourceFactory($driverFactoryManager, $extensions);
 $driverOptions = array(
     'entity' => 'FSiDemoBundle:News'
 );
-$datasource = $factory->createDataSource('doctrine',  $driverOptions, 'datasource_name');
+$datasource = $factory->createDataSource('doctrine-orm',  $driverOptions, 'datasource_name');
 
 ```
 

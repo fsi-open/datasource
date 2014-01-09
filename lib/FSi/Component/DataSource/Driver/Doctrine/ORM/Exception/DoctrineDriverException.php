@@ -7,13 +7,12 @@
  * file that was distributed with this source code.
  */
 
-namespace FSi\Component\DataSource\Driver\Doctrine\Exception;
+namespace FSi\Component\DataSource\Driver\Doctrine\ORM\Exception;
 
 use FSi\Component\DataSource\Exception\DataSourceException;
 
 /**
  * Exception for Doctrine driver.
- * @deprecated since version 1.4
  */
 class DoctrineDriverException extends DataSourceException
 {

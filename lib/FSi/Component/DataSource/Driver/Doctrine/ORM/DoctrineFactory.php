@@ -7,7 +7,7 @@
  * file that was distributed with this source code.
  */
 
-namespace FSi\Component\DataSource\Driver\Doctrine;
+namespace FSi\Component\DataSource\Driver\Doctrine\ORM;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 use FSi\Component\DataSource\Driver\DriverFactoryInterface;
@@ -16,7 +16,7 @@ use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
- * @deprecated since version 1.4
+ * {@inheritdoc}
  */
 class DoctrineFactory implements DriverFactoryInterface
 {
@@ -53,7 +53,7 @@ class DoctrineFactory implements DriverFactoryInterface
      */
     public function getDriverType()
     {
-        return 'doctrine';
+        return 'doctrine-orm';
     }
 
     /**
