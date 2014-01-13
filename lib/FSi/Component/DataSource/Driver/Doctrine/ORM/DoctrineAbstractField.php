@@ -10,7 +10,7 @@
 namespace FSi\Component\DataSource\Driver\Doctrine\ORM;
 
 use FSi\Component\DataSource\Field\FieldAbstractType;
-use FSi\Component\DataSource\Driver\Doctrine\Exception\DoctrineDriverException;
+use FSi\Component\DataSource\Driver\Doctrine\ORM\Exception\DoctrineDriverException;
 use Doctrine\ORM\QueryBuilder;
 
 /**
