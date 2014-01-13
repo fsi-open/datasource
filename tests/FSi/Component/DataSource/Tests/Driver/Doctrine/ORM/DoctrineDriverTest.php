@@ -588,6 +588,47 @@ class DoctrineDriverTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * Tests if 'having' value of 'clause' option works properly in 'entity' field
+     */
+    public function testHavingClauseInEntityField()
+    {
+        $dataSourceFactory = $this->getDataSourceFactory();
+
+        $qb = $this->em->createQueryBuilder()
+            ->select('n')
+            ->from('FSi\Component\DataSource\Tests\Fixtures\News', 'n')
+            ->join('n.category', 'c')
+        ;
+
+        $driverOptions = array(
+            'qb' => $qb,
+            'alias' => 'n'
+        );
+
+        $datasource = $dataSourceFactory->createDataSource('doctrine-orm', $driverOptions, 'datasource');
+        $datasource
+            ->addField('category', 'entity', 'in', array(
+                'clause' => 'HAVING'
+            ));
+
+        $parameters = array(
+            $datasource->getName() => array(
+                DataSourceInterface::PARAMETER_FIELDS => array(
+                    'category' => array(2, 3),
+                ),
+            ),
+        );
+
+        $datasource->bindParameters($parameters);
+        $datasource->getResult();
+
+        $this->assertEquals(
+            $this->testDoctrineExtension->getQueryBuilder()->getQuery()->getDQL(),
+            'SELECT n FROM FSi\Component\DataSource\Tests\Fixtures\News n INNER JOIN n.category c HAVING n.category IN (:category)'
+        );
+    }
+
+    /**
      * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
      */
     public function testCreateDriverWithoutEntityAndQbOptions()

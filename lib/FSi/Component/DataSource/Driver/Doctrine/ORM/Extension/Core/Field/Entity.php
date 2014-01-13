@@ -47,28 +47,26 @@ class Entity extends DoctrineAbstractField
         }
 
         $comparison = $this->getComparison();
-        if (!in_array($comparison, $this->comparisons)) {
-            throw new DoctrineDriverException(sprintf('Unexpected comparison type ("%s").', $comparison));
-        }
+        $func = sprintf('and%s', ucfirst($this->getOption('clause')));
 
         switch ($comparison) {
             case 'eq':
-                $qb->andWhere($qb->expr()->eq($fieldName, ":$name"));
+                $qb->$func($qb->expr()->eq($fieldName, ":$name"));
                 $qb->setParameter($name, $data);
                 break;
 
             case 'memberof':
-                $qb->andWhere(":$name MEMBER OF $fieldName");
+                $qb->$func(":$name MEMBER OF $fieldName");
                 $qb->setParameter($name, $data);
                 break;
 
             case 'in':
-                $qb->andWhere("$fieldName IN (:$name)");
+                $qb->$func("$fieldName IN (:$name)");
                 $qb->setParameter($name, $data);
                 break;
 
             case 'isNull':
-                $qb->andWhere($fieldName . ' IS ' . ($data === 'null' ? '' : 'NOT ') . 'NULL');
+                $qb->$func($fieldName . ' IS ' . ($data === 'null' ? '' : 'NOT ') . 'NULL');
                 break;
 
             default:
