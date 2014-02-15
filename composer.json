@@ -25,14 +25,19 @@
         "symfony/security-csrf": "~2.2",
         "symfony/http-foundation": "~2.2",
         "doctrine/orm": "~2.3",
-        "doctrine/collections": "~1.0",
+        "doctrine/common": "~2.3",
         "symfony/doctrine-bridge": "~2.2",
-        "symfony/property-access": "~2.2"
+        "symfony/property-access": "~2.2",
+        "phpunit/phpunit": "3.7.*"
     },
     "autoload": {
         "psr-0": {
-            "FSi\\Component\\DataSource": "lib/"
+            "FSi\\Component\\DataSource": "lib/",
+            "FSi\\Component\\DataSource\\Tests": "tests/"
         }
+    },
+    "config": {
+        "bin-dir": "bin"
     },
     "extra": {
         "branch-alias": {

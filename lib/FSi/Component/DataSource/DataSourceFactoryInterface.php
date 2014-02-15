@@ -20,7 +20,7 @@ interface DataSourceFactoryInterface
      * @param string $driver
      * @param array $driverOptions
      * @param $name
-     * @return mixed
+     * @return \FSi\Component\DataSource\DataSource
      */
     public function createDataSource($driver, $driverOptions = array(), $name);
 

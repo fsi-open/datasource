@@ -82,7 +82,7 @@ class Events implements EventSubscriberInterface
 
     /**
      * @param \FSi\Component\DataSource\Field\FieldTypeInterface $field
-     * @return \FSi\Component\DataSource\Field\FieldExtensionsInterface
+     * @return \FSi\Component\DataSource\Field\FieldExtensionInterface
      * @throws \FSi\Component\DataSource\Exception\DataSourceException
      */
     protected function getFieldExtension(FieldTypeInterface $field)

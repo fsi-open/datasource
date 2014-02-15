@@ -33,7 +33,7 @@ interface DriverExtensionInterface
      * Returns field for given type, or, if can't fine one, throws exception.
      *
      * @param string $type
-     * @return \FSi\Component\DataSource\Driver\Field\FieldTypeInterface
+     * @return \FSi\Component\DataSource\Field\FieldTypeInterface
      */
     public function getFieldType($type);
 

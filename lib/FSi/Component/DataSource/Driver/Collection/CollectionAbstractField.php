@@ -9,7 +9,7 @@
 
 namespace FSi\Component\DataSource\Driver\Collection;
 
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use FSi\Component\DataSource\Driver\Collection\Exception\CollectionDriverException;
 use Doctrine\Common\Collections\Criteria;
 use FSi\Component\DataSource\Field\FieldAbstractType;
 

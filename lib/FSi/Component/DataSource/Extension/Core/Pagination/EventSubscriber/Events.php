@@ -89,7 +89,7 @@ class Events implements EventSubscriberInterface
     /**
      * Method called at PostBuildView event.
      *
-     * @param \FSi\Component\DataSource\Event\ViewEventArgs $event
+     * @param \FSi\Component\DataSource\Event\DataSourceEvent\ViewEventArgs $event
      */
     public function postBuildView(DataSourceEvent\ViewEventArgs $event)
     {

@@ -11,6 +11,7 @@ namespace FSi\Component\DataSource\Driver\Doctrine;
 
 use Doctrine\ORM\QueryBuilder;
 use FSi\Component\DataSource\Driver\Doctrine\ORM\DoctrineAbstractField as BaseField;
+use FSi\Component\DataSource\Driver\Doctrine\ORM\Exception\DoctrineDriverException;
 
 /**
  * @deprecated since version 1.4

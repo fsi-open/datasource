@@ -133,7 +133,7 @@ interface FieldTypeInterface
     /**
      * Builds view.
      *
-     * @return \FSi\Component\DataSource\Field\FieldViewInterface\FieldViewInterface
+     * @return \FSi\Component\DataSource\Field\FieldViewInterface
      */
     public function createView();
 
@@ -177,7 +177,7 @@ interface FieldTypeInterface
     /**
      * Returns the configured options resolver used for this field's type.
      *
-     * @return \Symfony\Component\OptionsResolver\OptionsResolverInterface.
+     * @return \Symfony\Component\OptionsResolver\OptionsResolverInterface
      */
     public function getOptionsResolver();
 }
