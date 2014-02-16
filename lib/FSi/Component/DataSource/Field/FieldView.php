@@ -10,7 +10,6 @@
 namespace FSi\Component\DataSource\Field;
 
 use FSi\Component\DataSource\DataSourceViewInterface;
-use FSi\Component\DataSource\Field\FieldTypeInterface;
 use FSi\Component\DataSource\Util\AttributesContainer;
 
 /**

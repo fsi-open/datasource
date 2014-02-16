@@ -25,16 +25,4 @@ if (!file_exists(__DIR__.'/../vendor/autoload.php')) {
     die('Install vendors using command: composer.phar install --dev'."\n");
 }
 
-$loader = require_once __DIR__.'/../vendor/autoload.php';
-$loader->add('FSi\\Component\\DataSource\\Tests', __DIR__);
-$loader->add('FSi\\FSiExtension\\DataGrid\\Extension\\Tests\\Fixtures', __DIR__);
-if (class_exists($annotationRegistry = 'Doctrine\Common\Annotations\AnnotationRegistry')) {
-    $annotationRegistry::registerLoader(function($class) {
-        if (0 === strpos(ltrim($class, '/'), 'FSi\Component\DataSource')) {
-            if (file_exists($file = __DIR__.'/../lib/'. str_replace('\\', '/', $class) .'.php')) {
-                require_once $file;
-            }
-        }
-        return class_exists($class, false);
-    });
-}
+require_once __DIR__.'/../vendor/autoload.php';

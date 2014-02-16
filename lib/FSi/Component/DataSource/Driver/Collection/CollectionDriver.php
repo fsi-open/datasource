@@ -20,7 +20,7 @@ class CollectionDriver extends DriverAbstract
     /**
      * Criteria available during preGetResult event.
      *
-     * @var \CriteriDoctrine\Common\Collections\Criteria
+     * @var \Doctrine\Common\Collections\Criteria
      */
     private $currentCriteria;
 
@@ -77,8 +77,8 @@ class CollectionDriver extends DriverAbstract
      *
      * If criteria is set to null (so when getResult method is NOT executed at the moment) exception is throwed.
      *
-     * @return \CriteriDoctrine\Common\Collections\Criteria
-     * @throws \FSi\Component\DataSource\Driver\Doctrine\Exception\DoctrineDriverException
+     * @throws Exception\CollectionDriverException
+     * @return \Doctrine\Common\Collections\Criteria
      */
     public function getCriteria()
     {

@@ -9,11 +9,6 @@
 
 namespace FSi\Component\DataSource\Field;
 
-use FSi\Component\DataSource\DataSourceInterface;
-use FSi\Component\DataSource\DataSourceViewInterface;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
-
 /**
  * {@inheritdoc}
  */
