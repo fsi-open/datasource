@@ -244,10 +244,6 @@ class DoctrineDriverBasicTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($driver->hasFieldType($type));
         $field = $driver->getFieldType($type);
         $this->assertTrue($field instanceof \FSi\Component\DataSource\Field\FieldTypeInterface);
-        if (!$field instanceof \FSi\Component\DataSource\Driver\Doctrine\ORM\DoctrineFieldInterface){
-            var_dump($field);
-            die();
-        }
         $this->assertTrue($field instanceof \FSi\Component\DataSource\Driver\Doctrine\ORM\DoctrineFieldInterface);
 
         $this->assertTrue($field->getOptionsResolver()->isKnown('field'));

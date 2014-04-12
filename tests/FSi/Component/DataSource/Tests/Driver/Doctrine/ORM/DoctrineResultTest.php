@@ -9,7 +9,7 @@
 
 namespace FSi\Component\DataSource\Tests\Driver\Doctrine\ORM;
 
-use FSi\Component\DataSource\Driver\Doctrine\DoctrineResult;
+use FSi\Component\DataSource\Driver\Doctrine\ORM\DoctrineResult;
 
 class DoctrineResultTest extends \PHPUnit_Framework_TestCase
 {
