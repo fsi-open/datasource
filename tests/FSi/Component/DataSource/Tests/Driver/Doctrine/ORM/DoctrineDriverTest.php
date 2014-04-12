@@ -66,6 +66,32 @@ class DoctrineDriverTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * Test number field when comparing with 0 value.
+     */
+    public function testComparingWithZero()
+    {
+        $datasourceFactory = $this->getDataSourceFactory();
+        $driverOptions = array(
+            'entity' => 'FSi\Component\DataSource\Tests\Fixtures\News',
+        );
+
+        $datasource = $datasourceFactory
+            ->createDataSource('doctrine-orm', $driverOptions, 'datasource')
+            ->addField('id', 'number', 'eq');
+
+        $parameters = array(
+            $datasource->getName() => array(
+                DataSourceInterface::PARAMETER_FIELDS => array(
+                    'id' => '0',
+                ),
+            ),
+        );
+        $datasource->bindParameters($parameters);
+        $result = $datasource->getResult();
+        $this->assertEquals(0, count($result));
+    }
+
+    /**
      * General test for DataSource wtih DoctrineDriver in basic configuration.
      */
     public function testGeneral()

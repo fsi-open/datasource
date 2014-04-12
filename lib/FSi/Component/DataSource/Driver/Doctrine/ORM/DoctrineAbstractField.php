@@ -27,7 +27,7 @@ abstract class DoctrineAbstractField extends FieldAbstractType implements Doctri
         $fieldName = $this->getFieldName($alias);
         $name = $this->getName();
 
-        if (empty($data) && ($data !== 0) && ($data !== false)) {
+        if (($data === array()) || ($data === '') || ($data === null)) {
             return;
         }
 

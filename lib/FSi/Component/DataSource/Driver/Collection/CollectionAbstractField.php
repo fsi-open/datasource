@@ -44,7 +44,7 @@ abstract class CollectionAbstractField extends FieldAbstractType implements Coll
     {
         $data = $this->getCleanParameter();
 
-        if (empty($data) && ($data !== 0) && ($data !== false)) {
+        if (($data === array()) || ($data === '') || ($data === null)) {
             return;
         }
 
