@@ -62,7 +62,7 @@ class DataSourceFactory implements DataSourceFactoryInterface
         $name = (string) $name;
 
         if (!$this->driverFactoryManager->hasFactory($driver)) {
-            throw new DataSourceException('Driver "%s" doesn\'t exist.');
+            throw new DataSourceException(sprintf('Driver "%s" doesn\'t exist.', $driver));
         }
 
         $driverFactory = $this->driverFactoryManager->getFactory($driver);
