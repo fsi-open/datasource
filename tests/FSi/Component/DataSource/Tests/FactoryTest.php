@@ -113,6 +113,18 @@ class FactoryTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * Checks exception throw when creating DataSource with non-existing driver
+     *
+     * @expectedException \FSi\Component\DataSource\Exception\DataSourceException
+     * @expectedExceptionMessage Driver "unknownDriver" doesn't exist.
+     */
+    public function testFactoryException6()
+    {
+        $factory = new DataSourceFactory(new DriverFactoryManager());
+        $factory->createDataSource('unknownDriver');
+    }
+
+    /**
      * Checks exception thrown when creating DataSource with non unique name.
      *
      * @expectedException \FSi\Component\DataSource\Exception\DataSourceException
