@@ -74,7 +74,7 @@ class FormFieldExtensionTest extends \PHPUnit_Framework_TestCase
         $formFactory = $this->getMockBuilder('Symfony\Component\Form\FormFactory')
             ->disableOriginalConstructor()
             ->getMock();
-git s
+
         $formFielExtension = new FormFieldExtension($formFactory);
 
         $method = new ReflectionMethod(
