@@ -297,10 +297,7 @@ class FormFieldExtension extends FieldAbstractExtension
         );
 
         if (isset($options['choices'])) {
-            $options['choices'] = array_merge(
-                $defaultOptions['choices'],
-                array_intersect_key($options['choices'], $defaultOptions['choices'])
-            );
+            $options['choices'] = array_intersect_key($options['choices'], $defaultOptions['choices']);
         }
 
         $options = array_merge($defaultOptions, $options);
