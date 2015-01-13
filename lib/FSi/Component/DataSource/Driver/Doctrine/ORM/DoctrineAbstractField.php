@@ -89,8 +89,8 @@ abstract class DoctrineAbstractField extends FieldAbstractType implements Doctri
     {
         $field = $this;
         $this->getOptionsResolver()
-            ->setOptional(array('field'))
             ->setDefaults(array(
+                'field' => null,
                 'auto_alias' => true,
                 'clause' => 'where'
             ))

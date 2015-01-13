@@ -526,7 +526,7 @@ class DoctrineDriverTest extends \PHPUnit_Framework_TestCase
             ->addField('newscount', 'number', 'gt', array(
                 'field' => 'newscount',
                 'auto_alias' => false,
-                'clause' => 'HAVING'
+                'clause' => 'having'
             ));
 
         $parameters = array(
@@ -569,7 +569,7 @@ class DoctrineDriverTest extends \PHPUnit_Framework_TestCase
             ->addField('newscount', 'number', 'between', array(
                 'field' => 'newscount',
                 'auto_alias' => false,
-                'clause' => 'HAVING'
+                'clause' => 'having'
             ));
 
         $parameters = array(
@@ -610,7 +610,7 @@ class DoctrineDriverTest extends \PHPUnit_Framework_TestCase
         $datasource = $dataSourceFactory->createDataSource('doctrine', $driverOptions, 'datasource');
         $datasource
             ->addField('category', 'entity', 'in', array(
-                'clause' => 'HAVING'
+                'clause' => 'having'
             ));
 
         $parameters = array(
