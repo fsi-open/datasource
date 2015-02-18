@@ -235,7 +235,7 @@ class FormFieldExtension extends FieldAbstractExtension
      */
     protected function buildBetweenComparisonForm(FormInterface $form, FieldTypeInterface $field, $options = array())
     {
-        $betweenBuilder = $this->getFormFactory()->createNamedBuilder($field->getName(), 'form', null, $options);
+        $betweenBuilder = $this->getFormFactory()->createNamedBuilder($field->getName(), 'datasource_between', null, $options);
 
         $fromOptions = $field->getOption('form_from_options');
         $toOptions = $field->getOption('form_to_options');

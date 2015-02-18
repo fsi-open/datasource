@@ -9,9 +9,11 @@
 
 namespace FSi\Component\DataSource\Tests\Extension\Symfony;
 
+use FSi\Component\DataSource\Extension\Symfony\Form\Extension\DatasourceExtension;
 use FSi\Component\DataSource\Extension\Symfony\Form\FormExtension;
 use FSi\Component\DataSource\Extension\Symfony\Form\Driver\DriverExtension;
 use FSi\Component\DataSource\Extension\Symfony\Form\EventSubscriber\Events;
+use FSi\Component\DataSource\Extension\Symfony\Form\Type\BetweenType;
 use FSi\Component\DataSource\Field\FieldAbstractExtension;
 use FSi\Component\DataSource\Field\FieldView;
 use Symfony\Component\Form;
@@ -58,7 +60,7 @@ class FormExtensionTest extends \PHPUnit_Framework_TestCase
             array('number', 'eq', 'text'),
             array('datetime', 'isNull', 'choice'),
             array('datetime', 'eq', 'datetime'),
-            array('datetime', 'between', 'form'),
+            array('datetime', 'between', 'datasource_between'),
             array('time', 'isNull', 'choice'),
             array('time', 'eq', 'time'),
             array('date', 'isNull', 'choice'),
@@ -84,6 +86,7 @@ class FormExtensionTest extends \PHPUnit_Framework_TestCase
     private function getFormFactory()
     {
         $typeFactory = new Form\ResolvedFormTypeFactory();
+        $typeFactory->createResolvedType(new BetweenType(), array());
         $registry = new Form\FormRegistry(
             array(
                 new TestForm\Extension\TestCore\TestCoreExtension(),
@@ -91,6 +94,7 @@ class FormExtensionTest extends \PHPUnit_Framework_TestCase
                 new Form\Extension\Csrf\CsrfExtension(
                     new Form\Extension\Csrf\CsrfProvider\DefaultCsrfProvider('secret')
                 ),
+                new DatasourceExtension()
             ),
             $typeFactory
         );
