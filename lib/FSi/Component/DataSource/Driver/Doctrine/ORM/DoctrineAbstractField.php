@@ -94,25 +94,20 @@ abstract class DoctrineAbstractField extends FieldAbstractType implements Doctri
                 'auto_alias' => true,
                 'clause' => 'where'
             ))
-            ->setAllowedValues(array(
-                'clause' => array('where', 'having')
-            ))
-            ->setAllowedTypes(array(
-                'field' => array('string', 'null'),
-                'auto_alias' => 'bool'
-            ))
-            ->setNormalizers(array(
-                'field' => function($options, $value) use ($field) {
+            ->setAllowedValues('clause', array('where', 'having'))
+            ->setAllowedTypes('field', array('string', 'null'))
+            ->setAllowedTypes('auto_alias', 'bool')
+            ->setNormalizer('field', function($options, $value) use ($field) {
                     if (!isset($value) && $field->getName()) {
                         return $field->getName();
                     } else {
                         return $value;
                     }
-                },
-                'clause' => function($options, $value) {
+                })
+            ->setNormalizer('clause', function($options, $value) {
                     return strtolower($value);
                 }
-            ))
+            );
         ;
     }
 

@@ -16,16 +16,13 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 class FormType extends BaseFormType
 {
-    public function __construct(PropertyAccessorInterface $propertyAccessor = null)
-    {
-        parent::__construct($propertyAccessor);
-    }
-
     /**
      * {@inheritdoc}
      */
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
+        parent::buildView($view, $form, $options);
+
         $view->vars['type'] = $form->getConfig()->getType()->getName();
     }
 }

@@ -9,17 +9,16 @@
 
 namespace FSi\Component\DataSource\Tests\Extension\Symfony;
 
-use FSi\Component\DataSource\Extension\Symfony\Form\FormExtension;
+use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\Tools\Setup;
+use FSi\Component\DataSource\DataSourceInterface;
+use FSi\Component\DataSource\Event\FieldEvent;
 use FSi\Component\DataSource\Extension\Symfony\Form\Driver\DriverExtension;
 use FSi\Component\DataSource\Field\FieldAbstractExtension;
-use Symfony\Component\Form;
-use FSi\Component\DataSource\DataSourceInterface;
-use Symfony\Bridge\Doctrine\Form\DoctrineOrmExtension;
 use FSi\Component\DataSource\Tests\Fixtures\TestManagerRegistry;
-use Doctrine\ORM\Tools\Setup;
-use Doctrine\ORM\EntityManager;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use FSi\Component\DataSource\Event\FieldEvent;
+use Symfony\Bridge\Doctrine\Form\DoctrineOrmExtension;
+use Symfony\Component\Form;
+use Symfony\Component\Security;
 
 /**
  * Tests for Symfony Form Extension.
@@ -53,7 +52,7 @@ class FormExtensionEntityTest extends \PHPUnit_Framework_TestCase
             'memory' => true,
         );
 
-        $config = Setup::createAnnotationMetadataConfiguration(array(FIXTURES_PATH), true, null, null, false);
+        $config = Setup::createAnnotationMetadataConfiguration(array(__DIR__ . '/../../Fixtures'), true, null, null, false);
         $em = EntityManager::create($dbParams, $config);
         $tool = new \Doctrine\ORM\Tools\SchemaTool($em);
         $classes = array(
@@ -65,9 +64,7 @@ class FormExtensionEntityTest extends \PHPUnit_Framework_TestCase
         $registry = new Form\FormRegistry(
             array(
                 new Form\Extension\Core\CoreExtension(),
-                new Form\Extension\Csrf\CsrfExtension(
-                    new Form\Extension\Csrf\CsrfProvider\DefaultCsrfProvider('secret')
-                ),
+                new Form\Extension\Csrf\CsrfExtension(new Security\Csrf\CsrfTokenManager()),
                 new DoctrineOrmExtension(new TestManagerRegistry($em)),
             ),
             $typeFactory

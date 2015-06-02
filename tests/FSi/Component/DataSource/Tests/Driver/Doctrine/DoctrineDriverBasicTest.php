@@ -246,7 +246,7 @@ class DoctrineDriverBasicTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($field instanceof \FSi\Component\DataSource\Field\FieldTypeInterface);
         $this->assertTrue($field instanceof \FSi\Component\DataSource\Driver\Doctrine\DoctrineFieldInterface);
 
-        $this->assertTrue($field->getOptionsResolver()->isKnown('field'));
+        $this->assertTrue($field->getOptionsResolver()->isDefined('field'));
 
         $comparisons = $field->getAvailableComparisons();
         $this->assertTrue(count($comparisons) > 0);

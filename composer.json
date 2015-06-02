@@ -17,17 +17,18 @@
     "require": {
         "php": ">=5.3.0",
         "symfony/event-dispatcher": "~2.2",
-        "symfony/options-resolver": "~2.2",
+        "symfony/options-resolver": "~2.6",
         "fsi/data-indexer" : "0.9.*"
     },
     "require-dev": {
-        "symfony/form" : "~2.2",
-        "symfony/security-csrf": "~2.2",
+        "symfony/form" : "~2.4",
+        "symfony/security-csrf": "~2.4",
         "symfony/http-foundation": "~2.2",
         "doctrine/orm": "~2.3",
-        "doctrine/common": "~2.3",
+        "doctrine/common": "~2.4",
+        "doctrine/collections": "~1.1",
         "symfony/doctrine-bridge": "~2.2",
-        "symfony/property-access": "~2.2",
+        "symfony/property-access": "~2.3",
         "phpunit/phpunit": "3.7.*"
     },
     "autoload": {

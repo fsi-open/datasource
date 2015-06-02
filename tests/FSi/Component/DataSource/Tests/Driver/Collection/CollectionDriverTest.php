@@ -46,7 +46,7 @@ class CollectionDriverTest extends \PHPUnit_Framework_TestCase
             'memory' => true,
         );
 
-        $config = Setup::createAnnotationMetadataConfiguration(array(FIXTURES_PATH), true, null, null, false);
+        $config = Setup::createAnnotationMetadataConfiguration(array(__DIR__ . '/../../Fixtures'), true, null, null, false);
         $em = EntityManager::create($dbParams, $config);
         $tool = new \Doctrine\ORM\Tools\SchemaTool($em);
         $classes = array(

@@ -18,7 +18,7 @@ class TestCoreExtension extends AbstractExtension
     protected function loadTypes()
     {
         return array(
-            new Type\FormType(PropertyAccess::getPropertyAccessor()),
+            new Type\FormType(PropertyAccess::createPropertyAccessor()),
         );
     }
 }

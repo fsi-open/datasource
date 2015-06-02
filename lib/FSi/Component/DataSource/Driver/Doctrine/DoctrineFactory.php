@@ -88,12 +88,10 @@ class DoctrineFactory implements DriverFactoryInterface
             'em' => null,
         ));
 
-        $this->optionsResolver->setAllowedTypes(array(
-            'entity' => array('string', 'null'),
-            'qb' => array('\Doctrine\ORM\QueryBuilder', 'null'),
-            'alias' => array('null', 'string'),
-            'em' => array('null', 'string'),
-        ));
+        $this->optionsResolver->setAllowedTypes('entity', array('string', 'null'));
+        $this->optionsResolver->setAllowedTypes('qb', array('\Doctrine\ORM\QueryBuilder', 'null'));
+        $this->optionsResolver->setAllowedTypes('alias', array('null', 'string'));
+        $this->optionsResolver->setAllowedTypes('em', array('null', 'string'));
 
         $entityNormalizer = function(Options $options, $value) {
             if (is_null($options['qb']) && is_null($value)) {
@@ -103,8 +101,6 @@ class DoctrineFactory implements DriverFactoryInterface
             return $value;
         };
 
-        $this->optionsResolver->setNormalizers(array(
-            'entity' => $entityNormalizer,
-        ));
+        $this->optionsResolver->setNormalizer('entity', $entityNormalizer);
     }
 }

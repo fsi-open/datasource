@@ -177,7 +177,7 @@ interface FieldTypeInterface
     /**
      * Returns the configured options resolver used for this field's type.
      *
-     * @return \Symfony\Component\OptionsResolver\OptionsResolverInterface
+     * @return \Symfony\Component\OptionsResolver\OptionsResolver
      */
     public function getOptionsResolver();
 }

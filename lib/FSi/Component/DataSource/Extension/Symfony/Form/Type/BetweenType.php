@@ -10,6 +10,7 @@
 namespace FSi\Component\DataSource\Extension\Symfony\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 class BetweenType extends AbstractType
@@ -18,6 +19,14 @@ class BetweenType extends AbstractType
      * {@inheritdoc}
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
+    {
+        $resolver->setDefaults(array('label' => false));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(array('label' => false));
     }
