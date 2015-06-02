@@ -99,27 +99,12 @@ class FormExtensionTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * Checks creation of FormExtension.
-     */
-    public function testFormExtension()
-    {
-        $formFactory = $this->getFormFactory();
-        $extension = new FormExtension($formFactory);
-
-        $this->setExpectedException('Exception');
-        $extension = new FormExtension(new \stdClass());
-    }
-
-    /**
      * Checks creation of DriverExtension.
      */
     public function testCreateDriverExtension()
     {
         $formFactory = $this->getFormFactory();
         $extension = new DriverExtension($formFactory);
-
-        $this->setExpectedException('Exception');
-        $extension = new DriverExtension(new \stdClass());
     }
 
     /**

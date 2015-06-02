@@ -157,19 +157,6 @@ class DataSourceViewTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * Checks exception throwed when adding something different than field view.
-     */
-    public function testAddFieldException1()
-    {
-        $driver = $this->getMock('FSi\Component\DataSource\Driver\DriverInterface');
-        $datasource = $this->getMock('FSi\Component\DataSource\DataSource', array(), array($driver));
-        $view = new DataSourceView($datasource);
-
-        $this->setExpectedException('Exception');
-        $view->addField(new \stdClass());
-    }
-
-    /**
      * Checks exception throwed when adding another field with the same name.
      */
     public function testAddFieldException2()
