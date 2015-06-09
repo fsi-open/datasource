@@ -53,9 +53,6 @@ class DataSourceViewTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($field->getType(), $fieldView->getType());
         $this->assertEquals($field->getComparison(), $fieldView->getComparison());
         $this->assertEquals($field->getCleanParameter(), $fieldView->getParameter());
-
-        $this->setExpectedException('Exception');
-        $fieldView = new FieldView(new \stdClass());
     }
 
     /**
@@ -71,9 +68,6 @@ class DataSourceViewTest extends \PHPUnit_Framework_TestCase
 
         $fieldView->setDataSourceView($view);
         $this->assertEquals($fieldView->getDataSourceView(), $view);
-
-        $this->setExpectedException('Exception');
-        $fieldView->setDataSourceView(new \stdClass());
     }
 
     /**

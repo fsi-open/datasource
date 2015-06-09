@@ -81,38 +81,6 @@ class FactoryTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * Checks exception thrown when loading inproper extensions not in constructor.
-     *
-     * @expectedException \Exception
-     */
-    public function testFactoryException4()
-    {
-        $driveFactoryManager = new DriverFactoryManager(array(
-            new CollectionFactory()
-        ));
-
-        $factory = new DataSourceFactory($driveFactoryManager);
-
-        $factory->addExtension(new \stdClass());
-    }
-
-    /**
-     * Checks exception thrown when loading scalar as extension not in constructor.
-     *
-     * @expectedException \Exception
-     */
-    public function testFactoryException5()
-    {
-        $driveFactoryManager = new DriverFactoryManager(array(
-            new CollectionFactory()
-        ));
-
-        $factory = new DataSourceFactory($driveFactoryManager);
-
-        $factory->addExtension('scalar');
-    }
-
-    /**
      * Checks exception thrown when creating DataSource with non-existing driver
      *
      * @expectedException \FSi\Component\DataSource\Exception\DataSourceException

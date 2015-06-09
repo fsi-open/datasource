@@ -70,8 +70,6 @@ class CollectionFactory implements DriverFactoryInterface
             'collection' => array(),
         ));
 
-        $this->optionsResolver->setAllowedTypes(array(
-            'collection' => 'array',
-        ));
+        $this->optionsResolver->setAllowedTypes('collection', 'array');
     }
 }

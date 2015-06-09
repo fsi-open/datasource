@@ -396,19 +396,23 @@ class DataSource implements DataSourceInterface
         $this->eventDispatcher->dispatch(DataSourceEvents::POST_GET_PARAMETERS, $event);
         $parameters = $event->getParameters();
 
-        $cleanfunc = function(&$value) use (&$cleanfunc) {
-            if (is_scalar($value) && (!empty($value) || is_numeric($value))) {
-                return true;
-            } elseif (is_array($value)) {
-                $value = array_filter($value, $cleanfunc);
-                return !empty($value);
-            } else {
-                return false;
+        $cleanfunc = function(array $array) use (&$cleanfunc) {
+            $newArray = array();
+            foreach ($array as $key => $value) {
+                if (is_array($value)) {
+                    $newValue = $cleanfunc($value);
+                    if (!empty($newValue)) {
+                        $newArray[$key] = $newValue;
+                    }
+                } elseif (is_scalar($value) && (!empty($value) || is_numeric($value))) {
+                    $newArray[$key] = $value;
+                }
             }
+            return $newArray;
         };
 
         //Clearing parameters from empty values.
-        $parameters = array_filter($parameters, $cleanfunc);
+        $parameters = $cleanfunc($parameters);
 
         $this->cache['parameters'] = $parameters;
         return $parameters;

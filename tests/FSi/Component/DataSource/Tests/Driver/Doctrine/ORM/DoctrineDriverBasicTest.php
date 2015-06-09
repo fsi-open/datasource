@@ -103,29 +103,9 @@ class DoctrineDriverBasicTest extends \PHPUnit_Framework_TestCase
     /**
      * Checks creation exception.
      */
-    public function testCreationException1()
-    {
-        $this->setExpectedException('Exception');
-        new DoctrineDriver(array(), new \stdClass(), 'entity');
-    }
-
-    /**
-     * Checks creation exception.
-     */
-    public function testCreationException2()
-    {
-        $this->setExpectedException('Exception');
-        $em = $this->getEntityManagerMock();
-        $qb = $this->getQueryBuilderMock($em);
-        new DoctrineDriver('scalar', $em, 'entity');
-    }
-
-    /**
-     * Checks creation exception.
-     */
     public function testCreationException3()
     {
-        $this->setExpectedException('Exception');
+        $this->setExpectedException('FSi\Component\DataSource\Exception\DataSourceException');
         $em = $this->getEntityManagerMock();
         $qb = $this->getQueryBuilderMock($em);
         new DoctrineDriver(array(new \stdClass()), $em, 'entity');
@@ -246,7 +226,7 @@ class DoctrineDriverBasicTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($field instanceof \FSi\Component\DataSource\Field\FieldTypeInterface);
         $this->assertTrue($field instanceof \FSi\Component\DataSource\Driver\Doctrine\ORM\DoctrineFieldInterface);
 
-        $this->assertTrue($field->getOptionsResolver()->isKnown('field'));
+        $this->assertTrue($field->getOptionsResolver()->isDefined('field'));
 
         $comparisons = $field->getAvailableComparisons();
         $this->assertTrue(count($comparisons) > 0);

@@ -43,15 +43,6 @@ class DataSourceTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * Testing exception thrown when creating DataSource with non-driver.
-     */
-    public function testDataSourceCreateException1()
-    {
-        $this->setExpectedException('Exception');
-        $datasource = new DataSource(new \stdClass());
-    }
-
-    /**
      * Testing exception thrown when creating DataSource with wrong name.
      */
     public function testDataSourceCreateException2()
@@ -69,17 +60,6 @@ class DataSourceTest extends \PHPUnit_Framework_TestCase
         $this->setExpectedException('FSi\Component\DataSource\Exception\DataSourceException');
         $driver = $this->getMock('FSi\Component\DataSource\Driver\DriverInterface');
         $datasource = new DataSource($driver, '');
-    }
-
-    /**
-     * Checks thrown exception when trying to load as extension something that isn't.
-     */
-    public function testDataSourceExtensionsLoadException()
-    {
-        $this->setExpectedException('Exception');
-        $driver = $this->getMock('FSi\Component\DataSource\Driver\DriverInterface');
-        $datasource = new DataSource($driver);
-        $datasource->addExtension(new \stdClass());
     }
 
     /**

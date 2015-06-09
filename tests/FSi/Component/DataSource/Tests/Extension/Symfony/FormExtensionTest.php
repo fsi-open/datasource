@@ -17,8 +17,7 @@ use FSi\Component\DataSource\Extension\Symfony\Form\Type\BetweenType;
 use FSi\Component\DataSource\Field\FieldAbstractExtension;
 use FSi\Component\DataSource\Field\FieldView;
 use Symfony\Component\Form;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Bridge\Doctrine\Form\DoctrineOrmExtension;
+use Symfony\Component\Security;
 use FSi\Component\DataSource\Tests\Fixtures\TestManagerRegistry;
 use FSi\Component\DataSource\DataSourceInterface;
 use FSi\Component\DataSource\Event\FieldEvent;
@@ -91,26 +90,12 @@ class FormExtensionTest extends \PHPUnit_Framework_TestCase
             array(
                 new TestForm\Extension\TestCore\TestCoreExtension(),
                 new Form\Extension\Core\CoreExtension(),
-                new Form\Extension\Csrf\CsrfExtension(
-                    new Form\Extension\Csrf\CsrfProvider\DefaultCsrfProvider('secret')
-                ),
+                new Form\Extension\Csrf\CsrfExtension(new Security\Csrf\CsrfTokenManager()),
                 new DatasourceExtension()
             ),
             $typeFactory
         );
         return new Form\FormFactory($registry, $typeFactory);
-    }
-
-    /**
-     * Checks creation of FormExtension.
-     */
-    public function testFormExtension()
-    {
-        $formFactory = $this->getFormFactory();
-        $extension = new FormExtension($formFactory);
-
-        $this->setExpectedException('Exception');
-        $extension = new FormExtension(new \stdClass());
     }
 
     /**
@@ -120,9 +105,6 @@ class FormExtensionTest extends \PHPUnit_Framework_TestCase
     {
         $formFactory = $this->getFormFactory();
         $extension = new DriverExtension($formFactory);
-
-        $this->setExpectedException('Exception');
-        $extension = new DriverExtension(new \stdClass());
     }
 
     /**

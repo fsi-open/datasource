@@ -50,18 +50,14 @@ class FieldExtension extends FieldAbstractExtension
     public function initOptions(FieldTypeInterface $field)
     {
         $field->getOptionsResolver()
-            ->setOptional(array('default_sort_priority'))
+            ->setDefined(array('default_sort_priority'))
             ->setDefaults(array(
                 'default_sort' => null,
                 'sortable' => true
             ))
-            ->setAllowedTypes(array(
-                'default_sort_priority' => 'integer',
-                'sortable' => 'bool',
-            ))
-            ->setAllowedValues(array(
-                'default_sort' => array(null, 'asc', 'desc'),
-            ))
+            ->setAllowedTypes('default_sort_priority', 'integer')
+            ->setAllowedTypes('sortable', 'bool')
+            ->setAllowedValues('default_sort', array(null, 'asc', 'desc'));
         ;
     }
 
