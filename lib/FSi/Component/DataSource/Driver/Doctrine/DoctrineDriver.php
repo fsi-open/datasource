@@ -15,7 +15,7 @@ use FSi\Component\DataSource\Driver\Doctrine\ORM\Exception\DoctrineDriverExcepti
 use FSi\Component\DataSource\Driver\Doctrine\ORM\DoctrineDriver as BaseDriver;
 
 /**
- * @deprecated since version 1.4
+ * @deprecated since version 1.2
  */
 class DoctrineDriver extends BaseDriver
 {

@@ -13,7 +13,7 @@ use FSi\Component\DataSource\Driver\Doctrine\ORM\Extension\Core\EventSubscriber\
 
 /**
  * Class contains method called at BindParameters events.
- * @deprecated since version 1.4
+ * @deprecated since version 1.2
  */
 class ResultIndexer extends BaseIndexer
 {

@@ -14,7 +14,7 @@ use FSi\Component\DataSource\Driver\Doctrine\ORM\Extension\Core\Field\Time as Ba
 
 /**
  * Time field.
- * @deprecated since version 1.4
+ * @deprecated since version 1.2
  */
 class Time extends BaseTime implements DoctrineFieldInterface
 {

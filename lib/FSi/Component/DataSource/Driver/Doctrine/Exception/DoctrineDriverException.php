@@ -13,7 +13,7 @@ use FSi\Component\DataSource\Exception\DataSourceException;
 
 /**
  * Exception for Doctrine driver.
- * @deprecated since version 1.4
+ * @deprecated since version 1.2
  */
 class DoctrineDriverException extends DataSourceException
 {

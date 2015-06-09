@@ -14,7 +14,7 @@ use FSi\Component\DataSource\Driver\Doctrine\ORM\Extension\Core\Field\Number as 
 
 /**
  * Number field.
- * @deprecated since version 1.4
+ * @deprecated since version 1.2
  */
 class Number extends BaseNumber implements DoctrineFieldInterface
 {

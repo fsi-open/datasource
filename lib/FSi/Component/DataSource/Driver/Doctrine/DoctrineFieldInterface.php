@@ -13,7 +13,7 @@ use FSi\Component\DataSource\Driver\Doctrine\ORM\DoctrineFieldInterface as BaseD
 
 /**
  * Interface for Doctrine driver's fields.
- * @deprecated since version 1.4
+ * @deprecated since version 1.2
  */
 interface DoctrineFieldInterface extends BaseDoctrineField
 {

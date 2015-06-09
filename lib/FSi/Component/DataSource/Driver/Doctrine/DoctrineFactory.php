@@ -16,7 +16,7 @@ use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
- * @deprecated since version 1.4
+ * @deprecated since version 1.2
  */
 class DoctrineFactory implements DriverFactoryInterface
 {
