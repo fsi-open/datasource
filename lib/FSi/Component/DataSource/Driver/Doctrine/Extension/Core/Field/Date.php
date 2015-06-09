@@ -14,7 +14,7 @@ use FSi\Component\DataSource\Driver\Doctrine\ORM\Extension\Core\Field\Date as Ba
 
 /**
  * Date field.
- * @deprecated since version 1.4
+ * @deprecated since version 1.2
  */
 class Date extends BaseDate implements DoctrineFieldInterface
 {

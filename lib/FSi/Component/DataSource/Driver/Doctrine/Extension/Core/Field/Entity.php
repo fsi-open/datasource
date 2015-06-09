@@ -16,7 +16,7 @@ use FSi\Component\DataSource\Driver\Doctrine\ORM\Extension\Core\Field\Entity as 
 
 /**
  * Entity field.
- * @deprecated since version 1.4
+ * @deprecated since version 1.2
  */
 class Entity extends BaseEntity implements DoctrineFieldInterface
 {

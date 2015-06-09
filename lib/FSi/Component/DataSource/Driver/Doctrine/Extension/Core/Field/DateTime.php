@@ -14,7 +14,7 @@ use FSi\Component\DataSource\Driver\Doctrine\ORM\Extension\Core\Field\DateTime a
 
 /**
  * Datetime field.
- * @deprecated since version 1.4
+ * @deprecated since version 1.2
  */
 class DateTime extends BaseDateTime implements DoctrineFieldInterface
 {

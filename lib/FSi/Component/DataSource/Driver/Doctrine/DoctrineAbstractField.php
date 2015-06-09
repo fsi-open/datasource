@@ -14,7 +14,7 @@ use FSi\Component\DataSource\Driver\Doctrine\ORM\DoctrineAbstractField as BaseFi
 use FSi\Component\DataSource\Driver\Doctrine\ORM\Exception\DoctrineDriverException;
 
 /**
- * @deprecated since version 1.4
+ * @deprecated since version 1.2
  */
 abstract class DoctrineAbstractField extends BaseField implements DoctrineFieldInterface
 {

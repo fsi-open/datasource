@@ -14,7 +14,7 @@ use FSi\Component\DataSource\Driver\Doctrine\ORM\Extension\Core\Field\Boolean as
 
 /**
  * Boolean field.
- * @deprecated since version 1.4
+ * @deprecated since version 1.2
  */
 class Boolean extends BaseField implements DoctrineFieldInterface
 {
