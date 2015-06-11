@@ -32,9 +32,9 @@
         "phpunit/phpunit": "3.7.*"
     },
     "autoload": {
-        "psr-0": {
-            "FSi\\Component\\DataSource": "lib/",
-            "FSi\\Component\\DataSource\\Tests": "tests/"
+        "psr-4": {
+            "FSi\\Component\\DataSource\\": "lib/",
+            "FSi\\Component\\DataSource\\Tests\\": "tests/"
         }
     },
     "config": {
