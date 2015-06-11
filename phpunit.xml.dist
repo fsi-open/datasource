@@ -11,7 +11,7 @@
 >
     <testsuites>
         <testsuite name="FSi Datasource Component Test Suite">
-            <directory>tests/FSi/Component/DataSource/Tests/</directory>
+            <directory>tests</directory>
         </testsuite>
     </testsuites>
 </phpunit>
