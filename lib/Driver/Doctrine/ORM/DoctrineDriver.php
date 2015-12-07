@@ -10,9 +10,7 @@
 namespace FSi\Component\DataSource\Driver\Doctrine\ORM;
 
 use FSi\Component\DataSource\Driver\DriverAbstract;
-use FSi\Component\DataSource\Driver\Doctrine\ORM\DoctrineFieldInterface;
 use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\Tools\Pagination\Paginator;
 use FSi\Component\DataSource\Driver\Doctrine\ORM\Exception\DoctrineDriverException;
 use Doctrine\ORM\QueryBuilder;
 

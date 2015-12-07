@@ -11,7 +11,7 @@ namespace FSi\Component\DataSource\Driver\Doctrine\ORM;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Persistence\ManagerRegistry;
-use Doctrine\ORM\Tools\Pagination\Paginator;
+use Doctrine\ORM\Tools\Pagination\Paginator as DoctrinePaginator;
 use FSi\Component\DataIndexer\DoctrineDataIndexer;
 
 class DoctrineResult extends ArrayCollection
@@ -25,7 +25,7 @@ class DoctrineResult extends ArrayCollection
      * @param \Doctrine\Common\Persistence\ManagerRegistry $registry
      * @param \Doctrine\ORM\Tools\Pagination\Paginator $paginator
      */
-    public function __construct(ManagerRegistry $registry, Paginator $paginator)
+    public function __construct(ManagerRegistry $registry, DoctrinePaginator $paginator)
     {
         $result = array();
         $this->count = $paginator->count();

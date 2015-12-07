@@ -53,7 +53,7 @@ class DoctrineDriverBasicTest extends \PHPUnit_Framework_TestCase
     /**
      * Returns mock of EntityManager.
      *
-     * @return object
+     * @return \PHPUnit_Framework_MockObject_MockObject|EntityManager
      */
     private function getEntityManagerMock()
     {
@@ -64,6 +64,10 @@ class DoctrineDriverBasicTest extends \PHPUnit_Framework_TestCase
         ;
     }
 
+    /**
+     * @param \PHPUnit_Framework_MockObject_MockObject|EntityManager $em
+     * @return \PHPUnit_Framework_MockObject_MockObject|\Doctrine\ORM\QueryBuilder
+     */
     private function getQueryBuilderMock(EntityManager $em)
     {
         $qb = $this->getMock('Doctrine\ORM\QueryBuilder', array(), array($em));
@@ -87,6 +91,41 @@ class DoctrineDriverBasicTest extends \PHPUnit_Framework_TestCase
         ;
 
         return $qb;
+    }
+
+    /**
+     * @param \PHPUnit_Framework_MockObject_MockObject|EntityManager $em
+     * @param \PHPUnit_Framework_MockObject_MockObject|\Doctrine\ORM\QueryBuilder $qb
+     */
+    private function extendWithRootEntities($em, $qb, array $map = array(array('entity', true)))
+    {
+        $returnMap = array();
+        foreach ($map as $info) {
+            /** @var \PHPUnit_Framework_MockObject_MockObject|\Doctrine\ORM\Mapping\ClassMetadata $metadata */
+            $metadata = $this
+                ->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
+                ->disableOriginalConstructor()
+                ->getMock();
+            $metadata->isIdentifierComposite = $info[1];
+
+            $returnMap[] = array($info[0], $metadata);
+        }
+
+        $qb
+            ->expects($this->any())
+            ->method('getRootEntities')
+            ->will($this->returnValue(array('entity')))
+        ;
+        $qb->expects($this->any())
+            ->method('getEntityManager')
+            ->will($this->returnValue($em))
+        ;
+
+        $em
+            ->expects($this->any())
+            ->method('getClassMetadata')
+            ->will($this->returnValueMap($returnMap))
+        ;
     }
 
     /**
@@ -142,6 +181,7 @@ class DoctrineDriverBasicTest extends \PHPUnit_Framework_TestCase
 
         $em = $this->getEntityManagerMock();
         $qb = $this->getQueryBuilderMock($em);
+        $this->extendWithRootEntities($em, $qb);
 
         $driver = new DoctrineDriver(array(), $em, 'entity');
         $driver->getResult($fields, 0, 20);
@@ -220,6 +260,8 @@ class DoctrineDriverBasicTest extends \PHPUnit_Framework_TestCase
     {
         $em = $this->getEntityManagerMock();
         $qb = $this->getQueryBuilderMock($em);
+        $this->extendWithRootEntities($em, $qb);
+
         $driver = new DoctrineDriver(array(new CoreExtension()), $em, 'entity');
         $this->assertTrue($driver->hasFieldType($type));
         $field = $driver->getFieldType($type);
@@ -252,6 +294,8 @@ class DoctrineDriverBasicTest extends \PHPUnit_Framework_TestCase
     {
         $em = $this->getEntityManagerMock();
         $qb = $this->getQueryBuilderMock($em);
+        $this->extendWithRootEntities($em, $qb);
+
         $extension = new DoctrineDriverExtension();
         $driver = new DoctrineDriver(array(), $em, 'entity');
         $driver->addExtension($extension);
