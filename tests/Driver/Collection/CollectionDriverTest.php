@@ -351,7 +351,7 @@ class CollectionDriverTest extends \PHPUnit_Framework_TestCase
             $parameters = array(
                 $datasource->getName() => array(
                     DataSourceInterface::PARAMETER_FIELDS => array(
-                        'title_is_not' => ['title1', 'title2', 'title3']
+                        'title_is_not' => array('title1', 'title2', 'title3')
                     ),
                 ),
             );
