@@ -122,7 +122,13 @@ class DoctrineDriverTest extends \PHPUnit_Framework_TestCase
                 ))
                 ->addField('category', 'entity', 'eq')
                 ->addField('category2', 'entity', 'isNull')
+                ->addField('not_category2', 'entity', 'neq', array(
+                    'field' => 'category2'
+                ))
                 ->addField('group', 'entity', 'memberof', array(
+                    'field' => 'groups',
+                ))
+                ->addField('not_group', 'entity', 'notmemberof', array(
                     'field' => 'groups',
                 ))
                 ->addField('tags', 'text', 'isNull', array(
@@ -206,6 +212,18 @@ class DoctrineDriverTest extends \PHPUnit_Framework_TestCase
             $parameters = array(
                 $datasource->getName() => array(
                     DataSourceInterface::PARAMETER_FIELDS => array(
+                        'not_group' => 1,
+                    ),
+                ),
+            );
+
+            $datasource->bindParameters($parameters);
+            $result = $datasource->getResult();
+            $this->assertEquals(75, count($result));
+
+            $parameters = array(
+                $datasource->getName() => array(
+                    DataSourceInterface::PARAMETER_FIELDS => array(
                         'category' => 1,
                     ),
                 ),
@@ -214,6 +232,18 @@ class DoctrineDriverTest extends \PHPUnit_Framework_TestCase
             $datasource->bindParameters($parameters);
             $result = $datasource->getResult();
             $this->assertEquals(20, count($result));
+
+            $parameters = array(
+                $datasource->getName() => array(
+                    DataSourceInterface::PARAMETER_FIELDS => array(
+                        'not_category2' => 1,
+                    ),
+                ),
+            );
+
+            $datasource->bindParameters($parameters);
+            $result = $datasource->getResult();
+            $this->assertEquals(40, count($result));
 
             $parameters = array(
                 $datasource->getName() => array(

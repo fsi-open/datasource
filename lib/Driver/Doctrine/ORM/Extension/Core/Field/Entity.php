@@ -21,7 +21,7 @@ class Entity extends DoctrineAbstractField
     /**
      * {@inheritdoc}
      */
-    protected $comparisons = array('eq', 'memberof', 'in', 'isNull');
+    protected $comparisons = array('eq', 'neq', 'memberof', 'notmemberof', 'in', 'isNull');
 
     /**
      * {@inheritdoc}
@@ -55,8 +55,18 @@ class Entity extends DoctrineAbstractField
                 $qb->setParameter($name, $data);
                 break;
 
+            case 'neq':
+                $qb->$func($qb->expr()->neq($fieldName, ":$name"));
+                $qb->setParameter($name, $data);
+                break;
+
             case 'memberof':
                 $qb->$func(":$name MEMBER OF $fieldName");
+                $qb->setParameter($name, $data);
+                break;
+
+            case 'notmemberof':
+                $qb->$func(":$name NOT MEMBER OF $fieldName");
                 $qb->setParameter($name, $data);
                 break;
 

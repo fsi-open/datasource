@@ -450,7 +450,7 @@ class FormExtensionTest extends \PHPUnit_Framework_TestCase
 
         $form = $viewEventArgs->getView()->getAttribute('form');
 
-        $this->assertEquals($expected, $form['fields']['name']->vars['type']);
+        $this->assertEquals($expected, $form['fields']['name']->vars['block_prefixes'][1]);
 
         if ($comparison == 'isNull') {
             $this->assertEquals(
