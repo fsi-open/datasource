@@ -87,8 +87,12 @@ abstract class CollectionAbstractField extends FieldAbstractType implements Coll
             }
         }
 
-        if (in_array($comparison, array('in', 'nin')) && !is_array($data)) {
-            throw new CollectionDriverException('Fields with \'in\' and \'nin\' comparisons require to bind an array.');
+        if ($comparison === 'nin') {
+            $comparison = 'notIn';
+        }
+
+        if (in_array($comparison, array('in', 'nin', 'notIn')) && !is_array($data)) {
+            throw new CollectionDriverException('Fields with \'in\' and \'notIn\' comparisons require to bind an array.');
         }
 
         if (isset($type)) {
