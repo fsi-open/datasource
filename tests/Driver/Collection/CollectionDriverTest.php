@@ -23,14 +23,17 @@ use FSi\Component\DataSource\Extension\Symfony;
 use FSi\Component\DataSource\Tests\Fixtures\Category;
 use FSi\Component\DataSource\Tests\Fixtures\Group;
 use FSi\Component\DataSource\Tests\Fixtures\News;
-use FSi\Component\DataSource\Tests\Fixtures\TestManagerRegistry;
-use Symfony\Component\Form;
 
 /**
  * Tests for Doctrine driver.
  */
 class CollectionDriverTest extends \PHPUnit_Framework_TestCase
 {
+    /**
+     * @var EntityManager
+     */
+    private $em;
+
     /**
      * {@inheritdoc}
      */
@@ -86,7 +89,7 @@ class CollectionDriverTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * General test for DataSource wtih DoctrineDriver in basic configuration.
+     * General test for DataSource wtih CollectionDriver in basic configuration.
      */
     public function testGeneral()
     {
@@ -339,6 +342,24 @@ class CollectionDriverTest extends \PHPUnit_Framework_TestCase
                 $this->assertEquals(false, $news->isActive());
                 break;
             }
+
+            // test 'notIn' comparison
+            $datasource->addField('title_is_not', 'text', 'notIn', array(
+                'field' => 'title',
+            ));
+
+            $parameters = array(
+                $datasource->getName() => array(
+                    DataSourceInterface::PARAMETER_FIELDS => array(
+                        'title_is_not' => array('title1', 'title2', 'title3')
+                    ),
+                ),
+            );
+
+            $datasource->bindParameters($parameters);
+            $view = $datasource->createView();
+            $result = $datasource->getResult();
+            $this->assertEquals(97, count($result));
         }
     }
 
@@ -390,7 +411,7 @@ class CollectionDriverTest extends \PHPUnit_Framework_TestCase
     /**
      * Return configured DoctrinFactory.
      *
-     * @return DoctrineFactory.
+     * @return CollectionFactory.
      */
     private function getCollectionFactory()
     {
