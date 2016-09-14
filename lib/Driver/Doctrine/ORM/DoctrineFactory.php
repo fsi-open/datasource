@@ -71,7 +71,7 @@ class DoctrineFactory implements DriverFactoryInterface
 
         $entity = isset($options['entity']) ? $options['entity'] : $options['qb'];
 
-        return new DoctrineDriver($this->extensions, $em, $entity, $options['alias']);
+        return new DoctrineDriver($this->extensions, $em, $entity, $options['alias'], $options['useOutputWalkers']);
     }
 
     /**
@@ -86,12 +86,14 @@ class DoctrineFactory implements DriverFactoryInterface
             'qb' => null,
             'alias' => null,
             'em' => null,
+            'useOutputWalkers' => null,
         ));
 
         $this->optionsResolver->setAllowedTypes('entity', array('string', 'null'));
         $this->optionsResolver->setAllowedTypes('qb', array('\Doctrine\ORM\QueryBuilder', 'null'));
         $this->optionsResolver->setAllowedTypes('alias', array('null', 'string'));
         $this->optionsResolver->setAllowedTypes('em', array('null', 'string'));
+        $this->optionsResolver->setAllowedTypes('useOutputWalkers', array('null', 'bool'));
 
         $entityNormalizer = function(Options $options, $value) {
             if (is_null($options['qb']) && is_null($value)) {
