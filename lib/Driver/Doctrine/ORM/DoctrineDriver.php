@@ -50,6 +50,7 @@ class DoctrineDriver extends DriverAbstract
      * @var \Doctrine\ORM\QueryBuilder
      */
     private $currentQuery;
+
     /**
      * @var bool
      */
