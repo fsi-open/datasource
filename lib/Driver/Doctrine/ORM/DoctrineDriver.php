@@ -52,13 +52,20 @@ class DoctrineDriver extends DriverAbstract
     private $currentQuery;
 
     /**
+     * @var bool
+     */
+    private $useOutputWalkers;
+
+    /**
      * @param array $extensions
      * @param \Doctrine\ORM\EntityManager $em
      * @param string|\Doctrine\ORM\QueryBuilder $entity
      * @param string $alias
-     * @throws \FSi\Component\DataSource\Driver\Doctrine\Exception\DoctrineDriverException
+     * @param bool|null $useOutputWalkers
+     *
+     * @throws DoctrineDriverException
      */
-    public function __construct($extensions, EntityManager $em, $entity, $alias = null)
+    public function __construct($extensions, EntityManager $em, $entity, $alias = null, $useOutputWalkers = null)
     {
         parent::__construct($extensions);
 
@@ -85,6 +92,8 @@ class DoctrineDriver extends DriverAbstract
                 ->from((string) $entity, $this->alias)
             ;
         }
+
+        $this->useOutputWalkers = $useOutputWalkers;
     }
 
     /**
@@ -130,6 +139,7 @@ class DoctrineDriver extends DriverAbstract
         }
 
         $result = new Paginator($this->currentQuery);
+        $result->setUseOutputWalkers($this->useOutputWalkers);
 
         $this->currentQuery = null;
 
