@@ -16,8 +16,8 @@
     ],
     "require": {
         "php": ">=5.3.0",
-        "symfony/event-dispatcher": "~2.2",
-        "symfony/options-resolver": "~2.6",
+        "symfony/event-dispatcher": "^2.2|^3.0",
+        "symfony/options-resolver": "^2.6|^3.0",
         "fsi/data-indexer" : "0.9.*"
     },
     "require-dev": {
