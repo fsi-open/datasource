@@ -172,7 +172,7 @@ class DoctrineDriverBasicTest extends \PHPUnit_Framework_TestCase
             $field = $this->getMock('FSi\Component\DataSource\Driver\Doctrine\ORM\DoctrineAbstractField');
 
             $field
-                ->expects($this->atLeastOnce())
+                ->expects($this->once())
                 ->method('buildQuery')
             ;
 
