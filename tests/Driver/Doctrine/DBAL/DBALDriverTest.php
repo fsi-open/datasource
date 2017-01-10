@@ -16,7 +16,7 @@ use FSi\Component\DataSource\Driver\Doctrine\DBAL\Extension\Core\Field;
 use FSi\Component\DataSource\Tests\Driver\Doctrine\DBAL\Fixtures\DBALDriverExtension;
 use FSi\Component\DataSource\Tests\Fixtures\FieldExtension;
 
-class DBALTestBase extends TestBase
+class DBALDriverTest extends TestBase
 {
     /**
      * @var Connection

@@ -92,6 +92,7 @@ abstract class TestBase extends \PHPUnit_Framework_TestCase
 
         $schemaManager->createTable(new Table(self::TABLE_CATEGORY_NAME, array(
             new Column('id', Type::getType(Type::INTEGER)),
+            new Column('type', Type::getType(Type::STRING)),
             new Column('name', Type::getType(Type::STRING)),
         )));
 
@@ -107,6 +108,7 @@ abstract class TestBase extends \PHPUnit_Framework_TestCase
         for ($i=1; $i<=10; $i++) {
             $connection->insert(self::TABLE_CATEGORY_NAME, array(
                 'id' => $i,
+                'type' => $i % 2 == 0 ? 'B' : 'A',
                 'name' => sprintf('name-%d', $i),
             ));
         }

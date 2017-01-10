@@ -53,11 +53,22 @@ class DBALDriver extends DriverAbstract
      */
     private $currentQuery;
 
-    public function __construct(array $extensions = array(), Connection $connection, $table, $alias = null)
-    {
+    /**
+     * @var string|\Closure
+     */
+    private $indexField;
+
+    public function __construct(
+        array $extensions = array(),
+        Connection $connection,
+        $table,
+        $alias = null,
+        $indexField = null
+    ) {
         parent::__construct($extensions);
         $this->connection = $connection;
         $this->table = $table;
+        $this->indexField = $indexField;
 
         if (is_string($alias)) {
             $this->alias = (string) $alias;
@@ -136,5 +147,13 @@ class DBALDriver extends DriverAbstract
         }
 
         return $this->currentQuery;
+    }
+
+    /**
+     * @return \Closure|string
+     */
+    public function getIndexField()
+    {
+        return $this->indexField;
     }
 }

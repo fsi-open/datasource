@@ -10,6 +10,7 @@
 namespace FSi\Component\DataSource\Driver\Doctrine\DBAL;
 
 use Doctrine\Common\Persistence\ConnectionRegistry;
+use FSi\Component\DataSource\Driver\Doctrine\DBAL\Extension\Core\EventSubscriber\ResultIndexer;
 use FSi\Component\DataSource\Driver\DriverFactoryInterface;
 use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
 use Symfony\Component\OptionsResolver\Options;
@@ -59,7 +60,7 @@ class DBALFactory implements DriverFactoryInterface
 
         $table = isset($options['table']) ? $options['table'] : $options['qb'];
 
-        return new DBALDriver($this->extensions, $connection, $table, $options['alias']);
+        return new DBALDriver($this->extensions, $connection, $table, $options['alias'], $options['indexField']);
     }
 
     private function initOptions()
@@ -69,12 +70,14 @@ class DBALFactory implements DriverFactoryInterface
             'table' => null,
             'alias' => null,
             'connection' => null,
+            'indexField' => null,
         ));
 
         $this->optionsResolver->setAllowedTypes('qb', array('\Doctrine\DBAL\Query\QueryBuilder', 'null'));
         $this->optionsResolver->setAllowedTypes('table', array('string', 'null'));
         $this->optionsResolver->setAllowedTypes('alias', array('null', 'string'));
         $this->optionsResolver->setAllowedTypes('connection', array('null', 'string'));
+        $this->optionsResolver->setAllowedTypes('indexField', array('null', 'string', '\Closure'));
 
         $tableNormalizer = function(Options $options, $value) {
             if (is_null($options['qb']) && is_null($value)) {

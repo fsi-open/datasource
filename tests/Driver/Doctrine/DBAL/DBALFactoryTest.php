@@ -78,4 +78,21 @@ class DBALFactoryTest extends TestBase
         ));
         $this->assertCount(1, $factory->createDriver(array('table' => 'table_name'))->getExtensions());
     }
+
+    public function testPassIndexField()
+    {
+        $driver = $this->factory->createDriver(array(
+            'table' => self::TABLE_CATEGORY_NAME,
+            'indexField' => 'test',
+        ));
+
+        $this->assertEquals('test', $driver->getIndexField());
+
+        $driver = $this->factory->createDriver(array(
+            'table' => self::TABLE_CATEGORY_NAME,
+            'indexField' => function () {},
+        ));
+
+        $this->assertInstanceOf('\Closure', $driver->getIndexField());
+    }
 }

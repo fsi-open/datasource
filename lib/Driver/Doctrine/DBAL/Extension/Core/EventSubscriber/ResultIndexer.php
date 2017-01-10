@@ -9,11 +9,11 @@
 
 namespace FSi\Component\DataSource\Driver\Doctrine\DBAL\Extension\Core\EventSubscriber;
 
-use Doctrine\ORM\Tools\Pagination\Paginator;
-use FSi\Component\DataSource\Driver\Doctrine\ORM\DoctrineResult;
+use FSi\Component\DataSource\Driver\Doctrine\DBAL\DBALDriver;
+use FSi\Component\DataSource\Driver\Doctrine\DBAL\DBALResult;
+use FSi\Component\DataSource\Driver\Doctrine\DBAL\Paginator;
 use FSi\Component\DataSource\Event\DriverEvent\ResultEventArgs;
 use FSi\Component\DataSource\Event\DriverEvents;
-use Symfony\Bridge\Doctrine\ManagerRegistry;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
@@ -21,22 +21,6 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  */
 class ResultIndexer implements EventSubscriberInterface
 {
-    /**
-     * @var \Symfony\Bridge\Doctrine\ManagerRegistry
-     */
-    protected $registry;
-
-    /**
-     * @param \Symfony\Bridge\Doctrine\ManagerRegistry $registry
-     */
-    public function __construct(ManagerRegistry $registry)
-    {
-        $this->registry = $registry;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public static function getSubscribedEvents()
     {
         return array(DriverEvents::POST_GET_RESULT => array('postGetResult', 1024));
@@ -47,11 +31,18 @@ class ResultIndexer implements EventSubscriberInterface
      */
     public function postGetResult(ResultEventArgs $event)
     {
+        /** @var DBALDriver $driver */
+        $driver = $event->getDriver();
+        $indexField = $driver->getIndexField();
+
+        if (empty($indexField)) {
+            return;
+        }
+
         $result = $event->getResult();
 
         if ($result instanceof Paginator) {
-            $result = new DoctrineResult($this->registry, $result);
-            $event->setResult($result);
+            $event->setResult(new DBALResult($result, $indexField));
         }
     }
 }
