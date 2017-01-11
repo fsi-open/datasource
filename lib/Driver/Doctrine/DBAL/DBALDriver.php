@@ -16,10 +16,7 @@ use FSi\Component\DataSource\Driver\DriverAbstract;
 
 class DBALDriver extends DriverAbstract
 {
-    /**
-     * Default alias for entity during building query when no alias is specified.
-     */
-    const DEFAULT_ENTITY_ALIAS = 'e';
+    const DEFAULT_TABLE_ALIAS = 'e';
 
     /**
      * @var Connection
@@ -40,11 +37,9 @@ class DBALDriver extends DriverAbstract
     private $alias;
 
     /**
-     * Query builder available during preGetResult event.
-     *
      * @var QueryBuilder
      */
-    private $query;
+    private $initialQuery;
 
     /**
      * Query builder available during preGetResult event.
@@ -73,18 +68,18 @@ class DBALDriver extends DriverAbstract
         if (is_string($alias)) {
             $this->alias = (string) $alias;
         } else {
-            $this->alias = self::DEFAULT_ENTITY_ALIAS;
+            $this->alias = self::DEFAULT_TABLE_ALIAS;
         }
 
         if ($table instanceof QueryBuilder) {
-            $this->query = $table;
+            $this->initialQuery = $table;
         } else {
             if (empty($table)) {
                 throw new DBALDriverException('Name of table can\'t be empty.');
             }
 
-            $this->query = $this->connection->createQueryBuilder();
-            $this->query
+            $this->initialQuery = $this->connection->createQueryBuilder();
+            $this->initialQuery
                 ->select(sprintf('%s.*', $this->alias))
                 ->from($this->table, $this->alias)
             ;
@@ -106,7 +101,7 @@ class DBALDriver extends DriverAbstract
 
     protected function initResult()
     {
-        $this->currentQuery = clone $this->query;
+        $this->currentQuery = clone $this->initialQuery;
     }
 
     protected function buildResult($fields, $first, $max)
@@ -136,7 +131,7 @@ class DBALDriver extends DriverAbstract
     /**
      * Returns query builder.
      *
-     * If query is set to null (so when getResult method is NOT executed at the moment) exception is throwed.
+     * If query is set to null (so when getResult method is NOT executed at the moment) exception is thrown.
      *
      * @return QueryBuilder
      */

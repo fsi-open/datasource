@@ -24,8 +24,6 @@ class DBALFactory implements DriverFactoryInterface
     private $registry;
 
     /**
-     * Array of extensions.
-     *
      * @var array
      */
     private $extensions;

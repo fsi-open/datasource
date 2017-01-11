@@ -27,9 +27,8 @@ class Number extends DBALAbstractField
     public function getDBALType()
     {
         /*
-         * when we omit type, doctrine will bind value to statement as \PDO::PARAM_STR.
-         * Therefore some engines (like sqlite) will result in incorrect results
-         * while others (like mysql) will behave as expected.
+         * If the type is ommited, Doctrine will bind the value as \PDO::PARAM_STR.
+         * This will result in incorrect results for some engines (like SQLite).
          */
         return Type::INTEGER;
     }

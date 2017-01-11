@@ -30,30 +30,19 @@ class Paginator implements \Countable, \IteratorAggregate
 
     public function count()
     {
-        $resultQuery = clone $this->query;
-        $resultQuery->setFirstResult(null);
-        $resultQuery->setMaxResults(null);
+        $query = clone $this->query;
+        $query->setFirstResult(null);
+        $query->setMaxResults(null);
 
-        $countBuilder = $this->query->getConnection()->createQueryBuilder();
-        $queryBuilder = $countBuilder->select('COUNT(*) count')
-            ->from(sprintf('(%s)', $resultQuery->getSQL()), 'orig_query')
-            ->setParameters($resultQuery->getParameters(), $this->getParameterTypes($resultQuery));
+        $sql = $query->getSQL();
+        $query->resetQueryParts(array_keys($query->getQueryParts()));
 
-        $row = $queryBuilder->execute()->fetch();
+        $query
+            ->select('COUNT(*) count')
+            ->from(sprintf('(%s)', $sql), 'orig_query')
+        ;
+
+        $row = $query->execute()->fetch();
         return $row['count'];
-    }
-
-    private function getParameterTypes(QueryBuilder $qb)
-    {
-        //dbal >2.5
-        if (method_exists($qb, 'getParameterTypes')) {
-            return $qb->getParameterTypes();
-        }
-
-        //dbal <=2.4
-        $class = new \ReflectionClass('Doctrine\DBAL\Query\QueryBuilder');
-        $property = $class->getProperty('paramTypes');
-        $property->setAccessible(true);
-        return $property->getValue($qb);
     }
 }

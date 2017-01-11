@@ -52,11 +52,9 @@ class DBALExtension extends DriverExtension implements EventSubscriberInterface
             throw new \InvalidArgumentException("Field must be an instance of DoctrineField");
         }
 
-        if ($field->hasOption('field')) {
-            $name = $field->getOption('field');
-        } else {
-            $name = $field->getName();
-        }
+        $name = $field->hasOption('field')
+            ? $field->getOption('field')
+            : $field->getName();
 
         if ($field->getOption('auto_alias') && !preg_match('/\./', $name)) {
             $name = "$alias.$name";

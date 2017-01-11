@@ -111,8 +111,7 @@ abstract class DBALAbstractField extends FieldAbstractType implements DBALFieldI
             })
             ->setNormalizer('clause', function($options, $value) {
                 return strtolower($value);
-            }
-            );
+            })
         ;
     }
 

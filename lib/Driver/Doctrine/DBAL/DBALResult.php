@@ -29,7 +29,10 @@ class DBALResult extends ArrayCollection
     public function __construct(Paginator $paginator, $indexField)
     {
         if (!is_string($indexField) && !$indexField instanceof \Closure) {
-            throw new \InvalidArgumentException('indexField should be string or \Closure');
+            throw new \InvalidArgumentException(sprintf(
+                'indexField should be string or \Closure but is %s',
+                is_object($indexField) ? 'an instance of ' . get_class($indexField) : gettype($indexField)
+            ));
         }
 
         $result = array();
