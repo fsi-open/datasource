@@ -98,7 +98,7 @@ abstract class TestBase extends \PHPUnit_Framework_TestCase
 
         $schemaManager->createTable(new Table(self::TABLE_NEWS_NAME, array(
             new Column('id', Type::getType(Type::INTEGER)),
-            new Column('visible', Type::getType(Type::BOOLEAN)),
+            new Column('visible', Type::getType(Type::INTEGER)),
             new Column('title', Type::getType(Type::STRING)),
             new Column('create_date', Type::getType(Type::DATETIME)),
             new Column('content', Type::getType(Type::TEXT)),
@@ -116,11 +116,24 @@ abstract class TestBase extends \PHPUnit_Framework_TestCase
         for ($i=1; $i<=100; $i++) {
             $connection->insert(self::TABLE_NEWS_NAME, array(
                 'id' => $i,
-                'visible' => $i % 2 == 0,
+                'visible' => (int) $i % 2 == 0,
                 'title' => sprintf('title-%d', $i),
                 'create_date' => date("Y-m-d H:i:s", ($i - 1) * 60 * 60 - 60 * 60),
                 'content' => sprintf('Lorem ipsum %d', $i % 3),
-                'category_id' => $i % 10,
+                'category_id' => ceil((log($i - 1, 100) + 0.001) * 10),
+                /*
+                 * category id - how many news
+                 *  1 - 1
+                 *  2 - 1
+                 *  3 - 1
+                 *  4 - 3
+                 *  5 - 3
+                 *  6 - 6
+                 *  7 - 10
+                 *  8 - 14
+                 *  9 - 23
+                 * 10 - 37
+                 */
             ));
         }
     }

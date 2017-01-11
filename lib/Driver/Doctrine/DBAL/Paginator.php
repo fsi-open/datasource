@@ -37,9 +37,23 @@ class Paginator implements \Countable, \IteratorAggregate
         $countBuilder = $this->query->getConnection()->createQueryBuilder();
         $queryBuilder = $countBuilder->select('COUNT(*) count')
             ->from(sprintf('(%s)', $resultQuery->getSQL()), 'orig_query')
-            ->setParameters($resultQuery->getParameters());
+            ->setParameters($resultQuery->getParameters(), $this->getParameterTypes($resultQuery));
 
         $row = $queryBuilder->execute()->fetch();
         return $row['count'];
+    }
+
+    private function getParameterTypes(QueryBuilder $qb)
+    {
+        //dbal >2.5
+        if (method_exists($qb, 'getParameterTypes')) {
+            return $qb->getParameterTypes();
+        }
+
+        //dbal <=2.4
+        $class = new \ReflectionClass('Doctrine\DBAL\Query\QueryBuilder');
+        $property = $class->getProperty('paramTypes');
+        $property->setAccessible(true);
+        return $property->getValue($qb);
     }
 }

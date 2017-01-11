@@ -9,6 +9,7 @@
 
 namespace FSi\Component\DataSource\Driver\Doctrine\DBAL\Extension\Core\Field;
 
+use Doctrine\DBAL\Types\Type;
 use FSi\Component\DataSource\Driver\Doctrine\DBAL\DBALAbstractField;
 
 /**
@@ -21,5 +22,15 @@ class Number extends DBALAbstractField
     public function getType()
     {
         return 'number';
+    }
+
+    public function getDBALType()
+    {
+        /*
+         * when we omit type, doctrine will bind value to statement as \PDO::PARAM_STR.
+         * Therefore some engines (like sqlite) will result in incorrect results
+         * while others (like mysql) will behave as expected.
+         */
+        return Type::INTEGER;
     }
 }

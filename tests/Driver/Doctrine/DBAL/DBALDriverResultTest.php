@@ -11,15 +11,10 @@ namespace FSi\Component\DataSource\Tests\Driver\Doctrine\DBAL;
 
 use Doctrine\DBAL\Connection;
 use FSi\Component\DataSource\DataSourceInterface;
-use FSi\Component\DataSource\Driver\Doctrine\DBAL\DBALFactory;
-use FSi\Component\DataSource\Driver\Doctrine\DBAL\Extension\Core\CoreExtension;
 use FSi\Component\DataSource\Extension\Core;
 use FSi\Component\DataSource\Extension\Core\Ordering\OrderingExtension;
 use FSi\Component\DataSource\Extension\Core\Pagination\PaginationExtension;
 use FSi\Component\DataSource\Extension\Symfony;
-use FSi\Component\DataSource\Tests\Driver\Doctrine\DBAL\Fixtures\DBALDriverExtension;
-use FSi\Component\DataSource\Tests\Driver\Doctrine\DBAL\Fixtures\TestConnectionRegistry;
-use FSi\Component\DataSource\Tests\Fixtures\DoctrineDriverExtension;
 
 class DBALResultTestBase extends TestBase
 {
@@ -113,7 +108,8 @@ class DBALResultTestBase extends TestBase
         $datasource->bindParameters($parameters);
 
         $result = $datasource->getResult();
-        $this->assertEquals(12, count($result));
+        $this->assertCount(12, $result);
+        $this->assertCount(10, iterator_to_array($result));
 
         foreach ($result as $row) {
             $this->assertEquals('title-18', $row['title']);
@@ -144,18 +140,22 @@ class DBALResultTestBase extends TestBase
             ->addField('category', 'text', 'eq', array(
                 'field' => 'c.name',
             ))
+            ->setMaxResults(8);
         ;
 
         $parameters = array(
             $datasource->getName() => array(
                 DataSourceInterface::PARAMETER_FIELDS => array(
-                    'category' => 'name-1',
+                    'category' => 'name-10',
                 ),
             ),
         );
 
         $datasource->bindParameters($parameters);
-        $this->assertEquals(10, count($datasource->getResult()));
+        $result = $datasource->getResult();
+
+        $this->assertCount(37, $result);
+        $this->assertCount(8, iterator_to_array($result));
     }
 
     /**
@@ -167,9 +167,9 @@ class DBALResultTestBase extends TestBase
 
         $qb = $this->connection->createQueryBuilder()
             ->select('c.*')
-            ->addSelect('COUNT(n) newscount')
+            ->addSelect('COUNT(n.id) newscount')
             ->from(self::TABLE_CATEGORY_NAME, 'c')
-            ->join('c', 'news', 'n', 'n.category_id = c.id')
+            ->leftJoin('c', 'news', 'n', 'n.category_id = c.id')
             ->groupBy('c.id')
         ;
 
@@ -187,39 +187,43 @@ class DBALResultTestBase extends TestBase
             ->addField('newscount', 'number', 'gt', array(
                 'field' => 'newscount',
                 'auto_alias' => false,
-                'clause' => 'having'
-            ));
+                'clause' => 'having',
+            ))
+            ->setMaxResults(3)
+        ;
 
-        $parameters = array(
+        $datasource->bindParameters(array(
             $datasource->getName() => array(
                 DataSourceInterface::PARAMETER_FIELDS => array(
                     'newscount' => 3,
                 ),
             ),
-        );
+        ));
 
-        $datasource->bindParameters($parameters);
-        $datasource->getResult();
+        $result = $datasource->getResult();
+        $this->assertCount(5, $result);
+        $this->assertCount(3, iterator_to_array($result));
 
         $this->assertEquals(
             $this->testDoctrineExtension->getQueryBuilder()->getSQL(),
-            'SELECT c.*, COUNT(n) newscount FROM category c INNER JOIN news n ON n.category_id = c.id GROUP BY c.id HAVING newscount > :newscount'
+            'SELECT c.*, COUNT(n.id) newscount FROM category c LEFT JOIN news n ON n.category_id = c.id GROUP BY c.id HAVING newscount > :newscount LIMIT 3 OFFSET 0'
         );
 
-        $parameters = array(
+        $datasource->bindParameters(array(
             $datasource->getName() => array(
                 DataSourceInterface::PARAMETER_FIELDS => array(
                     'newscount' => 0,
                 ),
             ),
-        );
+        ));
 
-        $datasource->bindParameters($parameters);
-        $datasource->getResult();
+        $result = $datasource->getResult();
+        $this->assertCount(10, $result);
+        $this->assertCount(3, iterator_to_array($result));
 
         $this->assertEquals(
-            $this->testDoctrineExtension->getQueryBuilder()->getSQL(),
-            'SELECT c.*, COUNT(n) newscount FROM category c INNER JOIN news n ON n.category_id = c.id GROUP BY c.id HAVING newscount > :newscount'
+            'SELECT c.*, COUNT(n.id) newscount FROM category c LEFT JOIN news n ON n.category_id = c.id GROUP BY c.id HAVING newscount > :newscount LIMIT 3 OFFSET 0',
+            $this->testDoctrineExtension->getQueryBuilder()->getSQL()
         );
 
         $datasource = $dataSourceFactory->createDataSource('doctrine-dbal', $driverOptions, 'name2');
@@ -231,7 +235,9 @@ class DBALResultTestBase extends TestBase
                 'field' => 'newscount',
                 'auto_alias' => false,
                 'clause' => 'having'
-            ));
+            ))
+            ->setMaxResults(2)
+        ;
 
         $parameters = array(
             $datasource->getName() => array(
@@ -242,11 +248,13 @@ class DBALResultTestBase extends TestBase
         );
 
         $datasource->bindParameters($parameters);
-        $datasource->getResult();
+        $result = $datasource->getResult();
+        $this->assertCount(3, $result);
+        $this->assertCount(2, iterator_to_array($result));
 
         $this->assertEquals(
-            $this->testDoctrineExtension->getQueryBuilder()->getSQL(),
-            'SELECT c.*, COUNT(n) newscount FROM category c INNER JOIN news n ON n.category_id = c.id GROUP BY c.id HAVING newscount BETWEEN :newscount_from AND :newscount_to'
+            'SELECT c.*, COUNT(n.id) newscount FROM category c LEFT JOIN news n ON n.category_id = c.id GROUP BY c.id HAVING newscount BETWEEN :newscount_from AND :newscount_to LIMIT 2 OFFSET 0',
+            $this->testDoctrineExtension->getQueryBuilder()->getSQL()
         );
     }
 
