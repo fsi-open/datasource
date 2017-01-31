@@ -98,9 +98,11 @@ abstract class TestBase extends \PHPUnit_Framework_TestCase
 
         $schemaManager->createTable(new Table(self::TABLE_NEWS_NAME, array(
             new Column('id', Type::getType(Type::INTEGER)),
-            new Column('visible', Type::getType(Type::INTEGER)),
+            new Column('visible', Type::getType(Type::BOOLEAN)),
             new Column('title', Type::getType(Type::STRING)),
-            new Column('create_date', Type::getType(Type::DATETIME)),
+            new Column('create_datetime', Type::getType(Type::DATETIME)),
+            new Column('event_date', Type::getType(Type::DATE)),
+            new Column('event_hour', Type::getType(Type::TIME)),
             new Column('content', Type::getType(Type::TEXT)),
             new Column('category_id', Type::getType(Type::INTEGER)),
         )));
@@ -118,22 +120,33 @@ abstract class TestBase extends \PHPUnit_Framework_TestCase
                 'id' => $i,
                 'visible' => (int) $i % 2 == 0,
                 'title' => sprintf('title-%d', $i),
-                'create_date' => date("Y-m-d H:i:s", ($i - 1) * 60 * 60 - 60 * 60),
+                'create_datetime' => new \DateTime('@' . (($i - 1) * 60 * 60)),
+                'event_date' => new \DateTime('@' . (($i - 1) * 60 * 60)),
+                'event_hour' => new \DateTime('@' . (($i - 1) * 60 * 60)),
                 'content' => sprintf('Lorem ipsum %d', $i % 3),
-                'category_id' => ceil((log($i - 1, 100) + 0.001) * 10),
+                'category_id' => ceil((log($i + 0.001, 101)) * 10),
                 /*
                  * category id - how many news
                  *  1 - 1
                  *  2 - 1
                  *  3 - 1
                  *  4 - 3
-                 *  5 - 3
-                 *  6 - 6
+                 *  5 - 4
+                 *  6 - 5
                  *  7 - 10
-                 *  8 - 14
+                 *  8 - 15
                  *  9 - 23
                  * 10 - 37
                  */
+            ), array(
+                Type::INTEGER,
+                Type::BOOLEAN,
+                Type::STRING,
+                Type::DATETIME,
+                Type::DATE,
+                Type::TIME,
+                Type::TEXT,
+                Type::INTEGER,
             ));
         }
     }
