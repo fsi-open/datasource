@@ -75,7 +75,7 @@ abstract class DBALAbstractField extends FieldAbstractType implements DBALFieldI
             }
             $placeholders = array();
             foreach ($data as $value) {
-                $placeholders[] = $qb->createNamedParameter($value);
+                $placeholders[] = $qb->createNamedParameter($value, $type);
             }
             //this is because "in" and "notIn" was added in DBAL 2.4
             $comparison = $comparison === 'in' ? 'IN' : 'NOT IN';

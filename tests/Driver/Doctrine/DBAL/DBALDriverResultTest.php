@@ -125,7 +125,8 @@ class DBALResultTestBase extends TestBase
         $dataSourceFactory = $this->getDataSourceFactory();
 
         $qb = $this->connection->createQueryBuilder()
-            ->select('*')
+            ->select('n.id')
+            ->addSelect('c.id category_id')
             ->from('news', 'n')
             ->join('n', 'category', 'c', 'n.category_id = c.id')
         ;
@@ -201,7 +202,7 @@ class DBALResultTestBase extends TestBase
         ));
 
         $result = $datasource->getResult();
-        $this->assertCount(5, $result);
+        $this->assertCount(6, $result);
         $this->assertCount(3, iterator_to_array($result));
 
         $this->assertEquals(
