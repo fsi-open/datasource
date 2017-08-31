@@ -9,7 +9,7 @@ operations.
 
 You can create driver manually
 
-``` php
+```php
 <?php
 
 use FSi\Component\DataSource\Driver\Collection\CollectionDriver;
@@ -23,7 +23,7 @@ $driver = new CollectionDriver($driverExtensions, $arrayOfObjects);
 
 or through factory
 
-``` php
+```php
 <?php
 
 use FSi\Component\DataSource\Driver\Collection\CollectionFactory;
@@ -63,7 +63,7 @@ All fields allow by default to set option ``field`` which usage is explained bel
 In the simpliest case you must just create driver with proper array of objects and use it to create DataSource. In this example
 $data array is constructed from simple objects but it can contain any objects with consistent fields among the whole array.
 
-``` php
+```php
 <?php
 
 $data = array(
@@ -90,7 +90,7 @@ $datasource->addField('id', 'number', 'eq')
 
 You can use ``field`` option to have different field name, or many DataSource fields referring to one object field:
 
-``` php
+```php
 <?php
 
 $datasource

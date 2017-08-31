@@ -11,10 +11,8 @@ namespace FSi\Component\DataSource\Tests\Driver\Doctrine\DBAL;
 
 use Doctrine\DBAL\Connection;
 use FSi\Component\DataSource\DataSourceInterface;
-use FSi\Component\DataSource\Extension\Core;
 use FSi\Component\DataSource\Extension\Core\Ordering\OrderingExtension;
 use FSi\Component\DataSource\Extension\Core\Pagination\PaginationExtension;
-use FSi\Component\DataSource\Extension\Symfony;
 
 class DBALResultTestBase extends TestBase
 {

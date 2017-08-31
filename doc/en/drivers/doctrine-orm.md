@@ -1,12 +1,12 @@
-# Doctrine ORM Driver #
+# Doctrine ORM Driver
 
 This driver allows to fetch data from database using Doctrine2 ORM. 
 
-## Setup ##
+## Setup
 
 You can create driver manually
 
-``` php
+```php
 <?php
 
 use FSi\Component\DataSource\Driver\Doctrine\ORM\DoctrineDriver;
@@ -20,7 +20,7 @@ $driver = new DoctrineDriver($driverExtensions, $entityManager, $entityName);
 
 or through factory
 
-``` php
+```php
 <?php
 
 use FSi\Component\DataSource\Driver\Doctrine\ORM\DoctrineFactory;
@@ -39,7 +39,7 @@ $driver = $driverFactory->createDriver($entityName); // All drivers created this
 
 ```
 
-## Provided fields ##
+## Provided fields
 
 Doctrine driver provides some field types through
 ``FSi\Component\DataSource\Driver\Doctrine\ORM\Extension\Core\CoreExtension``
@@ -60,11 +60,11 @@ if ``entity`` you must give entity to it and if ``in``, or ``notIn`` then as arr
 
 All fields allow by default to set option ``field`` which usage is explained below.
 
-## Basic usage ##
+## Basic usage
 
 In the simpliest use case you must just create DataSource with proper entity name:
 
-``` php
+```php
 <?php
 
 $driverFactoryManager = new DriverFactoryManager(array(
@@ -122,7 +122,7 @@ corresponding DataSource field.
 You can also use predefined QueryBuilder, and if so, you can pass it to driver options insetad of ``entity``.
 If you do you can also pass an alias of entity as additional argument.
 
-``` php
+```php
 <?php
 
 $queryBuilder = $entityManager->createQueryBuilder();
@@ -142,12 +142,12 @@ $driverOptions = array(
 $datasource = $datasourceFactory->createDataSource('doctrine-orm', $driverOptions, 'datasource_name');
 ```
 
-## Advanced use with QueryBuilder ##
+## Advanced use with QueryBuilder
 
 If you want to have conditions to fields from joined entities, or you build very sophisticated query,
 remember to add field mapping to all of fields, otherwise they will try do refer to root entity alias.
 
-``` php
+```php
 <?php
 
 $queryBuilder = $entityManager->createQueryBuilder();

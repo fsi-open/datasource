@@ -20,12 +20,8 @@ use FSi\Component\DataSource\Tests\Fixtures\Group;
 use FSi\Component\DataSource\Tests\Fixtures\TestManagerRegistry;
 use FSi\Component\DataSource\Driver\Doctrine\Extension\Core\CoreExtension;
 use FSi\Component\DataSource\Driver\Doctrine\DoctrineFactory;
-use FSi\Component\DataSource\Extension\Symfony\Form\FormExtension;
-use FSi\Component\DataSource\Extension\Symfony;
 use FSi\Component\DataSource\Extension\Core;
 use FSi\Component\DataSource\Extension\Core\Ordering\OrderingExtension;
-use Symfony\Component\Form;
-use Symfony\Bridge\Doctrine\Form\DoctrineOrmExtension;
 use FSi\Component\DataSource\Extension\Core\Pagination\PaginationExtension;
 use FSi\Component\DataSource\Tests\Fixtures\DoctrineDriverExtension;
 
@@ -676,7 +672,6 @@ class DoctrineDriverTest extends \PHPUnit_Framework_TestCase
         ));
 
         $extensions = array(
-            new Symfony\Core\CoreExtension(),
             new Core\Pagination\PaginationExtension(),
             new OrderingExtension()
         );
