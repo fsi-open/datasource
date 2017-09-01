@@ -21,15 +21,10 @@
         "fsi/data-indexer" : "0.9.*"
     },
     "require-dev": {
-        "symfony/form" : "^2.4|^3.0",
-        "symfony/security-csrf": "^2.4|^3.0",
-        "symfony/http-foundation": "^2.2|^3.0",
         "doctrine/orm": "^2.3",
         "doctrine/common": "^2.4",
         "doctrine/collections": "^1.1",
-        "symfony/doctrine-bridge": "^2.2|^3.0",
-        "symfony/property-access": "^2.3|^3.0",
-        "phpunit/phpunit": "3.7.*"
+        "phpunit/phpunit": "^4.8"
     },
     "autoload": {
         "psr-4": {
