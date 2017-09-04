@@ -19,7 +19,6 @@ use FSi\Component\DataSource\Driver\DriverFactoryManager;
 use FSi\Component\DataSource\Extension\Core;
 use FSi\Component\DataSource\Extension\Core\Ordering\OrderingExtension;
 use FSi\Component\DataSource\Extension\Core\Pagination\PaginationExtension;
-use FSi\Component\DataSource\Extension\Symfony;
 use FSi\Component\DataSource\Tests\Fixtures\Category;
 use FSi\Component\DataSource\Tests\Fixtures\Group;
 use FSi\Component\DataSource\Tests\Fixtures\News;
@@ -434,7 +433,6 @@ class CollectionDriverTest extends \PHPUnit_Framework_TestCase
         ));
 
         $extensions = array(
-            new Symfony\Core\CoreExtension(),
             new Core\Pagination\PaginationExtension(),
             new OrderingExtension(),
         );

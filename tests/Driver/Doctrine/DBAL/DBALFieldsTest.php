@@ -9,19 +9,8 @@
 
 namespace FSi\Component\DataSource\Tests\Driver\Doctrine\DBAL;
 
-use Doctrine\DBAL\Connection;
-use FSi\Component\DataSource\DataSourceFactory;
+use DateTime;
 use FSi\Component\DataSource\DataSourceInterface;
-use FSi\Component\DataSource\Driver\Doctrine\DBAL\DBALDriver;
-use FSi\Component\DataSource\Driver\Doctrine\DBAL\DBALFactory;
-use FSi\Component\DataSource\Driver\Doctrine\DBAL\Extension\Core\CoreExtension;
-use FSi\Component\DataSource\Driver\DriverFactoryManager;
-use FSi\Component\DataSource\Extension\Core;
-use FSi\Component\DataSource\Extension\Core\Ordering\OrderingExtension;
-use FSi\Component\DataSource\Extension\Symfony;
-use FSi\Component\DataSource\Tests\Driver\Doctrine\DBAL\Fixtures\DBALDriverExtension;
-use FSi\Component\DataSource\Tests\Driver\Doctrine\DBAL\Fixtures\TestConnectionRegistry;
-use FSi\Component\DataSource\Tests\Fixtures\DoctrineDriverExtension;
 
 class DBALFieldsTestBase extends TestBase
 {
@@ -66,35 +55,35 @@ class DBALFieldsTestBase extends TestBase
                 'event_date',
                 'date',
                 array(
-                    array('eq', new \DateTime('1970-01-02 00:00:00'), 24),
-                    array('neq', new \DateTime('1970-01-01 00:00:00'), 76),
-                    array('lt', new \DateTime('1970-01-02 00:00:00'), 24),
-                    array('lte', new \DateTime('1970-01-02 00:00:00'), 48),
-                    array('gt', new \DateTime('1970-01-02 00:00:00'), 52),
-                    array('gte', new \DateTime('1970-01-02 00:00:00'), 76),
+                    array('eq', new DateTime('1970-01-02 00:00:00'), 24),
+                    array('neq', new DateTime('1970-01-01 00:00:00'), 76),
+                    array('lt', new DateTime('1970-01-02 00:00:00'), 24),
+                    array('lte', new DateTime('1970-01-02 00:00:00'), 48),
+                    array('gt', new DateTime('1970-01-02 00:00:00'), 52),
+                    array('gte', new DateTime('1970-01-02 00:00:00'), 76),
                     array(
                         'in',
                         array(
-                            new \DateTime('1970-01-01 00:00:00'),
-                            new \DateTime('1970-01-01 01:00:00'),
-                            new \DateTime('1970-01-02 00:00:00'),
+                            new DateTime('1970-01-01 00:00:00'),
+                            new DateTime('1970-01-01 01:00:00'),
+                            new DateTime('1970-01-02 00:00:00'),
                         ),
                         48 //not 3 because it's date, not datetime
                     ),
                     array(
                         'notIn',
                         array(
-                            new \DateTime('1970-01-01 00:00:00'),
-                            new \DateTime('1970-01-01 01:00:00'),
-                            new \DateTime('1970-01-02 00:00:00'),
+                            new DateTime('1970-01-01 00:00:00'),
+                            new DateTime('1970-01-01 01:00:00'),
+                            new DateTime('1970-01-02 00:00:00'),
                         ),
                         52 //not 97 because it's date, not datetime
                     ),
                     array(
                         'between',
                         array(
-                            'from' => new \DateTime('1970-01-02 00:00:00'),
-                            'to' => new \DateTime('1970-01-03 00:00:00'),
+                            'from' => new DateTime('1970-01-02 00:00:00'),
+                            'to' => new DateTime('1970-01-03 00:00:00'),
                         ),
                         48
                     ),
@@ -105,33 +94,33 @@ class DBALFieldsTestBase extends TestBase
                 'create_datetime',
                 'datetime',
                 array(
-                    array('eq', new \DateTime('1970-01-01 00:00:00'), 1),
-                    array('neq', new \DateTime('1970-01-01 00:00:00'), 99),
-                    array('lt', new \DateTime('1970-01-02 00:00:00'), 24),
-                    array('lte', new \DateTime('1970-01-02 00:00:00'), 25),
-                    array('gt', new \DateTime('1970-01-02 00:00:00'), 75),
-                    array('gte', new \DateTime('1970-01-02 00:00:00'), 76),
+                    array('eq', new DateTime('1970-01-01 00:00:00'), 1),
+                    array('neq', new DateTime('1970-01-01 00:00:00'), 99),
+                    array('lt', new DateTime('1970-01-02 00:00:00'), 24),
+                    array('lte', new DateTime('1970-01-02 00:00:00'), 25),
+                    array('gt', new DateTime('1970-01-02 00:00:00'), 75),
+                    array('gte', new DateTime('1970-01-02 00:00:00'), 76),
                     array(
                         'in',
                         array(
-                            new \DateTime('1970-01-01 00:00:00'),
-                            new \DateTime('1970-01-01 01:00:00'),
+                            new DateTime('1970-01-01 00:00:00'),
+                            new DateTime('1970-01-01 01:00:00'),
                         ),
                         2
                     ),
                     array(
                         'notIn',
                         array(
-                            new \DateTime('1970-01-01 00:00:00'),
-                            new \DateTime('1970-01-01 01:00:00'),
+                            new DateTime('1970-01-01 00:00:00'),
+                            new DateTime('1970-01-01 01:00:00'),
                         ),
                         98
                     ),
                     array(
                         'between',
                         array(
-                            'from' => new \DateTime('1970-01-01 00:00:00'),
-                            'to' => new \DateTime('1970-01-02 00:00:00'),
+                            'from' => new DateTime('1970-01-01 00:00:00'),
+                            'to' => new DateTime('1970-01-02 00:00:00'),
                         ),
                         25
                     ),
@@ -142,27 +131,27 @@ class DBALFieldsTestBase extends TestBase
                 'event_hour',
                 'time',
                 array(
-                    array('eq', new \DateTime('1970-01-01 01:00:00'), 5),
-                    array('neq',new \DateTime( '1970-01-01 01:00:00'), 95),
-                    array('lt', new \DateTime('1970-01-01 03:00:00'), 15),
-                    array('lte', new \DateTime('1970-01-01 03:00:00'), 20),
-                    array('gt', new \DateTime('1970-01-02 03:00:00'), 80),
-                    array('gte', new \DateTime('1970-01-02 03:00:00'), 85),
+                    array('eq', new DateTime('1970-01-01 01:00:00'), 5),
+                    array('neq',new DateTime( '1970-01-01 01:00:00'), 95),
+                    array('lt', new DateTime('1970-01-01 03:00:00'), 15),
+                    array('lte', new DateTime('1970-01-01 03:00:00'), 20),
+                    array('gt', new DateTime('1970-01-02 03:00:00'), 80),
+                    array('gte', new DateTime('1970-01-02 03:00:00'), 85),
                     array(
                         'in',
                         array(
-                            new \DateTime('1970-01-01 00:00:00'),
-                            new \DateTime('1970-01-01 01:00:00'),
-                            new \DateTime('1970-01-02 01:00:00'),
+                            new DateTime('1970-01-01 00:00:00'),
+                            new DateTime('1970-01-01 01:00:00'),
+                            new DateTime('1970-01-02 01:00:00'),
                         ),
                         10 //not 15 because it's time, not datetime
                     ),
                     array(
                         'notIn',
                         array(
-                            new \DateTime('1970-01-01 00:00:00'),
-                            new \DateTime('1970-01-01 01:00:00'),
-                            new \DateTime('1970-01-02 01:00:00'),
+                            new DateTime('1970-01-01 00:00:00'),
+                            new DateTime('1970-01-01 01:00:00'),
+                            new DateTime('1970-01-02 01:00:00'),
                         ),
                         90 //not 85 because it's time, not datetime
                     ),
@@ -170,8 +159,8 @@ class DBALFieldsTestBase extends TestBase
                         'between',
                         array(
                             //dates doesn't matter
-                            'from' => new \DateTime('1970-01-01 02:00:00'),
-                            'to' => new \DateTime('1970-01-02 05:00:00'),
+                            'from' => new DateTime('1970-01-01 02:00:00'),
+                            'to' => new DateTime('1970-01-02 05:00:00'),
                         ),
                         18
                     ),
