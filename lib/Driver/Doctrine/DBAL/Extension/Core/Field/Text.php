@@ -16,7 +16,7 @@ use FSi\Component\DataSource\Driver\Doctrine\DBAL\DBALAbstractField;
  */
 class Text extends DBALAbstractField
 {
-    protected $comparisons = array('eq', 'neq', 'in', 'notIn', 'like', 'contains', 'isNull');
+    protected $comparisons = ['eq', 'neq', 'in', 'notIn', 'like', 'contains', 'isNull'];
 
     public function getType()
     {

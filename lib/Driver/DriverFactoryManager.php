@@ -20,9 +20,9 @@ class DriverFactoryManager implements DriverFactoryManagerInterface
      * @param array $factories
      * @throws \InvalidArgumentException
      */
-    public function __construct($factories = array())
+    public function __construct($factories = [])
     {
-        $this->factories = array();
+        $this->factories = [];
 
         foreach ($factories as $factory) {
             if (!$factory instanceof DriverFactoryInterface) {

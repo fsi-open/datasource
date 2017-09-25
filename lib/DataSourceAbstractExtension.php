@@ -19,7 +19,7 @@ abstract class DataSourceAbstractExtension implements DataSourceExtensionInterfa
      */
     public function loadSubscribers()
     {
-        return array();
+        return [];
     }
 
     /**
@@ -27,6 +27,6 @@ abstract class DataSourceAbstractExtension implements DataSourceExtensionInterfa
      */
     public function loadDriverExtensions()
     {
-        return array();
+        return [];
     }
 }

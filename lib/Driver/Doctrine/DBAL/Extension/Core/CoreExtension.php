@@ -18,18 +18,18 @@ class CoreExtension extends DriverAbstractExtension
 {
     public function getExtendedDriverTypes()
     {
-        return array('doctrine-dbal');
+        return ['doctrine-dbal'];
     }
 
     protected function loadFieldTypes()
     {
-        return array(
+        return [
             new Field\Text(),
             new Field\Number(),
             new Field\Date(),
             new Field\Time(),
             new Field\DateTime(),
             new Field\Boolean(),
-        );
+        ];
     }
 }

@@ -28,10 +28,10 @@ class DoctrineExtension extends DriverExtension implements EventSubscriberInterf
      */
     public function getExtendedDriverTypes()
     {
-        return array(
+        return [
             'doctrine', // deprecated since version 1.4
             'doctrine-orm'
-        );
+        ];
     }
 
     /**
@@ -39,9 +39,9 @@ class DoctrineExtension extends DriverExtension implements EventSubscriberInterf
      */
     protected function loadFieldTypesExtensions()
     {
-        return array(
+        return [
             new FieldExtension(),
-        );
+        ];
     }
 
     /**
@@ -49,9 +49,9 @@ class DoctrineExtension extends DriverExtension implements EventSubscriberInterf
      */
     public static function getSubscribedEvents()
     {
-        return array(
-            DriverEvents::PRE_GET_RESULT => array('preGetResult'),
-        );
+        return [
+            DriverEvents::PRE_GET_RESULT => ['preGetResult'],
+        ];
     }
 
     /**

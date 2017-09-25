@@ -27,7 +27,7 @@ class DoctrineResult extends ArrayCollection
      */
     public function __construct(ManagerRegistry $registry, DoctrinePaginator $paginator)
     {
-        $result = array();
+        $result = [];
         $this->count = $paginator->count();
         $data = $paginator->getIterator();
 

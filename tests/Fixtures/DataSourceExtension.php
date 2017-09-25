@@ -21,23 +21,23 @@ class DataSourceExtension extends DataSourceAbstractExtension implements EventSu
     /**
      * @var array
      */
-    private $calls = array();
+    private $calls = [];
 
     /**
      * {@inheritdoc}
      */
     public static function getSubscribedEvents()
     {
-        return array(
-            DataSourceEvents::PRE_BIND_PARAMETERS => array('preBindParameters', 128),
-            DataSourceEvents::POST_BIND_PARAMETERS => array('postBindParameters', 128),
-            DataSourceEvents::PRE_GET_RESULT => array('preGetResult', 128),
-            DataSourceEvents::POST_GET_RESULT => array('postGetResult', 128),
-            DataSourceEvents::PRE_BUILD_VIEW => array('preBuildView', 128),
-            DataSourceEvents::POST_BUILD_VIEW => array('postBuildView', 128),
-            DataSourceEvents::PRE_GET_PARAMETERS => array('preGetParameters', 128),
-            DataSourceEvents::POST_GET_PARAMETERS => array('postGetParameters', 128),
-        );
+        return [
+            DataSourceEvents::PRE_BIND_PARAMETERS => ['preBindParameters', 128],
+            DataSourceEvents::POST_BIND_PARAMETERS => ['postBindParameters', 128],
+            DataSourceEvents::PRE_GET_RESULT => ['preGetResult', 128],
+            DataSourceEvents::POST_GET_RESULT => ['postGetResult', 128],
+            DataSourceEvents::PRE_BUILD_VIEW => ['preBuildView', 128],
+            DataSourceEvents::POST_BUILD_VIEW => ['postBuildView', 128],
+            DataSourceEvents::PRE_GET_PARAMETERS => ['preGetParameters', 128],
+            DataSourceEvents::POST_GET_PARAMETERS => ['postGetParameters', 128],
+        ];
     }
 
     /**
@@ -55,7 +55,7 @@ class DataSourceExtension extends DataSourceAbstractExtension implements EventSu
      */
     public function resetCalls()
     {
-        $this->calls = array();
+        $this->calls = [];
     }
 
     /**
@@ -76,6 +76,6 @@ class DataSourceExtension extends DataSourceAbstractExtension implements EventSu
      */
     public function loadSubscribers()
     {
-        return array($this);
+        return [$this];
     }
 }

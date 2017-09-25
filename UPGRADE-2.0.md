@@ -4,3 +4,7 @@
 
 Since it was moved to [datasource-bundle](https://github.com/fsi-open/datasource-bundle),
 you will need to install it in order to be able to use the extension.
+
+## Upgrade to PHP 7.1 or higher
+
+In order to use this library, you will need PHP 7.1 or higher.

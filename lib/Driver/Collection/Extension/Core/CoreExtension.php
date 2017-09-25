@@ -21,7 +21,7 @@ class CoreExtension extends DriverAbstractExtension
      */
     public function getExtendedDriverTypes()
     {
-        return array('collection');
+        return ['collection'];
     }
 
     /**
@@ -29,13 +29,13 @@ class CoreExtension extends DriverAbstractExtension
      */
     protected function loadFieldTypes()
     {
-        return array(
+        return [
             new Field\Text(),
             new Field\Number(),
             new Field\Date(),
             new Field\Time(),
             new Field\DateTime(),
             new Field\Boolean(),
-        );
+        ];
     }
 }

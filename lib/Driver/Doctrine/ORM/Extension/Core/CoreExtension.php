@@ -22,7 +22,7 @@ class CoreExtension extends DriverAbstractExtension
      */
     public function getExtendedDriverTypes()
     {
-        return array('doctrine-orm');
+        return ['doctrine-orm'];
     }
 
     /**
@@ -30,7 +30,7 @@ class CoreExtension extends DriverAbstractExtension
      */
     protected function loadFieldTypes()
     {
-        return array(
+        return [
             new Field\Text(),
             new Field\Number(),
             new Field\Date(),
@@ -38,6 +38,6 @@ class CoreExtension extends DriverAbstractExtension
             new Field\DateTime(),
             new Field\Entity(),
             new Field\Boolean(),
-        );
+        ];
     }
 }

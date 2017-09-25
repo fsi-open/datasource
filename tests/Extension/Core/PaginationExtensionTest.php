@@ -28,30 +28,30 @@ class PaginationExtensionTest extends \PHPUnit_Framework_TestCase
     {
         $self = $this;
 
-        $cases = array(
-            array(
+        $cases = [
+            [
                 'first_result' => 20,
                 'max_results' => 20,
                 'page' => 2,
                 'current_page' => 2
-            ),
-            array(
+            ],
+            [
                 'first_result' => 20,
                 'max_results' => 0,
                 'current_page' => 1
-            ),
-            array(
+            ],
+            [
                 'first_result' => 0,
                 'max_results' => 20,
                 'current_page' => 1
-            ),
-        );
+            ],
+        ];
 
-        $driver = $this->getMock('FSi\Component\DataSource\Driver\DriverInterface');
+        $driver = $this->createMock('FSi\Component\DataSource\Driver\DriverInterface');
         $extension = new PaginationExtension();
 
         foreach ($cases as $case) {
-            $datasource = $this->getMock('FSi\Component\DataSource\DataSource', array(), array($driver));
+            $datasource = $this->createMock('FSi\Component\DataSource\DataSource', [], [$driver]);
 
             $datasource
                 ->expects($this->any())
@@ -73,17 +73,17 @@ class PaginationExtensionTest extends \PHPUnit_Framework_TestCase
 
             $subscribers = $extension->loadSubscribers();
             $subscriber = array_shift($subscribers);
-            $event = new DataSourceEvent\ParametersEventArgs($datasource, array());
+            $event = new DataSourceEvent\ParametersEventArgs($datasource, []);
             $subscriber->postGetParameters($event);
 
             if (isset($case['page'])) {
                 $this->assertSame(
-                    array(
-                        'datasource' => array(
+                    [
+                        'datasource' => [
                             PaginationExtension::PARAMETER_MAX_RESULTS => 20,
                             PaginationExtension::PARAMETER_PAGE => 2
-                        )
-                    ),
+                        ]
+                    ],
                     $event->getParameters()
                 );
             } else {
@@ -92,7 +92,7 @@ class PaginationExtensionTest extends \PHPUnit_Framework_TestCase
                     $this->assertArrayNotHasKey(PaginationExtension::PARAMETER_PAGE, $parameters['datasource']);
             }
 
-            $view = $this->getMock('FSi\Component\DataSource\DataSourceViewInterface');
+            $view = $this->createMock('FSi\Component\DataSource\DataSourceViewInterface');
             $view
                 ->expects($this->any())
                 ->method('setAttribute')
@@ -111,20 +111,20 @@ class PaginationExtensionTest extends \PHPUnit_Framework_TestCase
 
     public function testSetMaxResultsByBindRequest()
     {
-        $extensions = array(
+        $extensions = [
             new PaginationExtension()
-        );
-        $driverExtensions = array(new CoreExtension());
+        ];
+        $driverExtensions = [new CoreExtension()];
         $driverFactory = new CollectionFactory($driverExtensions);
-        $driverFactoryManager = new DriverFactoryManager(array($driverFactory));
+        $driverFactoryManager = new DriverFactoryManager([$driverFactory]);
         $factory = new DataSourceFactory($driverFactoryManager, $extensions);
-        $dataSource = $factory->createDataSource('collection',  array(), 'foo_source');
+        $dataSource = $factory->createDataSource('collection',  [], 'foo_source');
 
-        $dataSource->bindParameters(array(
-            'foo_source' => array(
+        $dataSource->bindParameters([
+            'foo_source' => [
                 PaginationExtension::PARAMETER_MAX_RESULTS => 105
-            )
-        ));
+            ]
+        ]);
 
         $this->assertEquals(105, $dataSource->getMaxResults());
     }

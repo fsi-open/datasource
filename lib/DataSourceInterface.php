@@ -50,7 +50,7 @@ interface DataSourceInterface
      * @return \FSi\Component\DataSource\DataSourceInterface
      * @throws \FSi\Component\DataSource\Exception\DataSourceException
      */
-    public function addField($name, $type = null, $comparison = null, $options = array());
+    public function addField($name, $type = null, $comparison = null, $options = []);
 
     /**
      * Removes given field.
@@ -126,7 +126,7 @@ interface DataSourceInterface
      *
      * @param array $parameters
      */
-    public function bindParameters($parameters = array());
+    public function bindParameters($parameters = []);
 
     /**
      * Returns collection with result.

@@ -21,19 +21,19 @@ class FieldExtension extends FieldAbstractExtension implements EventSubscriberIn
     /**
      * @var array
      */
-    private $calls = array();
+    private $calls = [];
 
     /**
      * {@inheritdoc}
      */
     public static function getSubscribedEvents()
     {
-        return array(
-            FieldEvents::PRE_BIND_PARAMETER => array('preBindParameter', 128),
-            FieldEvents::POST_BIND_PARAMETER => array('postBindParameter', 128),
-            FieldEvents::POST_BUILD_VIEW => array('postBuildView', 128),
-            FieldEvents::POST_GET_PARAMETER => array('postGetParameter', 128),
-        );
+        return [
+            FieldEvents::PRE_BIND_PARAMETER => ['preBindParameter', 128],
+            FieldEvents::POST_BIND_PARAMETER => ['postBindParameter', 128],
+            FieldEvents::POST_BUILD_VIEW => ['postBuildView', 128],
+            FieldEvents::POST_GET_PARAMETER => ['postGetParameter', 128],
+        ];
     }
 
     /**
@@ -51,7 +51,7 @@ class FieldExtension extends FieldAbstractExtension implements EventSubscriberIn
      */
     public function resetCalls()
     {
-        $this->calls = array();
+        $this->calls = [];
     }
 
     /**
@@ -72,6 +72,6 @@ class FieldExtension extends FieldAbstractExtension implements EventSubscriberIn
      */
     public function loadSubscribers()
     {
-        return array($this);
+        return [$this];
     }
 }

@@ -15,7 +15,7 @@
         }
     ],
     "require": {
-        "php": ">=5.3",
+        "php": ">=7.1",
         "symfony/event-dispatcher": "^2.2|^3.0",
         "symfony/options-resolver": "^2.6|^3.0",
         "fsi/data-indexer" : "0.9.*"
@@ -24,11 +24,15 @@
         "doctrine/orm": "^2.3",
         "doctrine/common": "^2.4",
         "doctrine/collections": "^1.1",
-        "phpunit/phpunit": "^4.8"
+        "phpunit/phpunit": "^5.7"
     },
     "autoload": {
         "psr-4": {
-            "FSi\\Component\\DataSource\\": "lib/",
+            "FSi\\Component\\DataSource\\": "lib/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
             "FSi\\Component\\DataSource\\Tests\\": "tests/"
         }
     },

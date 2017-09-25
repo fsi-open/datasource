@@ -20,7 +20,7 @@ class Boolean extends CollectionAbstractField
     /**
      * {@inheritdoc}
      */
-    protected $comparisons = array('eq');
+    protected $comparisons = ['eq'];
 
     /**
      * {@inheritdoc}

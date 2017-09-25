@@ -21,7 +21,7 @@ abstract class DBALAbstractField extends FieldAbstractType implements DBALFieldI
         $fieldName = $this->getFieldName($alias);
         $name = $this->getName();
 
-        if (($data === array()) || ($data === '') || ($data === null)) {
+        if (($data === []) || ($data === '') || ($data === null)) {
             return;
         }
 
@@ -69,11 +69,11 @@ abstract class DBALAbstractField extends FieldAbstractType implements DBALFieldI
         }
 
         $expr = $qb->expr();
-        if (in_array($comparison, array('in', 'notIn'))) {
+        if (in_array($comparison, ['in', 'notIn'])) {
             if (!is_array($data)) {
                 throw new DBALDriverException('Fields with \'in\' and \'notIn\' comparisons require to bind an array.');
             }
-            $placeholders = array();
+            $placeholders = [];
             foreach ($data as $value) {
                 $placeholders[] = $qb->createNamedParameter($value, $type);
             }
@@ -81,7 +81,7 @@ abstract class DBALAbstractField extends FieldAbstractType implements DBALFieldI
             $comparison = $comparison === 'in' ? 'IN' : 'NOT IN';
             $qb->$func($expr->comparison($fieldName, $comparison, '('.implode(', ', $placeholders).')'));
             return;
-        } elseif (in_array($comparison, array('like', 'contains'))) {
+        } elseif (in_array($comparison, ['like', 'contains'])) {
             $data = "%$data%";
             $comparison = 'like';
         }
@@ -94,13 +94,13 @@ abstract class DBALAbstractField extends FieldAbstractType implements DBALFieldI
     {
         $field = $this;
         $this->getOptionsResolver()
-            ->setDefaults(array(
+            ->setDefaults([
                 'field' => null,
                 'auto_alias' => true,
                 'clause' => 'where'
-            ))
-            ->setAllowedValues('clause', array('where', 'having'))
-            ->setAllowedTypes('field', array('string', 'null'))
+            ])
+            ->setAllowedValues('clause', ['where', 'having'])
+            ->setAllowedTypes('field', ['string', 'null'])
             ->setAllowedTypes('auto_alias', 'bool')
             ->setNormalizer('field', function($options, $value) use ($field) {
                 if (!isset($value) && $field->getName()) {

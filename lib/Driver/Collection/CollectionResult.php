@@ -23,7 +23,7 @@ class CollectionResult extends ArrayCollection
      * @param array $elements
      * @param \Doctrine\Common\Collections\Criteria $criteria
      */
-    public function __construct(array $elements = array(), Criteria $criteria)
+    public function __construct(array $elements = [], Criteria $criteria)
     {
         $collection = new ArrayCollection($elements);
         $firstResult = $criteria->getFirstResult();

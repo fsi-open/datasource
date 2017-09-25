@@ -23,29 +23,29 @@ class FactoryTest extends \PHPUnit_Framework_TestCase
      */
     public function testExtensionsLoading()
     {
-        $extension1 = $this->getMock('FSi\Component\DataSource\DataSourceExtensionInterface');
-        $extension2 = $this->getMock('FSi\Component\DataSource\DataSourceExtensionInterface');
+        $extension1 = $this->createMock('FSi\Component\DataSource\DataSourceExtensionInterface');
+        $extension2 = $this->createMock('FSi\Component\DataSource\DataSourceExtensionInterface');
 
         $extension1
             ->expects($this->any())
             ->method('loadDriverExtensions')
-            ->will($this->returnValue(array()))
+            ->will($this->returnValue([]))
         ;
 
         $extension2
             ->expects($this->any())
             ->method('loadDriverExtensions')
-            ->will($this->returnValue(array()))
+            ->will($this->returnValue([]))
         ;
 
-        $driveFactoryManager = new DriverFactoryManager(array(
+        $driveFactoryManager = new DriverFactoryManager([
             new CollectionFactory()
-        ));
+        ]);
 
-        $extensions = array($extension1, $extension2);
+        $extensions = [$extension1, $extension2];
 
         $factory = new DataSourceFactory($driveFactoryManager, $extensions);
-        $datasource = $factory->createDataSource('collection', array('collection' => array()));
+        $datasource = $factory->createDataSource('collection', ['collection' => []]);
 
         $factoryExtensions = $factory->getExtensions();
         $datasourceExtensions = $datasource->getExtensions();
@@ -61,10 +61,10 @@ class FactoryTest extends \PHPUnit_Framework_TestCase
      */
     public function testFactoryException2()
     {
-        $driveFactoryManager = new DriverFactoryManager(array(
+        $driveFactoryManager = new DriverFactoryManager([
             new CollectionFactory()
-        ));
-        $datasourceFactory = new DataSourceFactory($driveFactoryManager, array(new \stdClass()));
+        ]);
+        $datasourceFactory = new DataSourceFactory($driveFactoryManager, [new \stdClass()]);
     }
 
     /**
@@ -74,10 +74,10 @@ class FactoryTest extends \PHPUnit_Framework_TestCase
      */
     public function testFactoryException3()
     {
-        $driveFactoryManager = new DriverFactoryManager(array(
+        $driveFactoryManager = new DriverFactoryManager([
             new CollectionFactory()
-        ));
-        $datasourceFactory = new DataSourceFactory($driveFactoryManager, array('scalar'));
+        ]);
+        $datasourceFactory = new DataSourceFactory($driveFactoryManager, ['scalar']);
     }
 
     /**
@@ -99,14 +99,14 @@ class FactoryTest extends \PHPUnit_Framework_TestCase
      */
     public function testFactoryCreateDataSourceException1()
     {
-        $driveFactoryManager = new DriverFactoryManager(array(
+        $driveFactoryManager = new DriverFactoryManager([
             new CollectionFactory()
-        ));
+        ]);
         $factory = new DataSourceFactory($driveFactoryManager);
 
-        $factory->createDataSource('collection', array('collection' => array()), 'unique');
-        $factory->createDataSource('collection', array('collection' => array()), 'nonunique');
-        $factory->createDataSource('collection', array('collection' => array()), 'nonunique');
+        $factory->createDataSource('collection', ['collection' => []], 'unique');
+        $factory->createDataSource('collection', ['collection' => []], 'nonunique');
+        $factory->createDataSource('collection', ['collection' => []], 'nonunique');
     }
 
     /**
@@ -116,11 +116,11 @@ class FactoryTest extends \PHPUnit_Framework_TestCase
      */
     public function testFactoryCreateDataSourceException2()
     {
-        $driveFactoryManager = new DriverFactoryManager(array(
+        $driveFactoryManager = new DriverFactoryManager([
             new CollectionFactory()
-        ));
+        ]);
         $factory = new DataSourceFactory($driveFactoryManager);
-        $factory->createDataSource('collection', array('collection' => array()), 'wrong-one');
+        $factory->createDataSource('collection', ['collection' => []], 'wrong-one');
     }
 
     /**
@@ -130,11 +130,11 @@ class FactoryTest extends \PHPUnit_Framework_TestCase
      */
     public function testFactoryCreateDataSourceException3()
     {
-        $driveFactoryManager = new DriverFactoryManager(array(
+        $driveFactoryManager = new DriverFactoryManager([
             new CollectionFactory()
-        ));
+        ]);
         $factory = new DataSourceFactory($driveFactoryManager);
-        $factory->createDataSource('collection', array('collection' => array()), '');
+        $factory->createDataSource('collection', ['collection' => []], '');
     }
 
     /**
@@ -142,14 +142,14 @@ class FactoryTest extends \PHPUnit_Framework_TestCase
      */
     public function testAddDataSource()
     {
-        $driveFactoryManager = new DriverFactoryManager(array(
+        $driveFactoryManager = new DriverFactoryManager([
             new CollectionFactory()
-        ));
+        ]);
         $factory = new DataSourceFactory($driveFactoryManager);
 
-        $driver = $this->getMock('FSi\Component\DataSource\Driver\DriverInterface');
-        $datasource = $this->getMock('FSi\Component\DataSource\DataSource', array(), array($driver));
-        $datasource2 = $this->getMock('FSi\Component\DataSource\DataSource', array(), array($driver));
+        $driver = $this->createMock('FSi\Component\DataSource\Driver\DriverInterface');
+        $datasource = $this->createMock('FSi\Component\DataSource\DataSource', [], [$driver]);
+        $datasource2 = $this->createMock('FSi\Component\DataSource\DataSource', [], [$driver]);
 
         $datasource->expects($this->any())
             ->method('getName')
@@ -177,22 +177,22 @@ class FactoryTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetAllAndOtherParameters()
     {
-        $driveFactoryManager = new DriverFactoryManager(array(
+        $driveFactoryManager = new DriverFactoryManager([
             new CollectionFactory()
-        ));
+        ]);
         $factory = new DataSourceFactory($driveFactoryManager);
 
-        $driver = $this->getMock('FSi\Component\DataSource\Driver\DriverInterface');
-        $datasource1 = $this->getMock('FSi\Component\DataSource\DataSource', array(), array($driver));
-        $datasource2 = $this->getMock('FSi\Component\DataSource\DataSource', array(), array($driver));
+        $driver = $this->createMock('FSi\Component\DataSource\Driver\DriverInterface');
+        $datasource1 = $this->createMock('FSi\Component\DataSource\DataSource', [], [$driver]);
+        $datasource2 = $this->createMock('FSi\Component\DataSource\DataSource', [], [$driver]);
 
-        $params1 = array(
+        $params1 = [
             'key1' => 'value1',
-        );
+        ];
 
-        $params2 = array(
+        $params2 = [
             'key2' => 'value2',
-        );
+        ];
 
         $result = array_merge($params1, $params2);
 

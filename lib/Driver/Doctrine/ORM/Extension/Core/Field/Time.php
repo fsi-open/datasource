@@ -19,7 +19,7 @@ class Time extends DoctrineAbstractField
     /**
      * {@inheritdoc}
      */
-    protected $comparisons = array('eq', 'neq', 'lt', 'lte', 'gt', 'gte', 'in', 'notIn', 'between', 'isNull');
+    protected $comparisons = ['eq', 'neq', 'lt', 'lte', 'gt', 'gte', 'in', 'notIn', 'between', 'isNull'];
 
     /**
      * {@inheritdoc}

@@ -32,11 +32,11 @@ class OrderingExtension extends DataSourceAbstractExtension
      */
     public function loadDriverExtensions()
     {
-        return array(
+        return [
             new Driver\DoctrineExtension(),
             new Driver\CollectionExtension(),
             new Driver\DBALExtension(),
-        );
+        ];
     }
 
     /**
@@ -44,8 +44,8 @@ class OrderingExtension extends DataSourceAbstractExtension
      */
     public function loadSubscribers()
     {
-        return array(
+        return [
             new EventSubscriber\Events(),
-        );
+        ];
     }
 }

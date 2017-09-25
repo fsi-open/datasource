@@ -19,7 +19,7 @@ class FieldAbstractExtension implements FieldExtensionInterface
      */
     public static function getSubscribedEvents()
     {
-        return array();
+        return [];
     }
 
     /**
@@ -27,7 +27,7 @@ class FieldAbstractExtension implements FieldExtensionInterface
      */
     public function getExtendedFieldTypes()
     {
-        return array();
+        return [];
     }
 
     /**

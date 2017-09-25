@@ -15,46 +15,34 @@ class DoctrineResultTest extends \PHPUnit_Framework_TestCase
 {
     public function testEmptyPaginator()
     {
-        $registry = $this->getMock('Doctrine\Common\Persistence\ManagerRegistry');
+        $registry = $this->createMock('Doctrine\Common\Persistence\ManagerRegistry');
         $paginator = $this->getMockBuilder('Doctrine\ORM\Tools\Pagination\Paginator')
             ->disableOriginalConstructor()
             ->getMock();
 
         $paginator->expects($this->any())
             ->method('getIterator')
-            ->will($this->returnValue(array()));
+            ->will($this->returnValue([]));
 
         $result = new DoctrineResult($registry, $paginator);
     }
 
     public function testResultWithNotObjectDataInRows()
     {
-        $registry = $this->getMock('Doctrine\Common\Persistence\ManagerRegistry');
+        $registry = $this->createMock('Doctrine\Common\Persistence\ManagerRegistry');
         $paginator = $this->getMockBuilder('Doctrine\ORM\Tools\Pagination\Paginator')
             ->disableOriginalConstructor()
             ->getMock();
 
         $paginator->expects($this->any())
             ->method('getIterator')
-            ->will($this->returnValue(array(
-                '0' => array(
-                    'foo',
-                    'bar'
-                ),
-                '1' => array(
-                    'foo1',
-                    'bar1'
-                )
-            )));
+            ->will($this->returnValue([
+                '0' => ['foo', 'bar'],
+                '1' => ['foo1', 'bar1']
+            ]));
 
         $result = new DoctrineResult($registry, $paginator);
-        $this->assertSame($result['0'], array(
-            'foo',
-            'bar'
-        ));
-        $this->assertSame($result['1'], array(
-            'foo1',
-            'bar1'
-        ));
+        $this->assertSame($result['0'], ['foo', 'bar']);
+        $this->assertSame($result['1'], ['foo1', 'bar1']);
     }
 }

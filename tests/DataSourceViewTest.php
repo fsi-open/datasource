@@ -10,7 +10,11 @@
 namespace FSi\Component\DataSource\Tests;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use FSi\Component\DataSource\DataSourceInterface;
 use FSi\Component\DataSource\DataSourceView;
+use FSi\Component\DataSource\Driver\DriverInterface;
+use FSi\Component\DataSource\Exception\DataSourceViewException;
+use FSi\Component\DataSource\Field\FieldViewInterface;
 
 /**
  * Tests for DataSourceView.
@@ -22,8 +26,7 @@ class DataSourceViewTest extends \PHPUnit_Framework_TestCase
      */
     public function testViewCreate()
     {
-        $driver = $this->getMock('FSi\Component\DataSource\Driver\DriverInterface');
-        $datasource = $this->getMock('FSi\Component\DataSource\DataSource', array(), array($driver));
+        $datasource = $this->createDatasourceMock();
         $datasource
             ->expects($this->once())
             ->method('getName')
@@ -39,19 +42,18 @@ class DataSourceViewTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetParameters()
     {
-        $driver = $this->getMock('FSi\Component\DataSource\Driver\DriverInterface');
-        $datasource = $this->getMock('FSi\Component\DataSource\DataSource', array(), array($driver));
+        $datasource = $this->createDatasourceMock();
 
         $datasource
             ->expects($this->once())
             ->method('getParameters')
-            ->will($this->returnValue(array('datasource' => array())))
+            ->will($this->returnValue(['datasource' => []]))
         ;
 
         $datasource
             ->expects($this->once())
             ->method('getOtherParameters')
-            ->will($this->returnValue(array('other_datasource' => array())))
+            ->will($this->returnValue(['other_datasource' => []]))
         ;
 
         $view = new DataSourceView($datasource);
@@ -61,10 +63,7 @@ class DataSourceViewTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(
             $allParameters,
-            array(
-                'datasource' => array(),
-                'other_datasource' => array()
-            )
+            ['datasource' => [], 'other_datasource' => []]
         );
     }
 
@@ -73,8 +72,7 @@ class DataSourceViewTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetResults()
     {
-        $driver = $this->getMock('FSi\Component\DataSource\Driver\DriverInterface');
-        $datasource = $this->getMock('FSi\Component\DataSource\DataSource', array(), array($driver));
+        $datasource = $this->createDatasourceMock();
 
         $datasource
             ->expects($this->once())
@@ -84,7 +82,7 @@ class DataSourceViewTest extends \PHPUnit_Framework_TestCase
         $view = new DataSourceView($datasource);
         $view->getParameters();
 
-        $this->assertInstanceOf('Doctrine\Common\Collections\ArrayCollection', $view->getResult());
+        $this->assertInstanceOf(ArrayCollection::class, $view->getResult());
     }
 
     /**
@@ -92,9 +90,7 @@ class DataSourceViewTest extends \PHPUnit_Framework_TestCase
      */
     public function testOptionsManipulation()
     {
-        $driver = $this->getMock('FSi\Component\DataSource\Driver\DriverInterface');
-        $datasource = $this->getMock('FSi\Component\DataSource\DataSource', array(), array($driver));
-        $view = new DataSourceView($datasource);
+        $view = new DataSourceView($this->createDatasourceMock());
 
         $this->assertFalse($view->hasAttribute('option1'));
         $view->setAttribute('option1', 'value1');
@@ -112,7 +108,7 @@ class DataSourceViewTest extends \PHPUnit_Framework_TestCase
         $view->setAttribute('option3', 'value3');
         $view->setAttribute('option4', 'value4');
 
-        $this->assertEquals($view->getAttributes(), array('option2' => null, 'option3' => 'value3', 'option4' => 'value4'));
+        $this->assertEquals($view->getAttributes(), ['option2' => null, 'option3' => 'value3', 'option4' => 'value4']);
 
         $this->assertEquals(null, $view->getAttribute('option2'));
     }
@@ -122,11 +118,9 @@ class DataSourceViewTest extends \PHPUnit_Framework_TestCase
      */
     public function testFieldsManipulation()
     {
-        $driver = $this->getMock('FSi\Component\DataSource\Driver\DriverInterface');
-        $datasource = $this->getMock('FSi\Component\DataSource\DataSource', array(), array($driver));
-        $fieldView1 = $this->getMock('FSi\Component\DataSource\Field\FieldViewInterface');
-        $fieldView2 = $this->getMock('FSi\Component\DataSource\Field\FieldViewInterface');
-        $view = new DataSourceView($datasource);
+        $fieldView1 = $this->createMock(FieldViewInterface::class);
+        $fieldView2 = $this->createMock(FieldViewInterface::class);
+        $view = new DataSourceView($this->createDatasourceMock());
 
         $fieldView1
             ->expects($this->any())
@@ -152,7 +146,7 @@ class DataSourceViewTest extends \PHPUnit_Framework_TestCase
         $view->getField('name1');
         $view->getField('name2');
 
-        $this->setExpectedException('FSi\Component\DataSource\Exception\DataSourceViewException');
+        $this->setExpectedException(DataSourceViewException::class);
         $view->addField($fieldView1);
     }
 
@@ -161,10 +155,8 @@ class DataSourceViewTest extends \PHPUnit_Framework_TestCase
      */
     public function testAddFieldException2()
     {
-        $driver = $this->getMock('FSi\Component\DataSource\Driver\DriverInterface');
-        $datasource = $this->getMock('FSi\Component\DataSource\DataSource', array(), array($driver));
-        $fieldView = $this->getMock('FSi\Component\DataSource\Field\FieldViewInterface');
-        $view = new DataSourceView($datasource);
+        $fieldView = $this->createMock(FieldViewInterface::class);
+        $view = new DataSourceView($this->createDatasourceMock());
 
         $fieldView
             ->expects($this->any())
@@ -175,7 +167,7 @@ class DataSourceViewTest extends \PHPUnit_Framework_TestCase
         $view->addField($fieldView);
 
         $view->getField('name');
-        $this->setExpectedException('FSi\Component\DataSource\Exception\DataSourceViewException');
+        $this->setExpectedException(DataSourceViewException::class);
         $view->getField('wrong');
     }
 
@@ -184,12 +176,9 @@ class DataSourceViewTest extends \PHPUnit_Framework_TestCase
      */
     public function testInterfaces()
     {
-        $driver = $this->getMock('FSi\Component\DataSource\Driver\DriverInterface');
-        $datasource = $this->getMock('FSi\Component\DataSource\DataSource', array(), array($driver));
-
-        $fielsViews = array();
+        $fielsViews = [];
         for ($x = 0; $x < 5; $x++) {
-            $fieldView = $this->getMock('FSi\Component\DataSource\Field\FieldViewInterface');
+            $fieldView = $this->createMock(FieldViewInterface::class);
 
             $fieldView
                 ->expects($this->any())
@@ -200,7 +189,7 @@ class DataSourceViewTest extends \PHPUnit_Framework_TestCase
             $fieldsViews[] = $fieldView;
         }
 
-        $view = new DataSourceView($datasource);
+        $view = new DataSourceView($this->createDatasourceMock());
         $view->addField($fieldsViews[0]);
 
         $this->assertEquals(1, count($view));
@@ -231,12 +220,12 @@ class DataSourceViewTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('name1', $view->current()->getName());
         $this->assertEquals('name1', $view->key());
 
-        $fields = array();
+        $fields = [];
         for ($view->rewind(); $view->valid(); $view->next()) {
             $fields[] = $view->current()->getName();
         }
 
-        $expected = array('name0', 'name1', 'name2', 'name3', 'name4');
+        $expected = ['name0', 'name1', 'name2', 'name3', 'name4'];
         $this->assertEquals($expected, $fields);
 
         $this->assertEquals('name3', $view['name3']->getName());
@@ -246,5 +235,17 @@ class DataSourceViewTest extends \PHPUnit_Framework_TestCase
         $this->assertNotEquals('trash', $view['name0']);
         unset($view['name0']);
         $this->assertTrue(isset($view['name0']));
+    }
+
+    /**
+     * @return \PHPUnit_Framework_MockObject_MockObject
+     */
+    private function createDatasourceMock()
+    {
+        return $this->createMock(
+            DataSourceInterface::class,
+            [],
+            [$this->createMock(DriverInterface::class)]
+        );
     }
 }

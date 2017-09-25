@@ -17,7 +17,7 @@ use FSi\Component\DataSource\Driver\Doctrine\DBAL\DBALAbstractField;
  */
 class Date extends DBALAbstractField
 {
-    protected $comparisons = array('eq', 'neq', 'lt', 'lte', 'gt', 'gte', 'in', 'notIn', 'between', 'isNull');
+    protected $comparisons = ['eq', 'neq', 'lt', 'lte', 'gt', 'gte', 'in', 'notIn', 'between', 'isNull'];
 
     public function getType()
     {

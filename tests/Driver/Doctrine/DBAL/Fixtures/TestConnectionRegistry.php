@@ -40,11 +40,11 @@ class TestConnectionRegistry implements ConnectionRegistry
 
     public function getConnections()
     {
-        return array($this->connection);
+        return [$this->connection];
     }
 
     public function getConnectionNames()
     {
-        return array($this->getDefaultConnectionName());
+        return [$this->getDefaultConnectionName()];
     }
 }

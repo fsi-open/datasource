@@ -22,7 +22,7 @@ class DBALDriverExtension extends DriverAbstractExtension implements EventSubscr
     /**
      * @var array
      */
-    private $calls = array();
+    private $calls = [];
 
     /**
      * @var QueryBuilder
@@ -31,15 +31,15 @@ class DBALDriverExtension extends DriverAbstractExtension implements EventSubscr
 
     public function getExtendedDriverTypes()
     {
-        return array('doctrine-dbal');
+        return ['doctrine-dbal'];
     }
 
     public static function getSubscribedEvents()
     {
-        return array(
-            DriverEvents::PRE_GET_RESULT => array('preGetResult', 128),
-            DriverEvents::POST_GET_RESULT => array('postGetResult', 128),
-        );
+        return [
+            DriverEvents::PRE_GET_RESULT => ['preGetResult', 128],
+            DriverEvents::POST_GET_RESULT => ['postGetResult', 128],
+        ];
     }
 
     /**
@@ -57,7 +57,7 @@ class DBALDriverExtension extends DriverAbstractExtension implements EventSubscr
      */
     public function resetCalls()
     {
-        $this->calls = array();
+        $this->calls = [];
     }
 
     /**
@@ -79,7 +79,7 @@ class DBALDriverExtension extends DriverAbstractExtension implements EventSubscr
      */
     public function loadSubscribers()
     {
-        return array($this);
+        return [$this];
     }
 
     /**
