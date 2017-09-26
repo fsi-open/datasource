@@ -10,11 +10,18 @@
 namespace FSi\Component\DataSource\Tests\Driver\Doctrine\DBAL;
 
 use Doctrine\DBAL\Connection;
+use FSi\Component\DataSource\Driver\Doctrine\DBAL\DBALAbstractField;
 use FSi\Component\DataSource\Driver\Doctrine\DBAL\DBALDriver;
+use FSi\Component\DataSource\Driver\Doctrine\DBAL\DBALFieldInterface;
+use FSi\Component\DataSource\Driver\Doctrine\DBAL\Exception\DBALDriverException;
 use FSi\Component\DataSource\Driver\Doctrine\DBAL\Extension\Core\CoreExtension;
 use FSi\Component\DataSource\Driver\Doctrine\DBAL\Extension\Core\Field;
+use FSi\Component\DataSource\Exception\DataSourceException;
+use FSi\Component\DataSource\Exception\FieldException;
+use FSi\Component\DataSource\Field\FieldTypeInterface;
 use FSi\Component\DataSource\Tests\Driver\Doctrine\DBAL\Fixtures\DBALDriverExtension;
 use FSi\Component\DataSource\Tests\Fixtures\FieldExtension;
+use stdClass;
 
 class DBALDriverTest extends TestBase
 {
@@ -25,10 +32,6 @@ class DBALDriverTest extends TestBase
 
     protected function setUp()
     {
-        if (!class_exists('Doctrine\DBAL\Connection')) {
-            $this->markTestSkipped('Doctrine DBAL needed!');
-        }
-
         $this->connection = $this->getMemoryConnection();
     }
 
@@ -36,8 +39,8 @@ class DBALDriverTest extends TestBase
     {
         $qb = $this->connection->createQueryBuilder();
 
-        new DBALDriver(array(), $this->connection, 'table');
-        new DBALDriver(array(), $this->connection, $qb);
+        new DBALDriver([], $this->connection, 'table');
+        new DBALDriver([], $this->connection, $qb);
     }
 
     /**
@@ -45,8 +48,8 @@ class DBALDriverTest extends TestBase
      */
     public function testCreationExceptionWhenExtensionIsInvalid()
     {
-        $this->setExpectedException('FSi\Component\DataSource\Exception\DataSourceException');
-        new DBALDriver(array(new \stdClass()), $this->connection, 'table');
+        $this->setExpectedException(DataSourceException::class);
+        new DBALDriver([new stdClass()], $this->connection, 'table');
     }
 
     /**
@@ -54,8 +57,8 @@ class DBALDriverTest extends TestBase
      */
     public function testCreationExceptionWhenNoQueryBuilderAndTable()
     {
-        $this->setExpectedException('FSi\Component\DataSource\Driver\Doctrine\DBAL\Exception\DBALDriverException');
-        new DBALDriver(array(), $this->connection, null);
+        $this->setExpectedException(DBALDriverException::class);
+        new DBALDriver([], $this->connection, null);
     }
 
     /**
@@ -63,10 +66,10 @@ class DBALDriverTest extends TestBase
      */
     public function testGetResultExceptionWhenFieldIsNotDBALField()
     {
-        $driver = new DBALDriver(array(), $this->connection, 'table');
-        $this->setExpectedException('FSi\Component\DataSource\Driver\Doctrine\DBAL\Exception\DBALDriverException');
+        $driver = new DBALDriver([], $this->connection, 'table');
+        $this->setExpectedException(DBALDriverException::class);
 
-        $fields = array($this->getMock('FSi\Component\DataSource\Field\FieldTypeInterface'));
+        $fields = [$this->createMock(FieldTypeInterface::class)];
         $driver->getResult($fields, 0, 20);
     }
 
@@ -75,10 +78,10 @@ class DBALDriverTest extends TestBase
      */
     public function testAllFieldsBuildQueryMethod()
     {
-        $fields = array();
+        $fields = [];
 
         for ($x = 0; $x < 6; $x++) {
-            $field = $this->getMock('FSi\Component\DataSource\Driver\Doctrine\DBAL\DBALAbstractField');
+            $field = $this->createMock(DBALAbstractField::class);
 
             $field
                 ->expects($this->once())
@@ -88,7 +91,7 @@ class DBALDriverTest extends TestBase
             $fields[] = $field;
         }
 
-        $driver = new DBALDriver(array(), $this->connection, 'table');
+        $driver = new DBALDriver([], $this->connection, 'table');
         $driver->getResult($fields, 0, 20);
     }
 
@@ -97,8 +100,8 @@ class DBALDriverTest extends TestBase
      */
     public function testGetQueryExceptionWhenNotInsideGetResult()
     {
-        $driver = new DBALDriver(array(), $this->connection, 'table');
-        $this->setExpectedException('FSi\Component\DataSource\Driver\Doctrine\DBAL\Exception\DBALDriverException');
+        $driver = new DBALDriver([], $this->connection, 'table');
+        $this->setExpectedException(DBALDriverException::class);
         $driver->getQueryBuilder();
     }
 
@@ -107,7 +110,7 @@ class DBALDriverTest extends TestBase
      */
     public function testCoreExtension()
     {
-        $driver = new DBALDriver(array(new CoreExtension()), $this->connection, 'table');
+        $driver = new DBALDriver([new CoreExtension()], $this->connection, 'table');
 
         $this->assertTrue($driver->hasFieldType('text'));
         $this->assertTrue($driver->hasFieldType('number'));
@@ -118,7 +121,7 @@ class DBALDriverTest extends TestBase
         $this->assertFalse($driver->hasFieldType('wrong'));
         $this->assertFalse($driver->hasFieldType(null));
 
-        $this->setExpectedException('FSi\Component\DataSource\Exception\DataSourceException');
+        $this->setExpectedException(DataSourceException::class);
         $driver->getFieldType('wrong');
     }
 
@@ -128,11 +131,11 @@ class DBALDriverTest extends TestBase
     public function testExtensionsCalls()
     {
         $extension = new DBALDriverExtension();
-        $driver = new DBALDriver(array(), $this->connection, 'table');
+        $driver = new DBALDriver([], $this->connection, 'table');
         $driver->addExtension($extension);
 
-        $driver->getResult(array(), 0, 20);
-        $this->assertEquals(array('preGetResult', 'postGetResult'), $extension->getCalls());
+        $driver->getResult([], 0, 20);
+        $this->assertEquals(['preGetResult', 'postGetResult'], $extension->getCalls());
     }
 
     /**
@@ -142,14 +145,14 @@ class DBALDriverTest extends TestBase
      */
     public static function fieldNameProvider()
     {
-        return array(
-            array('text'),
-            array('number'),
-            array('date'),
-            array('time'),
-            array('datetime'),
-            array('boolean'),
-        );
+        return [
+            ['text'],
+            ['number'],
+            ['date'],
+            ['time'],
+            ['datetime'],
+            ['boolean'],
+        ];
     }
 
     /**
@@ -159,11 +162,11 @@ class DBALDriverTest extends TestBase
      */
     public function testCoreFields($type)
     {
-        $driver = new DBALDriver(array(new CoreExtension()), $this->connection, 'table');
+        $driver = new DBALDriver([new CoreExtension()], $this->connection, 'table');
         $this->assertTrue($driver->hasFieldType($type));
         $field = $driver->getFieldType($type);
-        $this->assertTrue($field instanceof \FSi\Component\DataSource\Field\FieldTypeInterface);
-        $this->assertTrue($field instanceof \FSi\Component\DataSource\Driver\Doctrine\DBAL\DBALFieldInterface);
+        $this->assertTrue($field instanceof FieldTypeInterface);
+        $this->assertTrue($field instanceof DBALFieldInterface);
 
         $this->assertTrue($field->getOptionsResolver()->isDefined('field'));
 
@@ -174,12 +177,12 @@ class DBALDriverTest extends TestBase
             $field = $driver->getFieldType($type);
             $field->setName('name');
             $field->setComparison($cmp);
-            $field->setOptions(array());
+            $field->setOptions([]);
         }
 
         $this->assertEquals($field->getOption('field'), $field->getName());
 
-        $this->setExpectedException('FSi\Component\DataSource\Exception\FieldException');
+        $this->setExpectedException(FieldException::class);
         $field = $driver->getFieldType($type);
         $field->setComparison('wrong');
     }
@@ -190,29 +193,29 @@ class DBALDriverTest extends TestBase
     public function testFieldsExtensionsCalls()
     {
         $extension = new FieldExtension();
-        $parameter = array();
+        $parameter = [];
 
-        $fields = array(
+        $fields = [
             new Field\Text(),
             new Field\Number(),
             new Field\Date(),
             new Field\Time(),
             new Field\DateTime(),
-        );
+        ];
 
         foreach ($fields as $field) {
             $field->addExtension($extension);
 
-            $field->bindParameter(array());
-            $this->assertEquals(array('preBindParameter', 'postBindParameter'), $extension->getCalls());
+            $field->bindParameter([]);
+            $this->assertEquals(['preBindParameter', 'postBindParameter'], $extension->getCalls());
             $extension->resetCalls();
 
             $field->getParameter($parameter);
-            $this->assertEquals(array('postGetParameter'), $extension->getCalls());
+            $this->assertEquals(['postGetParameter'], $extension->getCalls());
             $extension->resetCalls();
 
-            $field->createView(array());
-            $this->assertEquals(array('postBuildView'), $extension->getCalls());
+            $field->createView([]);
+            $this->assertEquals(['postBuildView'], $extension->getCalls());
             $extension->resetCalls();
         }
     }

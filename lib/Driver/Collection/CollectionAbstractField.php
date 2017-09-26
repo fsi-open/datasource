@@ -25,8 +25,8 @@ abstract class CollectionAbstractField extends FieldAbstractType implements Coll
     {
         $field = $this;
         $this->getOptionsResolver()
-            ->setDefined(array('field'))
-            ->setAllowedTypes('field', array('string', 'null'))
+            ->setDefined(['field'])
+            ->setAllowedTypes('field', ['string', 'null'])
             ->setNormalizer('field', function($options, $value) use ($field) {
                 if (!isset($value) && $field->getName()) {
                     return $field->getName();
@@ -44,7 +44,7 @@ abstract class CollectionAbstractField extends FieldAbstractType implements Coll
     {
         $data = $this->getCleanParameter();
 
-        if (($data === array()) || ($data === '') || ($data === null)) {
+        if (($data === []) || ($data === '') || ($data === null)) {
             return;
         }
 
@@ -91,7 +91,7 @@ abstract class CollectionAbstractField extends FieldAbstractType implements Coll
             $comparison = 'notIn';
         }
 
-        if (in_array($comparison, array('in', 'nin', 'notIn')) && !is_array($data)) {
+        if (in_array($comparison, ['in', 'nin', 'notIn']) && !is_array($data)) {
             throw new CollectionDriverException('Fields with \'in\' and \'notIn\' comparisons require to bind an array.');
         }
 

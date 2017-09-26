@@ -27,7 +27,7 @@ abstract class DoctrineAbstractField extends FieldAbstractType implements Doctri
         $fieldName = $this->getFieldName($alias);
         $name = $this->getName();
 
-        if (($data === array()) || ($data === '') || ($data === null)) {
+        if (($data === []) || ($data === '') || ($data === null)) {
             return;
         }
 
@@ -72,9 +72,9 @@ abstract class DoctrineAbstractField extends FieldAbstractType implements Doctri
             return;
         }
 
-        if (in_array($comparison, array('in', 'notIn')) && !is_array($data)) {
+        if (in_array($comparison, ['in', 'notIn']) && !is_array($data)) {
             throw new DoctrineDriverException('Fields with \'in\' and \'notIn\' comparisons require to bind an array.');
-        } elseif (in_array($comparison, array('like', 'contains'))) {
+        } elseif (in_array($comparison, ['like', 'contains'])) {
             $data = "%$data%";
             $comparison = 'like';
         }
@@ -89,13 +89,13 @@ abstract class DoctrineAbstractField extends FieldAbstractType implements Doctri
     {
         $field = $this;
         $this->getOptionsResolver()
-            ->setDefaults(array(
+            ->setDefaults([
                 'field' => null,
                 'auto_alias' => true,
                 'clause' => 'where'
-            ))
-            ->setAllowedValues('clause', array('where', 'having'))
-            ->setAllowedTypes('field', array('string', 'null'))
+            ])
+            ->setAllowedValues('clause', ['where', 'having'])
+            ->setAllowedTypes('field', ['string', 'null'])
             ->setAllowedTypes('auto_alias', 'bool')
             ->setNormalizer('field', function($options, $value) use ($field) {
                     if (!isset($value) && $field->getName()) {

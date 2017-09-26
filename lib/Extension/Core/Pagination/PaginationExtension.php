@@ -31,8 +31,8 @@ class PaginationExtension extends DataSourceAbstractExtension
      */
     public function loadSubscribers()
     {
-        return array(
+        return [
             new EventSubscriber\Events(),
-        );
+        ];
     }
 }

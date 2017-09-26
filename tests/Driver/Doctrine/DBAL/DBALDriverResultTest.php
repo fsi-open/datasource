@@ -23,10 +23,6 @@ class DBALResultTestBase extends TestBase
 
     protected function setUp()
     {
-        if (!class_exists('Doctrine\DBAL\Connection')) {
-            $this->markTestSkipped('Doctrine DBAL needed!');
-        }
-
         $this->connection = $this->getMemoryConnection();
         $this->loadTestData($this->connection);
     }
@@ -48,13 +44,13 @@ class DBALResultTestBase extends TestBase
         $datasource = $this->getNewsDataSource();
         $datasource->addField('title', 'text', 'like');
 
-        $parameters = array(
-            $datasource->getName() => array(
-                DataSourceInterface::PARAMETER_FIELDS => array(
+        $parameters = [
+            $datasource->getName() => [
+                DataSourceInterface::PARAMETER_FIELDS => [
                     'title' => 'title-1',
-                ),
-            ),
-        );
+                ],
+            ],
+        ];
         $datasource->bindParameters($parameters);
 
         //title-1, title-10-19, title-100
@@ -67,14 +63,14 @@ class DBALResultTestBase extends TestBase
         $datasource->addField('title', 'text', 'like');
         $datasource->setMaxResults(10);
 
-        $parameters = array(
-            $datasource->getName() => array(
+        $parameters = [
+            $datasource->getName() => [
                 PaginationExtension::PARAMETER_PAGE => 2,
-                DataSourceInterface::PARAMETER_FIELDS => array(
+                DataSourceInterface::PARAMETER_FIELDS => [
                     'title' => 'title-1',
-                ),
-            ),
-        );
+                ],
+            ],
+        ];
         $datasource->bindParameters($parameters);
 
         $result = $datasource->getResult();
@@ -92,17 +88,17 @@ class DBALResultTestBase extends TestBase
         $datasource->addField('content', 'text', 'like');
         $datasource->setMaxResults(10);
 
-        $parameters = array(
-            $datasource->getName() => array(
-                OrderingExtension::PARAMETER_SORT => array(
+        $parameters = [
+            $datasource->getName() => [
+                OrderingExtension::PARAMETER_SORT => [
                     'content' => 'asc',
                     'title' => 'desc',
-                ),
-                DataSourceInterface::PARAMETER_FIELDS => array(
+                ],
+                DataSourceInterface::PARAMETER_FIELDS => [
                     'title' => 'title-1',
-                ),
-            ),
-        );
+                ],
+            ],
+        ];
         $datasource->bindParameters($parameters);
 
         $result = $datasource->getResult();
@@ -129,26 +125,26 @@ class DBALResultTestBase extends TestBase
             ->join('n', 'category', 'c', 'n.category_id = c.id')
         ;
 
-        $driverOptions = array(
+        $driverOptions = [
             'qb' => $qb,
             'alias' => 'n',
-        );
+        ];
 
         $datasource = $dataSourceFactory->createDataSource('doctrine-dbal', $driverOptions, 'name');
         $datasource
-            ->addField('category', 'text', 'eq', array(
+            ->addField('category', 'text', 'eq', [
                 'field' => 'c.name',
-            ))
+            ])
             ->setMaxResults(8);
         ;
 
-        $parameters = array(
-            $datasource->getName() => array(
-                DataSourceInterface::PARAMETER_FIELDS => array(
+        $parameters = [
+            $datasource->getName() => [
+                DataSourceInterface::PARAMETER_FIELDS => [
                     'category' => 'name-10',
-                ),
-            ),
-        );
+                ],
+            ],
+        ];
 
         $datasource->bindParameters($parameters);
         $result = $datasource->getResult();
@@ -172,32 +168,32 @@ class DBALResultTestBase extends TestBase
             ->groupBy('c.id')
         ;
 
-        $driverOptions = array(
+        $driverOptions = [
             'qb' => $qb,
             'alias' => 'c',
-        );
+        ];
 
         $datasource = $dataSourceFactory->createDataSource('doctrine-dbal', $driverOptions, 'name');
 
         $datasource
-            ->addField('category', 'text', 'like', array(
+            ->addField('category', 'text', 'like', [
                 'field' => 'c.name',
-            ))
-            ->addField('newscount', 'number', 'gt', array(
+            ])
+            ->addField('newscount', 'number', 'gt', [
                 'field' => 'newscount',
                 'auto_alias' => false,
                 'clause' => 'having',
-            ))
+            ])
             ->setMaxResults(3)
         ;
 
-        $datasource->bindParameters(array(
-            $datasource->getName() => array(
-                DataSourceInterface::PARAMETER_FIELDS => array(
+        $datasource->bindParameters([
+            $datasource->getName() => [
+                DataSourceInterface::PARAMETER_FIELDS => [
                     'newscount' => 3,
-                ),
-            ),
-        ));
+                ],
+            ],
+        ]);
 
         $result = $datasource->getResult();
         $this->assertCount(6, $result);
@@ -205,46 +201,48 @@ class DBALResultTestBase extends TestBase
 
         $this->assertEquals(
             $this->testDoctrineExtension->getQueryBuilder()->getSQL(),
-            'SELECT c.*, COUNT(n.id) newscount FROM category c LEFT JOIN news n ON n.category_id = c.id GROUP BY c.id HAVING newscount > :newscount LIMIT 3 OFFSET 0'
+            'SELECT c.*, COUNT(n.id) newscount FROM category c LEFT JOIN news n'
+            . ' ON n.category_id = c.id GROUP BY c.id HAVING newscount > :newscount'
+            . ' LIMIT 3 OFFSET 0'
         );
 
-        $datasource->bindParameters(array(
-            $datasource->getName() => array(
-                DataSourceInterface::PARAMETER_FIELDS => array(
-                    'newscount' => 0,
-                ),
-            ),
-        ));
+        $datasource->bindParameters([
+            $datasource->getName() => [
+                DataSourceInterface::PARAMETER_FIELDS => ['newscount' => 0,],
+            ],
+        ]);
 
         $result = $datasource->getResult();
         $this->assertCount(10, $result);
         $this->assertCount(3, iterator_to_array($result));
 
         $this->assertEquals(
-            'SELECT c.*, COUNT(n.id) newscount FROM category c LEFT JOIN news n ON n.category_id = c.id GROUP BY c.id HAVING newscount > :newscount LIMIT 3 OFFSET 0',
+            'SELECT c.*, COUNT(n.id) newscount FROM category c LEFT JOIN news n'
+            . ' ON n.category_id = c.id GROUP BY c.id HAVING newscount > :newscount'
+            . ' LIMIT 3 OFFSET 0',
             $this->testDoctrineExtension->getQueryBuilder()->getSQL()
         );
 
         $datasource = $dataSourceFactory->createDataSource('doctrine-dbal', $driverOptions, 'name2');
         $datasource
-            ->addField('category', 'text', 'like', array(
+            ->addField('category', 'text', 'like', [
                 'field' => 'c.name',
-            ))
-            ->addField('newscount', 'number', 'between', array(
+            ])
+            ->addField('newscount', 'number', 'between', [
                 'field' => 'newscount',
                 'auto_alias' => false,
                 'clause' => 'having'
-            ))
+            ])
             ->setMaxResults(2)
         ;
 
-        $parameters = array(
-            $datasource->getName() => array(
-                DataSourceInterface::PARAMETER_FIELDS => array(
-                    'newscount' => array(0, 1),
-                ),
-            ),
-        );
+        $parameters = [
+            $datasource->getName() => [
+                DataSourceInterface::PARAMETER_FIELDS => [
+                    'newscount' => [0, 1],
+                ],
+            ],
+        ];
 
         $datasource->bindParameters($parameters);
         $result = $datasource->getResult();
@@ -252,7 +250,9 @@ class DBALResultTestBase extends TestBase
         $this->assertCount(2, iterator_to_array($result));
 
         $this->assertEquals(
-            'SELECT c.*, COUNT(n.id) newscount FROM category c LEFT JOIN news n ON n.category_id = c.id GROUP BY c.id HAVING newscount BETWEEN :newscount_from AND :newscount_to LIMIT 2 OFFSET 0',
+            'SELECT c.*, COUNT(n.id) newscount FROM category c LEFT JOIN news n'
+            . ' ON n.category_id = c.id GROUP BY c.id HAVING newscount BETWEEN'
+            . ' :newscount_from AND :newscount_to LIMIT 2 OFFSET 0',
             $this->testDoctrineExtension->getQueryBuilder()->getSQL()
         );
     }
@@ -270,24 +270,24 @@ class DBALResultTestBase extends TestBase
             ->join('n', self::TABLE_CATEGORY_NAME, 'c', 'n.category_id = c.id')
         ;
 
-        $driverOptions = array(
+        $driverOptions = [
             'qb' => $qb,
             'alias' => 'n'
-        );
+        ];
 
         $datasource = $dataSourceFactory->createDataSource('doctrine-dbal', $driverOptions, 'name');
         $datasource
-            ->addField('category', 'number', 'in', array(
+            ->addField('category', 'number', 'in', [
                 'clause' => 'having'
-            ));
+            ]);
 
-        $parameters = array(
-            $datasource->getName() => array(
-                DataSourceInterface::PARAMETER_FIELDS => array(
-                    'category' => array(2, 3),
-                ),
-            ),
-        );
+        $parameters = [
+            $datasource->getName() => [
+                DataSourceInterface::PARAMETER_FIELDS => [
+                    'category' => [2, 3],
+                ],
+            ],
+        ];
 
         $datasource->bindParameters($parameters);
         $datasource->getResult();
@@ -302,7 +302,7 @@ class DBALResultTestBase extends TestBase
     {
         return $this->getDataSourceFactory()->createDataSource(
             'doctrine-dbal',
-            array('table' => 'news'),
+            ['table' => 'news'],
             'name'
         );
     }

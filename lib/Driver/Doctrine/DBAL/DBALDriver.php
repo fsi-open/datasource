@@ -54,7 +54,7 @@ class DBALDriver extends DriverAbstract
     private $indexField;
 
     public function __construct(
-        array $extensions = array(),
+        array $extensions = [],
         Connection $connection,
         $table,
         $alias = null,

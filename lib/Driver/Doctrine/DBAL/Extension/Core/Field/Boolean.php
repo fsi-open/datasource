@@ -17,7 +17,7 @@ use Doctrine\DBAL\Types\Type;
  */
 class Boolean extends DBALAbstractField
 {
-    protected $comparisons = array('eq');
+    protected $comparisons = ['eq'];
 
     public function getType()
     {

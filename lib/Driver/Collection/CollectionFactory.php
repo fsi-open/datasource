@@ -9,7 +9,6 @@
 
 namespace FSi\Component\DataSource\Driver\Collection;
 
-use FSi\Component\DataSource\DataSourceFactoryInterface;
 use FSi\Component\DataSource\Driver\DriverFactoryInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -33,7 +32,7 @@ class CollectionFactory implements DriverFactoryInterface
     /**
      * @param array $extensions
      */
-    public function __construct($extensions = array())
+    public function __construct($extensions = [])
     {
         $this->extensions = $extensions;
         $this->optionsResolver = new OptionsResolver();
@@ -54,7 +53,7 @@ class CollectionFactory implements DriverFactoryInterface
      * @param array $options
      * @return \FSi\Component\DataSource\Driver\Collection\CollectionDriver
      */
-    public function createDriver($options = array())
+    public function createDriver($options = [])
     {
         $options = $this->optionsResolver->resolve($options);
 
@@ -66,9 +65,9 @@ class CollectionFactory implements DriverFactoryInterface
      */
     private function initOptions()
     {
-        $this->optionsResolver->setDefaults(array(
-            'collection' => array(),
-        ));
+        $this->optionsResolver->setDefaults([
+            'collection' => [],
+        ]);
 
         $this->optionsResolver->setAllowedTypes('collection', 'array');
     }

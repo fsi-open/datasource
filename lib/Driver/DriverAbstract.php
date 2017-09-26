@@ -25,21 +25,21 @@ abstract class DriverAbstract implements DriverInterface
      *
      * @var array
      */
-    protected $extensions = array();
+    protected $extensions = [];
 
     /**
      * Field types.
      *
      * @var array
      */
-    protected $fieldTypes = array();
+    protected $fieldTypes = [];
 
     /**
      * Fields extensions.
      *
      * @var array
      */
-    protected $fieldExtensions = array();
+    protected $fieldExtensions = [];
 
     /**
      * @var \Symfony\Component\EventDispatcher\EventDispatcher
@@ -50,7 +50,7 @@ abstract class DriverAbstract implements DriverInterface
      * @param $extensions array with extensions
      * @throws \FSi\Component\DataSource\Exception\DataSourceException
      */
-    public function __construct(array $extensions = array())
+    public function __construct(array $extensions = [])
     {
         foreach ($extensions as $extension) {
             if (!$extension instanceof DriverExtensionInterface) {
@@ -129,7 +129,7 @@ abstract class DriverAbstract implements DriverInterface
 
         $this->fieldTypes[$type] = $typeInstance;
 
-        $ext = array();
+        $ext = [];
         foreach ($this->extensions as $extension) {
             if ($extension->hasFieldTypeExtensions($type)) {
                 $fieldExtensions = $extension->getFieldTypeExtensions($type);

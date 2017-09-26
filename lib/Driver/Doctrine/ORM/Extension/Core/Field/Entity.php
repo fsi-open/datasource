@@ -21,7 +21,7 @@ class Entity extends DoctrineAbstractField
     /**
      * {@inheritdoc}
      */
-    protected $comparisons = array('eq', 'neq', 'memberof', 'notmemberof', 'in', 'isNull');
+    protected $comparisons = ['eq', 'neq', 'memberof', 'notmemberof', 'in', 'isNull'];
 
     /**
      * {@inheritdoc}

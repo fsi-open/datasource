@@ -35,7 +35,7 @@ class DBALResult extends ArrayCollection
             ));
         }
 
-        $result = array();
+        $result = [];
         $this->count = $paginator->count();
         $data = $paginator->getIterator();
 

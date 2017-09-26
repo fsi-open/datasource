@@ -46,10 +46,10 @@ abstract class TestBase extends \PHPUnit_Framework_TestCase
     {
         $this->testDoctrineExtension = new DBALDriverExtension();
 
-        return new DBALFactory(new TestConnectionRegistry($this->getMemoryConnection()), array(
+        return new DBALFactory(new TestConnectionRegistry($this->getMemoryConnection()), [
             new CoreExtension(),
             $this->testDoctrineExtension,
-        ));
+        ]);
     }
 
     /**
@@ -58,10 +58,10 @@ abstract class TestBase extends \PHPUnit_Framework_TestCase
     protected function getMemoryConnection()
     {
         if (empty($this->connection)) {
-            $this->connection = DriverManager::getConnection(array(
+            $this->connection = DriverManager::getConnection([
                 'driver' => 'pdo_sqlite',
                 'memory' => true,
-            ));
+            ]);
         }
 
         return $this->connection;
@@ -72,14 +72,14 @@ abstract class TestBase extends \PHPUnit_Framework_TestCase
      */
     protected function getDataSourceFactory()
     {
-        $driverFactoryManager = new DriverFactoryManager(array(
+        $driverFactoryManager = new DriverFactoryManager([
             $this->getDriverFactory()
-        ));
+        ]);
 
-        $extensions = array(
+        $extensions = [
             new Core\Pagination\PaginationExtension(),
             new OrderingExtension(),
-        );
+        ];
 
         return new DataSourceFactory($driverFactoryManager, $extensions);
     }
@@ -88,13 +88,13 @@ abstract class TestBase extends \PHPUnit_Framework_TestCase
     {
         $schemaManager = $connection->getSchemaManager();
 
-        $schemaManager->createTable(new Table(self::TABLE_CATEGORY_NAME, array(
+        $schemaManager->createTable(new Table(self::TABLE_CATEGORY_NAME, [
             new Column('id', Type::getType(Type::INTEGER)),
             new Column('type', Type::getType(Type::STRING)),
             new Column('name', Type::getType(Type::STRING)),
-        )));
+        ]));
 
-        $schemaManager->createTable(new Table(self::TABLE_NEWS_NAME, array(
+        $schemaManager->createTable(new Table(self::TABLE_NEWS_NAME, [
             new Column('id', Type::getType(Type::INTEGER)),
             new Column('visible', Type::getType(Type::BOOLEAN)),
             new Column('title', Type::getType(Type::STRING)),
@@ -103,18 +103,18 @@ abstract class TestBase extends \PHPUnit_Framework_TestCase
             new Column('event_hour', Type::getType(Type::TIME)),
             new Column('content', Type::getType(Type::TEXT)),
             new Column('category_id', Type::getType(Type::INTEGER)),
-        )));
+        ]));
 
         for ($i=1; $i<=10; $i++) {
-            $connection->insert(self::TABLE_CATEGORY_NAME, array(
+            $connection->insert(self::TABLE_CATEGORY_NAME, [
                 'id' => $i,
                 'type' => $i % 2 == 0 ? 'B' : 'A',
                 'name' => sprintf('name-%d', $i),
-            ));
+            ]);
         }
 
         for ($i=1; $i<=100; $i++) {
-            $connection->insert(self::TABLE_NEWS_NAME, array(
+            $connection->insert(self::TABLE_NEWS_NAME, [
                 'id' => $i,
                 'visible' => (int) $i % 2 == 0,
                 'title' => sprintf('title-%d', $i),
@@ -136,7 +136,7 @@ abstract class TestBase extends \PHPUnit_Framework_TestCase
                  *  9 - 23
                  * 10 - 37
                  */
-            ), array(
+            ], [
                 Type::INTEGER,
                 Type::BOOLEAN,
                 Type::STRING,
@@ -145,7 +145,7 @@ abstract class TestBase extends \PHPUnit_Framework_TestCase
                 Type::TIME,
                 Type::TEXT,
                 Type::INTEGER,
-            ));
+            ]);
         }
     }
 }

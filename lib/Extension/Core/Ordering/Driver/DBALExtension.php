@@ -24,23 +24,23 @@ class DBALExtension extends DriverExtension implements EventSubscriberInterface
 {
     public function getExtendedDriverTypes()
     {
-        return array(
+        return [
             'doctrine-dbal'
-        );
+        ];
     }
 
     protected function loadFieldTypesExtensions()
     {
-        return array(
+        return [
             new FieldExtension(),
-        );
+        ];
     }
 
     public static function getSubscribedEvents()
     {
-        return array(
-            DriverEvents::PRE_GET_RESULT => array('preGetResult'),
-        );
+        return [
+            DriverEvents::PRE_GET_RESULT => ['preGetResult'],
+        ];
     }
 
     /**

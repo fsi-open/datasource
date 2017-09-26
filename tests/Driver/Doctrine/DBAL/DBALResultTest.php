@@ -12,6 +12,7 @@ namespace FSi\Component\DataSource\Tests\Driver\Doctrine\DBAL;
 use Doctrine\DBAL\Connection;
 use FSi\Component\DataSource\Driver\Doctrine\DBAL\DBALResult;
 use FSi\Component\DataSource\Driver\Doctrine\DBAL\Paginator;
+use RuntimeException;
 
 class DBALResultTest extends TestBase
 {
@@ -54,13 +55,13 @@ class DBALResultTest extends TestBase
 
     public function testInvalidStringIndexField()
     {
-        $this->setExpectedException('\RuntimeException', 'Index cannot be null');
+        $this->setExpectedException(RuntimeException::class, 'Index cannot be null');
         new DBALResult($this->paginator, '[invalid]');
     }
 
     public function testDuplicatedStringIndex()
     {
-        $this->setExpectedException('\RuntimeException', 'Duplicate index "A"');
+        $this->setExpectedException(RuntimeException::class, 'Duplicate index "A"');
         new DBALResult($this->paginator, '[type]');
     }
 
@@ -68,16 +69,16 @@ class DBALResultTest extends TestBase
     {
         $result = new DBALResult($this->paginator, '[id]');
         $this->assertCount(10, $result);
-        $this->assertEquals(array(
-            1 => array('id' => 1, 'type' => 'A', 'name' => 'name-1'),
-            2 => array('id' => 2, 'type' => 'B', 'name' => 'name-2'),
-            3 => array('id' => 3, 'type' => 'A', 'name' => 'name-3'),
-        ), $result->toArray());
+        $this->assertEquals([
+            1 => ['id' => 1, 'type' => 'A', 'name' => 'name-1'],
+            2 => ['id' => 2, 'type' => 'B', 'name' => 'name-2'],
+            3 => ['id' => 3, 'type' => 'A', 'name' => 'name-3'],
+        ], $result->toArray());
     }
 
     public function testDuplicatedCallbackIndex()
     {
-        $this->setExpectedException('\RuntimeException', 'Duplicate index "C"');
+        $this->setExpectedException(RuntimeException::class, 'Duplicate index "C"');
         new DBALResult($this->paginator, function () {
             return 'C';
         });
@@ -90,10 +91,10 @@ class DBALResultTest extends TestBase
         });
 
         $this->assertCount(10, $result);
-        $this->assertEquals(array(
-            'A_1' => array('id' => 1, 'type' => 'A', 'name' => 'name-1'),
-            'A_2' => array('id' => 2, 'type' => 'B', 'name' => 'name-2'),
-            'A_3' => array('id' => 3, 'type' => 'A', 'name' => 'name-3'),
-        ), $result->toArray());
+        $this->assertEquals([
+            'A_1' => ['id' => 1, 'type' => 'A', 'name' => 'name-1'],
+            'A_2' => ['id' => 2, 'type' => 'B', 'name' => 'name-2'],
+            'A_3' => ['id' => 3, 'type' => 'A', 'name' => 'name-3'],
+        ], $result->toArray());
     }
 }

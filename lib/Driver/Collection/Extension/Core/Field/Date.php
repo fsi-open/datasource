@@ -19,7 +19,7 @@ class Date extends CollectionAbstractField
     /**
      * {@inheritdoc}
      */
-    protected $comparisons = array('eq', 'neq', 'lt', 'lte', 'gt', 'gte', 'in', 'notIn', 'between');
+    protected $comparisons = ['eq', 'neq', 'lt', 'lte', 'gt', 'gte', 'in', 'notIn', 'between'];
 
     /**
      * {@inheritdoc}

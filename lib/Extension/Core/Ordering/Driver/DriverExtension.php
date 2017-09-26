@@ -24,9 +24,9 @@ abstract class DriverExtension extends DriverAbstractExtension
      */
     protected function loadFieldTypesExtensions()
     {
-        return array(
+        return [
             new FieldExtension(),
-        );
+        ];
     }
 
     /**
@@ -34,9 +34,9 @@ abstract class DriverExtension extends DriverAbstractExtension
      */
     public static function getSubscribedEvents()
     {
-        return array(
-            DriverEvents::PRE_GET_RESULT => array('preGetResult'),
-        );
+        return [
+            DriverEvents::PRE_GET_RESULT => ['preGetResult'],
+        ];
     }
 
     /**
@@ -59,10 +59,10 @@ abstract class DriverExtension extends DriverAbstractExtension
      */
     protected function sortFields(array $fields)
     {
-        $sortedFields = array();
-        $orderingDirection = array();
+        $sortedFields = [];
+        $orderingDirection = [];
 
-        $tmpFields = array();
+        $tmpFields = [];
         foreach ($fields as $field) {
             if ($fieldExtension = $this->getFieldExtension($field)) {
                 $fieldOrdering = $fieldExtension->getOrdering($field);

@@ -19,7 +19,7 @@ class AttributesContainer implements AttributesContainerInterface
      *
      * @var array
      */
-    protected $attributes = array();
+    protected $attributes = [];
 
     /**
      * {@inheritdoc}

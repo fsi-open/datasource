@@ -21,160 +21,160 @@ class DBALFieldsTestBase extends TestBase
 
     public function fieldsProvider()
     {
-        return array(
-            array(
+        return [
+            [
                 'title',
                 'text',
-                array(
-                    array('eq', 'title-1', 1),
-                    array('neq', 'title-1', 99),
-                    array('in', array('title-1', 'title-2'), 2),
-                    array('notIn', array('title-1', 'title-2'), 98),
-                    array('like', 'title-1', 12),
-                    array('contains', 'title-1', 12),
-                    array('isNull', 'null', 0),
-                ),
-            ),
-            array(
+                [
+                    ['eq', 'title-1', 1],
+                    ['neq', 'title-1', 99],
+                    ['in', ['title-1', 'title-2'], 2],
+                    ['notIn', ['title-1', 'title-2'], 98],
+                    ['like', 'title-1', 12],
+                    ['contains', 'title-1', 12],
+                    ['isNull', 'null', 0],
+                ],
+            ],
+            [
                 'id',
                 'number',
-                array(
-                    array('eq', 50, 1),
-                    array('neq', 50, 99),
-                    array('lt', 50, 49),
-                    array('lte', 50, 50),
-                    array('gt', 50, 50),
-                    array('gte', 50, 51),
-                    array('in', array(50, 60), 2),
-                    array('notIn', array(50, 60), 98),
-                    array('between', array('from' => 30, 'to' => 50), 21),
-                    array('isNull', 'null', 0),
-                ),
-            ),
-            array(
+                [
+                    ['eq', 50, 1],
+                    ['neq', 50, 99],
+                    ['lt', 50, 49],
+                    ['lte', 50, 50],
+                    ['gt', 50, 50],
+                    ['gte', 50, 51],
+                    ['in', [50, 60], 2],
+                    ['notIn', [50, 60], 98],
+                    ['between', ['from' => 30, 'to' => 50], 21],
+                    ['isNull', 'null', 0],
+                ],
+            ],
+            [
                 'event_date',
                 'date',
-                array(
-                    array('eq', new DateTime('1970-01-02 00:00:00'), 24),
-                    array('neq', new DateTime('1970-01-01 00:00:00'), 76),
-                    array('lt', new DateTime('1970-01-02 00:00:00'), 24),
-                    array('lte', new DateTime('1970-01-02 00:00:00'), 48),
-                    array('gt', new DateTime('1970-01-02 00:00:00'), 52),
-                    array('gte', new DateTime('1970-01-02 00:00:00'), 76),
-                    array(
+                [
+                    ['eq', new DateTime('1970-01-02 00:00:00'), 24],
+                    ['neq', new DateTime('1970-01-01 00:00:00'), 76],
+                    ['lt', new DateTime('1970-01-02 00:00:00'), 24],
+                    ['lte', new DateTime('1970-01-02 00:00:00'), 48],
+                    ['gt', new DateTime('1970-01-02 00:00:00'), 52],
+                    ['gte', new DateTime('1970-01-02 00:00:00'), 76],
+                    [
                         'in',
-                        array(
+                        [
                             new DateTime('1970-01-01 00:00:00'),
                             new DateTime('1970-01-01 01:00:00'),
                             new DateTime('1970-01-02 00:00:00'),
-                        ),
+                        ],
                         48 //not 3 because it's date, not datetime
-                    ),
-                    array(
+                    ],
+                    [
                         'notIn',
-                        array(
+                        [
                             new DateTime('1970-01-01 00:00:00'),
                             new DateTime('1970-01-01 01:00:00'),
                             new DateTime('1970-01-02 00:00:00'),
-                        ),
+                        ],
                         52 //not 97 because it's date, not datetime
-                    ),
-                    array(
+                    ],
+                    [
                         'between',
-                        array(
+                        [
                             'from' => new DateTime('1970-01-02 00:00:00'),
                             'to' => new DateTime('1970-01-03 00:00:00'),
-                        ),
+                        ],
                         48
-                    ),
-                    array('isNull', 'null', 0),
-                ),
-            ),
-            array(
+                    ],
+                    ['isNull', 'null', 0],
+                ],
+            ],
+            [
                 'create_datetime',
                 'datetime',
-                array(
-                    array('eq', new DateTime('1970-01-01 00:00:00'), 1),
-                    array('neq', new DateTime('1970-01-01 00:00:00'), 99),
-                    array('lt', new DateTime('1970-01-02 00:00:00'), 24),
-                    array('lte', new DateTime('1970-01-02 00:00:00'), 25),
-                    array('gt', new DateTime('1970-01-02 00:00:00'), 75),
-                    array('gte', new DateTime('1970-01-02 00:00:00'), 76),
-                    array(
+                [
+                    ['eq', new DateTime('1970-01-01 00:00:00'), 1],
+                    ['neq', new DateTime('1970-01-01 00:00:00'), 99],
+                    ['lt', new DateTime('1970-01-02 00:00:00'), 24],
+                    ['lte', new DateTime('1970-01-02 00:00:00'), 25],
+                    ['gt', new DateTime('1970-01-02 00:00:00'), 75],
+                    ['gte', new DateTime('1970-01-02 00:00:00'), 76],
+                    [
                         'in',
-                        array(
+                        [
                             new DateTime('1970-01-01 00:00:00'),
                             new DateTime('1970-01-01 01:00:00'),
-                        ),
+                        ],
                         2
-                    ),
-                    array(
+                    ],
+                    [
                         'notIn',
-                        array(
+                        [
                             new DateTime('1970-01-01 00:00:00'),
                             new DateTime('1970-01-01 01:00:00'),
-                        ),
+                        ],
                         98
-                    ),
-                    array(
+                    ],
+                    [
                         'between',
-                        array(
+                        [
                             'from' => new DateTime('1970-01-01 00:00:00'),
                             'to' => new DateTime('1970-01-02 00:00:00'),
-                        ),
+                        ],
                         25
-                    ),
-                    array('isNull', 'null', 0),
-                ),
-            ),
-            array(
+                    ],
+                    ['isNull', 'null', 0],
+                ],
+            ],
+            [
                 'event_hour',
                 'time',
-                array(
-                    array('eq', new DateTime('1970-01-01 01:00:00'), 5),
-                    array('neq',new DateTime( '1970-01-01 01:00:00'), 95),
-                    array('lt', new DateTime('1970-01-01 03:00:00'), 15),
-                    array('lte', new DateTime('1970-01-01 03:00:00'), 20),
-                    array('gt', new DateTime('1970-01-02 03:00:00'), 80),
-                    array('gte', new DateTime('1970-01-02 03:00:00'), 85),
-                    array(
+                [
+                    ['eq', new DateTime('1970-01-01 01:00:00'), 5],
+                    ['neq',new DateTime( '1970-01-01 01:00:00'), 95],
+                    ['lt', new DateTime('1970-01-01 03:00:00'), 15],
+                    ['lte', new DateTime('1970-01-01 03:00:00'), 20],
+                    ['gt', new DateTime('1970-01-02 03:00:00'), 80],
+                    ['gte', new DateTime('1970-01-02 03:00:00'), 85],
+                    [
                         'in',
-                        array(
+                        [
                             new DateTime('1970-01-01 00:00:00'),
                             new DateTime('1970-01-01 01:00:00'),
                             new DateTime('1970-01-02 01:00:00'),
-                        ),
+                        ],
                         10 //not 15 because it's time, not datetime
-                    ),
-                    array(
+                    ],
+                    [
                         'notIn',
-                        array(
+                        [
                             new DateTime('1970-01-01 00:00:00'),
                             new DateTime('1970-01-01 01:00:00'),
                             new DateTime('1970-01-02 01:00:00'),
-                        ),
+                        ],
                         90 //not 85 because it's time, not datetime
-                    ),
-                    array(
+                    ],
+                    [
                         'between',
-                        array(
+                        [
                             //dates doesn't matter
                             'from' => new DateTime('1970-01-01 02:00:00'),
                             'to' => new DateTime('1970-01-02 05:00:00'),
-                        ),
+                        ],
                         18
-                    ),
-                    array('isNull', 'null', 0),
-                )
-            ),
-            array(
+                    ],
+                    ['isNull', 'null', 0],
+                ]
+            ],
+            [
                 'visible',
                 'boolean',
-                array(
-                    array('eq', true, 50),
-                ),
-            ),
-        );
+                [
+                    ['eq', true, 50],
+                ],
+            ],
+        ];
     }
 
     /**
@@ -188,13 +188,13 @@ class DBALFieldsTestBase extends TestBase
             $datasource = $this->getNewsDataSource();
             $datasource->addField($fieldName, $datasourceType, $comparison);
 
-            $datasource->bindParameters(array(
-                $datasource->getName() => array(
-                    DataSourceInterface::PARAMETER_FIELDS => array(
+            $datasource->bindParameters([
+                $datasource->getName() => [
+                    DataSourceInterface::PARAMETER_FIELDS => [
                         $fieldName => $parameter,
-                    ),
-                ),
-            ));
+                    ],
+                ],
+            ]);
 
             $this->assertEquals($expectedCount, count($datasource->getResult()));
         }
@@ -204,7 +204,7 @@ class DBALFieldsTestBase extends TestBase
     {
         return $this->getDataSourceFactory()->createDataSource(
             'doctrine-dbal',
-            array('table' => 'news'),
+            ['table' => 'news'],
             'name'
         );
     }

@@ -18,10 +18,8 @@ class Text extends CollectionAbstractField
 {
     /**
      * {@inheritdoc}
-     *
-     * 'nin' comparison is deprecated since 1.3 and will be removed in 2.0
      */
-    protected $comparisons = array('eq', 'neq', 'in', 'nin', 'notIn', 'contains');
+    protected $comparisons = ['eq', 'neq', 'in', 'notIn', 'contains'];
 
     /**
      * {@inheritdoc}

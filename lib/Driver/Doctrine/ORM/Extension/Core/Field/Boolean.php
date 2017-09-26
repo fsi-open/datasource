@@ -20,7 +20,7 @@ class Boolean extends DoctrineAbstractField
     /**
      * {@inheritdoc}
      */
-    protected $comparisons = array('eq');
+    protected $comparisons = ['eq'];
 
     /**
      * {@inheritdoc}

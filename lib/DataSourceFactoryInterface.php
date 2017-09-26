@@ -22,7 +22,7 @@ interface DataSourceFactoryInterface
      * @param $name
      * @return \FSi\Component\DataSource\DataSource
      */
-    public function createDataSource($driver, $driverOptions = array(), $name);
+    public function createDataSource($driver, $driverOptions = [], $name);
 
     /**
      * Adds extension to list.

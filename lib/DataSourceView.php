@@ -25,19 +25,19 @@ class DataSourceView extends AttributesContainer implements DataSourceViewInterf
     /**
      * @var array
      */
-    private $parameters = array();
+    private $parameters = [];
 
     /**
      * @var array
      */
-    private $otherParameters = array();
+    private $otherParameters = [];
 
     /**
      * Array of field views.
      *
      * @var array
      */
-    private $fields = array();
+    private $fields = [];
 
     /**
      * Fields iterator.
@@ -52,9 +52,9 @@ class DataSourceView extends AttributesContainer implements DataSourceViewInterf
     private $result;
 
     /**
-     * @param \FSi\Component\DataSource\DataSource $datasource
+     * @param \FSi\Component\DataSource\DataSourceInterface $datasource
      */
-    public function __construct(DataSource $datasource)
+    public function __construct(DataSourceInterface $datasource)
     {
         $this->name = $datasource->getName();
         $this->parameters = $datasource->getParameters();
@@ -138,7 +138,7 @@ class DataSourceView extends AttributesContainer implements DataSourceViewInterf
      */
     public function clearFields()
     {
-        $this->fields = array();
+        $this->fields = [];
 
         return $this;
     }
@@ -163,7 +163,7 @@ class DataSourceView extends AttributesContainer implements DataSourceViewInterf
      */
     public function setFields(array $fields)
     {
-        $this->fields = array();
+        $this->fields = [];
 
         foreach ($fields as $field) {
             if (!$field instanceof Field\FieldViewInterface) {

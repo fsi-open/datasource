@@ -39,7 +39,7 @@ class ResultIndexer implements EventSubscriberInterface
      */
     public static function getSubscribedEvents()
     {
-        return array(DriverEvents::POST_GET_RESULT => array('postGetResult', 1024));
+        return [DriverEvents::POST_GET_RESULT => ['postGetResult', 1024]];
     }
 
     /**

@@ -64,7 +64,7 @@ class TestManagerRegistry implements ManagerRegistry
      */
     public function getConnections()
     {
-        return array($this->em);
+        return [$this->em];
     }
 
     /**
@@ -72,7 +72,7 @@ class TestManagerRegistry implements ManagerRegistry
      */
     public function getConnectionNames()
     {
-        return array(self::NAME);
+        return [self::NAME];
     }
 
 
@@ -89,7 +89,7 @@ class TestManagerRegistry implements ManagerRegistry
      */
     function getManagers()
     {
-        return array($this->em);
+        return [$this->em];
     }
 
     /**
@@ -111,7 +111,7 @@ class TestManagerRegistry implements ManagerRegistry
      */
     function getManagerNames()
     {
-        return array(self::NAME);
+        return [self::NAME];
     }
 
     /**

@@ -33,7 +33,7 @@ class DBALFactory implements DriverFactoryInterface
      */
     private $optionsResolver;
 
-    public function __construct(ConnectionRegistry $registry, $extensions = array())
+    public function __construct(ConnectionRegistry $registry, $extensions = [])
     {
         $this->registry = $registry;
         $this->extensions = $extensions;
@@ -46,7 +46,7 @@ class DBALFactory implements DriverFactoryInterface
         return 'doctrine-dbal';
     }
 
-    public function createDriver($options = array())
+    public function createDriver($options = [])
     {
         $options = $this->optionsResolver->resolve($options);
 
@@ -63,19 +63,19 @@ class DBALFactory implements DriverFactoryInterface
 
     private function initOptions()
     {
-        $this->optionsResolver->setDefaults(array(
+        $this->optionsResolver->setDefaults([
             'qb' => null,
             'table' => null,
             'alias' => null,
             'connection' => null,
             'indexField' => null,
-        ));
+        ]);
 
-        $this->optionsResolver->setAllowedTypes('qb', array('\Doctrine\DBAL\Query\QueryBuilder', 'null'));
-        $this->optionsResolver->setAllowedTypes('table', array('string', 'null'));
-        $this->optionsResolver->setAllowedTypes('alias', array('null', 'string'));
-        $this->optionsResolver->setAllowedTypes('connection', array('null', 'string'));
-        $this->optionsResolver->setAllowedTypes('indexField', array('null', 'string', '\Closure'));
+        $this->optionsResolver->setAllowedTypes('qb', ['\Doctrine\DBAL\Query\QueryBuilder', 'null']);
+        $this->optionsResolver->setAllowedTypes('table', ['string', 'null']);
+        $this->optionsResolver->setAllowedTypes('alias', ['null', 'string']);
+        $this->optionsResolver->setAllowedTypes('connection', ['null', 'string']);
+        $this->optionsResolver->setAllowedTypes('indexField', ['null', 'string', '\Closure']);
 
         $tableNormalizer = function(Options $options, $value) {
             if (is_null($options['qb']) && is_null($value)) {

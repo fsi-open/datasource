@@ -9,10 +9,10 @@
 
 namespace FSi\Component\DataSource\Driver\Doctrine\ORM;
 
-use FSi\Component\DataSource\Driver\DriverAbstract;
-use Doctrine\ORM\EntityManager;
-use FSi\Component\DataSource\Driver\Doctrine\ORM\Exception\DoctrineDriverException;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\QueryBuilder;
+use FSi\Component\DataSource\Driver\Doctrine\ORM\Exception\DoctrineDriverException;
+use FSi\Component\DataSource\Driver\DriverAbstract;
 
 /**
  * Driver to fetch data from databases using Doctrine.
@@ -25,7 +25,7 @@ class DoctrineDriver extends DriverAbstract
     const DEFAULT_ENTITY_ALIAS = 'e';
 
     /**
-     * @var \Doctrine\ORM\EntityManager
+     * @var EntityManagerInterface
      */
     private $em;
 
@@ -40,14 +40,14 @@ class DoctrineDriver extends DriverAbstract
     /**
      * Template query builder.
      *
-     * @var \Doctrine\ORM\QueryBuilder
+     * @var QueryBuilder
      */
     private $query;
 
     /**
      * Query builder available during preGetResult event.
      *
-     * @var \Doctrine\ORM\QueryBuilder
+     * @var QueryBuilder
      */
     private $currentQuery;
 
@@ -58,14 +58,14 @@ class DoctrineDriver extends DriverAbstract
 
     /**
      * @param array $extensions
-     * @param \Doctrine\ORM\EntityManager $em
-     * @param string|\Doctrine\ORM\QueryBuilder $entity
+     * @param EntityManagerInterface $em
+     * @param string|QueryBuilder $entity
      * @param string $alias
      * @param bool|null $useOutputWalkers
      *
      * @throws DoctrineDriverException
      */
-    public function __construct($extensions, EntityManager $em, $entity, $alias = null, $useOutputWalkers = null)
+    public function __construct($extensions, EntityManagerInterface $em, $entity, $alias = null, $useOutputWalkers = null)
     {
         parent::__construct($extensions);
 
@@ -127,7 +127,9 @@ class DoctrineDriver extends DriverAbstract
     {
         foreach ($fields as $field) {
             if (!$field instanceof DoctrineFieldInterface) {
-                throw new DoctrineDriverException(sprintf('All fields must be instances of FSi\Component\DataSource\Driver\Doctrine\ORM\DoctrineFieldInterface.'));
+                throw new DoctrineDriverException(sprintf(
+                    'All fields must be instances of FSi\Component\DataSource\Driver\Doctrine\ORM\DoctrineFieldInterface.'
+                ));
             }
 
             $field->buildQuery($this->currentQuery, $this->alias);
@@ -151,7 +153,7 @@ class DoctrineDriver extends DriverAbstract
      *
      * If query is set to null (so when getResult method is NOT executed at the moment) exception is throwed.
      *
-     * @return \Doctrine\ORM\QueryBuilder
+     * @return QueryBuilder
      */
     public function getQueryBuilder()
     {

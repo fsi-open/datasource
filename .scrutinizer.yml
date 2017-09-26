@@ -1,0 +1,13 @@
+---
+filter:
+    excluded_paths: [bin/*, vendor/*, doc/*, tests/*]
+
+checks:
+    php:
+        code_rating: true
+        duplication: true
+
+tools:
+    php_cpd: true
+    php_pdepend:
+        excluded_dirs: [vendor]

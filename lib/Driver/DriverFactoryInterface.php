@@ -26,5 +26,5 @@ interface DriverFactoryInterface
      * @param array $options
      * @return \FSi\Component\DataSource\Driver\DriverInterface
      */
-    public function createDriver($options = array());
+    public function createDriver($options = []);
 }

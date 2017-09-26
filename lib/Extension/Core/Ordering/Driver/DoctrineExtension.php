@@ -12,8 +12,6 @@ namespace FSi\Component\DataSource\Extension\Core\Ordering\Driver;
 use FSi\Component\DataSource\Driver\Doctrine\DoctrineFieldInterface;
 use \FSi\Component\DataSource\Driver\Doctrine\ORM\DoctrineFieldInterface as DoctrineORMFieldInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use FSi\Component\DataSource\Event\DriverEvent\DriverEventArgs;
-use FSi\Component\DataSource\Driver\Doctrine\DoctrineAbstractField;
 use FSi\Component\DataSource\Extension\Core\Ordering\Field\FieldExtension;
 use FSi\Component\DataSource\Event\DriverEvents;
 use FSi\Component\DataSource\Event\DriverEvent;
@@ -28,10 +26,9 @@ class DoctrineExtension extends DriverExtension implements EventSubscriberInterf
      */
     public function getExtendedDriverTypes()
     {
-        return array(
-            'doctrine', // deprecated since version 1.4
+        return [
             'doctrine-orm'
-        );
+        ];
     }
 
     /**
@@ -39,9 +36,9 @@ class DoctrineExtension extends DriverExtension implements EventSubscriberInterf
      */
     protected function loadFieldTypesExtensions()
     {
-        return array(
+        return [
             new FieldExtension(),
-        );
+        ];
     }
 
     /**
@@ -49,9 +46,9 @@ class DoctrineExtension extends DriverExtension implements EventSubscriberInterf
      */
     public static function getSubscribedEvents()
     {
-        return array(
-            DriverEvents::PRE_GET_RESULT => array('preGetResult'),
-        );
+        return [
+            DriverEvents::PRE_GET_RESULT => ['preGetResult'],
+        ];
     }
 
     /**

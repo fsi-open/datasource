@@ -94,7 +94,7 @@ abstract class DriverAbstractExtension implements DriverExtensionInterface, Even
      */
     protected function loadFieldTypesExtensions()
     {
-        return array();
+        return [];
     }
 
     /**
@@ -102,7 +102,7 @@ abstract class DriverAbstractExtension implements DriverExtensionInterface, Even
      */
     protected function loadFieldTypes()
     {
-        return array();
+        return [];
     }
 
     /**
@@ -112,7 +112,7 @@ abstract class DriverAbstractExtension implements DriverExtensionInterface, Even
      */
     private function initFieldsTypes()
     {
-        $this->fieldTypes = array();
+        $this->fieldTypes = [];
 
         $fieldTypes = $this->loadFieldTypes();
 
@@ -145,7 +145,7 @@ abstract class DriverAbstractExtension implements DriverExtensionInterface, Even
             $types = $extension->getExtendedFieldTypes();
             foreach ($types as $type) {
                 if (!isset($this->fieldTypesExtensions)) {
-                    $this->fieldTypesExtensions[$type] = array();
+                    $this->fieldTypesExtensions[$type] = [];
                 }
                 $this->fieldTypesExtensions[$type][] = $extension;
             }
@@ -157,7 +157,7 @@ abstract class DriverAbstractExtension implements DriverExtensionInterface, Even
      */
     public function loadSubscribers()
     {
-        return array($this);
+        return [$this];
     }
 
     /**
@@ -165,6 +165,6 @@ abstract class DriverAbstractExtension implements DriverExtensionInterface, Even
      */
     public static function getSubscribedEvents()
     {
-        return array();
+        return [];
     }
 }
