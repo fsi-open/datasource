@@ -9,7 +9,6 @@
 
 namespace FSi\Component\DataSource\Driver\Collection;
 
-use FSi\Component\DataSource\DataSourceFactoryInterface;
 use FSi\Component\DataSource\Driver\DriverFactoryInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 

@@ -9,7 +9,9 @@
 
 namespace FSi\Component\DataSource\Tests\Driver;
 
-use FSi\Component\DataSource\Driver\Doctrine\Extension\Core\Field;
+use FSi\Component\DataSource\Driver\Collection\CollectionFactory;
+use FSi\Component\DataSource\Driver\Doctrine\DBAL;
+use FSi\Component\DataSource\Driver\Doctrine\ORM;
 use FSi\Component\DataSource\Driver\DriverFactoryManager;
 
 /**
@@ -19,15 +21,23 @@ class DriverFactoryManagerTest extends \PHPUnit_Framework_TestCase
 {
     public function testBasicManagerOperations()
     {
-        $doctrineFactory = $this->getMockBuilder('FSi\Component\DataSource\Driver\Doctrine\DoctrineFactory')
+        $doctrineDbalFactory = $this->getMockBuilder(DBAL\DBalFactory::class)
             ->disableOriginalConstructor()
             ->getMock();
 
-        $doctrineFactory->expects($this->any())
+        $doctrineDbalFactory->expects($this->any())
             ->method('getDriverType')
-            ->will($this->returnValue('doctrine'));
+            ->will($this->returnValue('doctrine-dbal'));
 
-        $collectionFactory = $this->getMockBuilder('FSi\Component\DataSource\Driver\Collection\CollectionFactory')
+        $doctrineOrmFactory = $this->getMockBuilder(ORM\DoctrineFactory::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $doctrineOrmFactory->expects($this->any())
+            ->method('getDriverType')
+            ->will($this->returnValue('doctrine-orm'));
+
+        $collectionFactory = $this->getMockBuilder(CollectionFactory::class)
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -37,14 +47,17 @@ class DriverFactoryManagerTest extends \PHPUnit_Framework_TestCase
 
 
         $manager = new DriverFactoryManager([
-            $doctrineFactory,
+            $doctrineDbalFactory,
+            $doctrineOrmFactory,
             $collectionFactory
         ]);
 
-        $this->assertTrue($manager->hasFactory('doctrine'));
+        $this->assertTrue($manager->hasFactory('doctrine-dbal'));
+        $this->assertTrue($manager->hasFactory('doctrine-orm'));
         $this->assertTrue($manager->hasFactory('collection'));
 
-        $this->assertSame($doctrineFactory, $manager->getFactory('doctrine'));
+        $this->assertSame($doctrineDbalFactory, $manager->getFactory('doctrine-dbal'));
+        $this->assertSame($doctrineOrmFactory, $manager->getFactory('doctrine-orm'));
         $this->assertSame($collectionFactory, $manager->getFactory('collection'));
     }
 
@@ -53,10 +66,6 @@ class DriverFactoryManagerTest extends \PHPUnit_Framework_TestCase
      */
     public function testAddInvalidFactory()
     {
-        $notFactory = new \DateTime();
-
-        $manager = new DriverFactoryManager([
-            $notFactory,
-        ]);
+        new DriverFactoryManager([new \DateTime()]);
     }
 }
