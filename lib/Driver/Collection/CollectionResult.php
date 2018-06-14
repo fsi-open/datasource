@@ -50,18 +50,11 @@ class CollectionResult implements Countable, \IteratorAggregate, ArrayAccess
             );
         }
 
-        $firstResult = $criteria->getFirstResult();
-        $maxResults = $criteria->getMaxResults();
+        $this->collection = $collection->matching($criteria);
 
         $criteria->setFirstResult(null);
         $criteria->setMaxResults(null);
-
-        $this->collection = $collection->matching($criteria);
-        $this->count = \count($this->collection);
-
-        if ($firstResult || $maxResults) {
-            $this->collection = new ArrayCollection($this->collection->slice((int) $firstResult, $maxResults));
-        }
+        $this->count = \count($collection->matching($criteria));
     }
 
     public function count()
