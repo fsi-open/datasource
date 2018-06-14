@@ -16,7 +16,7 @@ use FSi\Component\DataSource\Event\FieldEvents;
 /**
  * Class to test DoctrineDriver extensions calls.
  */
-class FieldExtension extends FieldAbstractExtension implements EventSubscriberInterface
+class FieldExtension extends FieldAbstractExtension
 {
     /**
      * @var array

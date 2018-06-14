@@ -10,41 +10,32 @@
 namespace FSi\Component\DataSource\Tests\Driver;
 
 use FSi\Component\DataSource\Driver\Collection\CollectionFactory;
-use FSi\Component\DataSource\Driver\Doctrine\DBAL;
+use FSi\Component\DataSource\Driver\Doctrine\DBAL\DBALFactory;
 use FSi\Component\DataSource\Driver\Doctrine\ORM;
 use FSi\Component\DataSource\Driver\DriverFactoryManager;
+use PHPUnit\Framework\TestCase;
 
 /**
  * Basic tests for Doctrine driver.
  */
-class DriverFactoryManagerTest extends \PHPUnit_Framework_TestCase
+class DriverFactoryManagerTest extends TestCase
 {
     public function testBasicManagerOperations()
     {
-        $doctrineDbalFactory = $this->getMockBuilder(DBAL\DBalFactory::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
+        $doctrineDbalFactory = $this->createMock(DBALFactory::class);
         $doctrineDbalFactory->expects($this->any())
             ->method('getDriverType')
-            ->will($this->returnValue('doctrine-dbal'));
+            ->willReturn('doctrine-dbal');
 
-        $doctrineOrmFactory = $this->getMockBuilder(ORM\DoctrineFactory::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
+        $doctrineOrmFactory = $this->createMock(ORM\DoctrineFactory::class);
         $doctrineOrmFactory->expects($this->any())
             ->method('getDriverType')
-            ->will($this->returnValue('doctrine-orm'));
+            ->willReturn('doctrine-orm');
 
-        $collectionFactory = $this->getMockBuilder(CollectionFactory::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
+        $collectionFactory = $this->createMock(CollectionFactory::class);
         $collectionFactory->expects($this->any())
             ->method('getDriverType')
-            ->will($this->returnValue('collection'));
-
+            ->willReturn('collection');
 
         $manager = new DriverFactoryManager([
             $doctrineDbalFactory,
@@ -61,11 +52,10 @@ class DriverFactoryManagerTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($collectionFactory, $manager->getFactory('collection'));
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testAddInvalidFactory()
     {
+        $this->expectException(\InvalidArgumentException::class);
+
         new DriverFactoryManager([new \DateTime()]);
     }
 }

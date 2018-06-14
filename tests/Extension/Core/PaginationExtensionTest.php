@@ -15,20 +15,16 @@ use FSi\Component\DataSource\Driver\Collection\Extension\Core\CoreExtension;
 use FSi\Component\DataSource\Driver\DriverFactoryManager;
 use FSi\Component\DataSource\Extension\Core\Pagination\PaginationExtension;
 use FSi\Component\DataSource\Event\DataSourceEvent;
+use PHPUnit\Framework\TestCase;
+use FSi\Component\DataSource\Driver\DriverInterface;
+use FSi\Component\DataSource\DataSource;
+use FSi\Component\DataSource\DataSourceViewInterface;
 
-/**
- * Tests for Pagination Extension.
- */
-class PaginationExtensionTest extends \PHPUnit_Framework_TestCase
+class PaginationExtensionTest extends TestCase
 {
-    /**
-     * First case of event (when page is not 1).
-     */
-    public function testPaginationExtension()
+    public function paginationCases()
     {
-        $self = $this;
-
-        $cases = [
+        return [
             [
                 'first_result' => 20,
                 'max_results' => 20,
@@ -38,37 +34,53 @@ class PaginationExtensionTest extends \PHPUnit_Framework_TestCase
             [
                 'first_result' => 20,
                 'max_results' => 0,
+                'page' => null,
                 'current_page' => 1
             ],
             [
                 'first_result' => 0,
                 'max_results' => 20,
+                'page' => null,
                 'current_page' => 1
             ],
         ];
-
-        $driver = $this->createMock('FSi\Component\DataSource\Driver\DriverInterface');
+    }
+    
+    /**
+     * First case of event (when page is not 1).
+     * @dataProvider paginationCases
+     */
+    public function testPaginationExtension(int $firstResult, int $maxResults, ?int $page, int $currentPage)
+    {
+        $driver = $this->createMock(DriverInterface::class);
         $extension = new PaginationExtension();
 
-        foreach ($cases as $case) {
-            $datasource = $this->createMock('FSi\Component\DataSource\DataSource', [], [$driver]);
+            $datasource = $this->getMockBuilder(DataSource::class)
+                ->setConstructorArgs([$driver])
+                ->getMock();
 
             $datasource
                 ->expects($this->any())
                 ->method('getName')
-                ->will($this->returnValue('datasource'))
+                ->willReturn('datasource')
+            ;
+
+            $datasource
+                ->expects($this->any())
+                ->method('getResult')
+                ->willReturn([])
             ;
 
             $datasource
                 ->expects($this->any())
                 ->method('getMaxResults')
-                ->will($this->returnValue($case['max_results']))
+                ->willReturn($maxResults)
             ;
 
             $datasource
                 ->expects($this->any())
                 ->method('getFirstResult')
-                ->will($this->returnValue($case['first_result']))
+                ->willReturn($firstResult)
             ;
 
             $subscribers = $extension->loadSubscribers();
@@ -76,7 +88,7 @@ class PaginationExtensionTest extends \PHPUnit_Framework_TestCase
             $event = new DataSourceEvent\ParametersEventArgs($datasource, []);
             $subscriber->postGetParameters($event);
 
-            if (isset($case['page'])) {
+            if ($page !== null) {
                 $this->assertSame(
                     [
                         'datasource' => [
@@ -88,25 +100,25 @@ class PaginationExtensionTest extends \PHPUnit_Framework_TestCase
                 );
             } else {
                 $parameters = $event->getParameters();
-                if (isset($parameters['datasource']))
+                if (isset($parameters['datasource'])) {
                     $this->assertArrayNotHasKey(PaginationExtension::PARAMETER_PAGE, $parameters['datasource']);
+                }
             }
 
-            $view = $this->createMock('FSi\Component\DataSource\DataSourceViewInterface');
+            $view = $this->createMock(DataSourceViewInterface::class);
             $view
                 ->expects($this->any())
                 ->method('setAttribute')
-                ->will($this->returnCallback(function($attribute, $value) use ($self, $case) {
+                ->will($this->returnCallback(function($attribute, $value) use ($currentPage) {
                     switch ($attribute) {
                         case 'page':
-                            $self->assertEquals($case['current_page'], $value);
+                            $this->assertEquals($currentPage, $value);
                             break;
                     };
                 }))
             ;
 
             $subscriber->postBuildView(new DataSourceEvent\ViewEventArgs($datasource, $view));
-        }
     }
 
     public function testSetMaxResultsByBindRequest()

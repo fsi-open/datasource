@@ -12,30 +12,35 @@ namespace FSi\Component\DataSource\Tests;
 use FSi\Component\DataSource\DataSourceFactory;
 use FSi\Component\DataSource\Driver\Collection\CollectionFactory;
 use FSi\Component\DataSource\Driver\DriverFactoryManager;
+use PHPUnit\Framework\TestCase;
+use FSi\Component\DataSource\DataSourceExtensionInterface;
+use FSi\Component\DataSource\Driver\DriverInterface;
+use FSi\Component\DataSource\DataSource;
+use FSi\Component\DataSource\Exception\DataSourceException;
 
 /**
  * Tests for DataSourceFactory.
  */
-class FactoryTest extends \PHPUnit_Framework_TestCase
+class FactoryTest extends TestCase
 {
     /**
      * Checks proper extensions loading.
      */
     public function testExtensionsLoading()
     {
-        $extension1 = $this->createMock('FSi\Component\DataSource\DataSourceExtensionInterface');
-        $extension2 = $this->createMock('FSi\Component\DataSource\DataSourceExtensionInterface');
+        $extension1 = $this->createMock(DataSourceExtensionInterface::class);
+        $extension2 = $this->createMock(DataSourceExtensionInterface::class);
 
         $extension1
             ->expects($this->any())
             ->method('loadDriverExtensions')
-            ->will($this->returnValue([]))
+            ->willReturn([])
         ;
 
         $extension2
             ->expects($this->any())
             ->method('loadDriverExtensions')
-            ->will($this->returnValue([]))
+            ->willReturn([])
         ;
 
         $driveFactoryManager = new DriverFactoryManager([
@@ -50,8 +55,8 @@ class FactoryTest extends \PHPUnit_Framework_TestCase
         $factoryExtensions = $factory->getExtensions();
         $datasourceExtensions = $datasource->getExtensions();
 
-        $this->assertEquals(count($factoryExtensions), count($extensions));
-        $this->assertEquals(count($datasourceExtensions), count($extensions));
+        $this->assertCount(count($factoryExtensions), $extensions);
+        $this->assertCount(count($datasourceExtensions), $extensions);
     }
 
     /**
@@ -64,41 +69,41 @@ class FactoryTest extends \PHPUnit_Framework_TestCase
         $driveFactoryManager = new DriverFactoryManager([
             new CollectionFactory()
         ]);
-        $datasourceFactory = new DataSourceFactory($driveFactoryManager, [new \stdClass()]);
+        new DataSourceFactory($driveFactoryManager, [new \stdClass()]);
     }
 
     /**
      * Checks exception thrown when loading scalars in place of extensions.
-     *
-     * @expectedException \FSi\Component\DataSource\Exception\DataSourceException
      */
     public function testFactoryException3()
     {
+        $this->expectException(DataSourceException::class);
+
         $driveFactoryManager = new DriverFactoryManager([
             new CollectionFactory()
         ]);
-        $datasourceFactory = new DataSourceFactory($driveFactoryManager, ['scalar']);
+        new DataSourceFactory($driveFactoryManager, ['scalar']);
     }
 
     /**
      * Checks exception thrown when creating DataSource with non-existing driver
-     *
-     * @expectedException \FSi\Component\DataSource\Exception\DataSourceException
-     * @expectedExceptionMessage Driver "unknownDriver" doesn't exist.
      */
     public function testFactoryException6()
     {
+        $this->expectException(DataSourceException::class);
+        $this->expectExceptionMessage('Driver "unknownDriver" doesn\'t exist.');
+
         $factory = new DataSourceFactory(new DriverFactoryManager());
         $factory->createDataSource('unknownDriver');
     }
 
     /**
      * Checks exception thrown when creating DataSource with non unique name.
-     *
-     * @expectedException \FSi\Component\DataSource\Exception\DataSourceException
      */
     public function testFactoryCreateDataSourceException1()
     {
+        $this->expectException(DataSourceException::class);
+
         $driveFactoryManager = new DriverFactoryManager([
             new CollectionFactory()
         ]);
@@ -111,11 +116,11 @@ class FactoryTest extends \PHPUnit_Framework_TestCase
 
     /**
      * Checks exception thrown when creating DataSource with wrong name.
-     *
-     * @expectedException \FSi\Component\DataSource\Exception\DataSourceException
      */
     public function testFactoryCreateDataSourceException2()
     {
+        $this->expectException(DataSourceException::class);
+
         $driveFactoryManager = new DriverFactoryManager([
             new CollectionFactory()
         ]);
@@ -125,11 +130,11 @@ class FactoryTest extends \PHPUnit_Framework_TestCase
 
     /**
      * Checks exception thrown when creating DataSource with empty name.
-     *
-     * @expectedException \FSi\Component\DataSource\Exception\DataSourceException
      */
     public function testFactoryCreateDataSourceException3()
     {
+        $this->expectException(DataSourceException::class);
+
         $driveFactoryManager = new DriverFactoryManager([
             new CollectionFactory()
         ]);
@@ -147,17 +152,17 @@ class FactoryTest extends \PHPUnit_Framework_TestCase
         ]);
         $factory = new DataSourceFactory($driveFactoryManager);
 
-        $driver = $this->createMock('FSi\Component\DataSource\Driver\DriverInterface');
-        $datasource = $this->createMock('FSi\Component\DataSource\DataSource', [], [$driver]);
-        $datasource2 = $this->createMock('FSi\Component\DataSource\DataSource', [], [$driver]);
+        $driver = $this->createMock(DriverInterface::class);
+        $datasource = $this->getMockBuilder(DataSource::class)->setConstructorArgs([$driver])->getMock();
+        $datasource2 = $this->getMockBuilder(DataSource::class)->setConstructorArgs([$driver])->getMock();
 
         $datasource->expects($this->any())
             ->method('getName')
-            ->will($this->returnValue('name'));
+            ->willReturn('name');
 
         $datasource2->expects($this->any())
             ->method('getName')
-            ->will($this->returnValue('name'));
+            ->willReturn('name');
 
         $datasource->expects($this->atLeastOnce())
             ->method('setFactory')
@@ -168,7 +173,7 @@ class FactoryTest extends \PHPUnit_Framework_TestCase
         $factory->addDataSource($datasource);
 
         //Checking exception for adding different datasource with the same name.
-        $this->setExpectedException('FSi\Component\DataSource\Exception\DataSourceException');
+        $this->expectException(DataSourceException::class);
         $factory->addDataSource($datasource2);
     }
 
@@ -182,9 +187,9 @@ class FactoryTest extends \PHPUnit_Framework_TestCase
         ]);
         $factory = new DataSourceFactory($driveFactoryManager);
 
-        $driver = $this->createMock('FSi\Component\DataSource\Driver\DriverInterface');
-        $datasource1 = $this->createMock('FSi\Component\DataSource\DataSource', [], [$driver]);
-        $datasource2 = $this->createMock('FSi\Component\DataSource\DataSource', [], [$driver]);
+        $driver = $this->createMock(DriverInterface::class);
+        $datasource1 = $this->getMockBuilder(DataSource::class)->setConstructorArgs([$driver])->getMock();
+        $datasource2 = $this->getMockBuilder(DataSource::class)->setConstructorArgs([$driver])->getMock();
 
         $params1 = [
             'key1' => 'value1',
@@ -198,19 +203,19 @@ class FactoryTest extends \PHPUnit_Framework_TestCase
 
         $datasource1->expects($this->any())
             ->method('getName')
-            ->will($this->returnValue('name'));
+            ->willReturn('name');
 
         $datasource2->expects($this->any())
             ->method('getName')
-            ->will($this->returnValue('name2'));
+            ->willReturn('name2');
 
         $datasource1->expects($this->any())
             ->method('getParameters')
-            ->will($this->returnValue($params1));
+            ->willReturn($params1);
 
         $datasource2->expects($this->any())
             ->method('getParameters')
-            ->will($this->returnValue($params2));
+            ->willReturn($params2);
 
         $factory->addDataSource($datasource1);
         $factory->addDataSource($datasource2);

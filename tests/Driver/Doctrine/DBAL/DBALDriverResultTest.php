@@ -14,7 +14,7 @@ use FSi\Component\DataSource\DataSourceInterface;
 use FSi\Component\DataSource\Extension\Core\Ordering\OrderingExtension;
 use FSi\Component\DataSource\Extension\Core\Pagination\PaginationExtension;
 
-class DBALResultTestBase extends TestBase
+class DBALDriverResultTest extends TestBase
 {
     /**
      * @var Connection
@@ -30,7 +30,7 @@ class DBALResultTestBase extends TestBase
     public function testTableResultCount()
     {
         $datasource = $this->getNewsDataSource();
-        $this->assertEquals(100, count($datasource->getResult()));
+        $this->assertCount(100, $datasource->getResult());
     }
 
     public function testDoubleCallToGetResultReturnSameResultSet()
@@ -54,7 +54,7 @@ class DBALResultTestBase extends TestBase
         $datasource->bindParameters($parameters);
 
         //title-1, title-10-19, title-100
-        $this->assertEquals(12, count($datasource->getResult()));
+        $this->assertCount(12, $datasource->getResult());
     }
 
     public function testPaginatedResult()
@@ -76,9 +76,9 @@ class DBALResultTestBase extends TestBase
         $result = $datasource->getResult();
 
         //all result count
-        $this->assertEquals(12, count($result));
+        $this->assertCount(12, $result);
         //current page count
-        $this->assertEquals(2, count(iterator_to_array($result)));
+        $this->assertCount(2, iterator_to_array($result));
     }
 
     public function testSortingField()
@@ -294,7 +294,7 @@ class DBALResultTestBase extends TestBase
 
         $this->assertEquals(
             'SELECT n FROM news n INNER JOIN category c ON n.category_id = c.id HAVING n.category IN (:dcValue1, :dcValue2)',
-            $this->testDoctrineExtension->getQueryBuilder()->getSql()
+            $this->testDoctrineExtension->getQueryBuilder()->getSQL()
         );
     }
 

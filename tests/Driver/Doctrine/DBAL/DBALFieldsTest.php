@@ -12,14 +12,14 @@ namespace FSi\Component\DataSource\Tests\Driver\Doctrine\DBAL;
 use DateTime;
 use FSi\Component\DataSource\DataSourceInterface;
 
-class DBALFieldsTestBase extends TestBase
+class DBALFieldsTest extends TestBase
 {
     protected function setUp()
     {
         $this->loadTestData($this->getMemoryConnection());
     }
 
-    public function fieldsProvider()
+    public function fieldsProvider(): array
     {
         return [
             [
@@ -180,11 +180,9 @@ class DBALFieldsTestBase extends TestBase
     /**
      * @dataProvider fieldsProvider
      */
-    public function testFieldResult($fieldName, $datasourceType, array $typeParams)
+    public function testFieldResult(string $fieldName, string $datasourceType, array $typeParams): void
     {
-        foreach ($typeParams as $params) {
-            list($comparison, $parameter, $expectedCount) = $params;
-
+        foreach ($typeParams as [$comparison, $parameter, $expectedCount]) {
             $datasource = $this->getNewsDataSource();
             $datasource->addField($fieldName, $datasourceType, $comparison);
 
@@ -196,7 +194,7 @@ class DBALFieldsTestBase extends TestBase
                 ],
             ]);
 
-            $this->assertEquals($expectedCount, count($datasource->getResult()));
+            $this->assertCount($expectedCount, $datasource->getResult());
         }
     }
 

@@ -15,11 +15,13 @@ use FSi\Component\DataSource\DataSourceView;
 use FSi\Component\DataSource\Driver\DriverInterface;
 use FSi\Component\DataSource\Exception\DataSourceViewException;
 use FSi\Component\DataSource\Field\FieldViewInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
 /**
  * Tests for DataSourceView.
  */
-class DataSourceViewTest extends \PHPUnit_Framework_TestCase
+class DataSourceViewTest extends TestCase
 {
     /**
      * Checks creation of view.
@@ -30,7 +32,7 @@ class DataSourceViewTest extends \PHPUnit_Framework_TestCase
         $datasource
             ->expects($this->once())
             ->method('getName')
-            ->will($this->returnValue('ds'))
+            ->willReturn('ds')
         ;
 
         $view = new DataSourceView($datasource);
@@ -47,13 +49,13 @@ class DataSourceViewTest extends \PHPUnit_Framework_TestCase
         $datasource
             ->expects($this->once())
             ->method('getParameters')
-            ->will($this->returnValue(['datasource' => []]))
+            ->willReturn(['datasource' => []])
         ;
 
         $datasource
             ->expects($this->once())
             ->method('getOtherParameters')
-            ->will($this->returnValue(['other_datasource' => []]))
+            ->willReturn(['other_datasource' => []])
         ;
 
         $view = new DataSourceView($datasource);
@@ -77,7 +79,7 @@ class DataSourceViewTest extends \PHPUnit_Framework_TestCase
         $datasource
             ->expects($this->once())
             ->method('getResult')
-            ->will($this->returnValue(new ArrayCollection()));
+            ->willReturn(new ArrayCollection());
 
         $view = new DataSourceView($datasource);
         $view->getParameters();
@@ -125,19 +127,19 @@ class DataSourceViewTest extends \PHPUnit_Framework_TestCase
         $fieldView1
             ->expects($this->any())
             ->method('getName')
-            ->will($this->returnValue('name1'))
+            ->willReturn('name1')
         ;
 
         $fieldView2
             ->expects($this->any())
             ->method('getName')
-            ->will($this->returnValue('name2'))
+            ->willReturn('name2')
         ;
 
         $view->addField($fieldView1);
         $view->addField($fieldView2);
 
-        $this->assertEquals(count($view->getFields()), 2);
+        $this->assertCount(2, $view->getFields());
         $this->assertTrue($view->hasField('name1'));
         $this->assertTrue($view->hasField('name2'));
         $this->assertFalse($view->hasField('wrong'));
@@ -146,7 +148,7 @@ class DataSourceViewTest extends \PHPUnit_Framework_TestCase
         $view->getField('name1');
         $view->getField('name2');
 
-        $this->setExpectedException(DataSourceViewException::class);
+        $this->expectException(DataSourceViewException::class);
         $view->addField($fieldView1);
     }
 
@@ -161,13 +163,13 @@ class DataSourceViewTest extends \PHPUnit_Framework_TestCase
         $fieldView
             ->expects($this->any())
             ->method('getName')
-            ->will($this->returnValue('name'))
+            ->willReturn('name')
         ;
 
         $view->addField($fieldView);
 
         $view->getField('name');
-        $this->setExpectedException(DataSourceViewException::class);
+        $this->expectException(DataSourceViewException::class);
         $view->getField('wrong');
     }
 
@@ -176,14 +178,13 @@ class DataSourceViewTest extends \PHPUnit_Framework_TestCase
      */
     public function testInterfaces()
     {
-        $fielsViews = [];
         for ($x = 0; $x < 5; $x++) {
             $fieldView = $this->createMock(FieldViewInterface::class);
 
             $fieldView
                 ->expects($this->any())
                 ->method('getName')
-                ->will($this->returnValue("name$x"))
+                ->willReturn("name$x")
             ;
 
             $fieldsViews[] = $fieldView;
@@ -192,7 +193,7 @@ class DataSourceViewTest extends \PHPUnit_Framework_TestCase
         $view = new DataSourceView($this->createDatasourceMock());
         $view->addField($fieldsViews[0]);
 
-        $this->assertEquals(1, count($view));
+        $this->assertCount(1, $view);
         $this->assertTrue(isset($view['name0']));
         $this->assertFalse(isset($view['name1']));
 
@@ -213,7 +214,7 @@ class DataSourceViewTest extends \PHPUnit_Framework_TestCase
         //After adding fields iterator resets on its own.
         $this->assertEquals('name0', $view->key());
 
-        $this->assertEquals(5, count($view));
+        $this->assertCount(5, $view);
         $this->assertTrue(isset($view['name1']));
 
         $view->seek(1);
@@ -238,14 +239,12 @@ class DataSourceViewTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return MockObject|DataSourceInterface
      */
     private function createDatasourceMock()
     {
-        return $this->createMock(
-            DataSourceInterface::class,
-            [],
-            [$this->createMock(DriverInterface::class)]
-        );
+        return $this->getMockBuilder(DataSourceInterface::class)
+            ->setConstructorArgs([$this->createMock(DriverInterface::class)])
+            ->getMock();
     }
 }
