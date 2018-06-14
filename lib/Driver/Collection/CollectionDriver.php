@@ -26,9 +26,9 @@ class CollectionDriver extends DriverAbstract
 
     /**
      * @param array $extensions
-     * @param array $collection
+     * @param $collection
      */
-    public function __construct(array $extensions, array $collection)
+    public function __construct(array $extensions, $collection)
     {
         parent::__construct($extensions);
         $this->collection = $collection;

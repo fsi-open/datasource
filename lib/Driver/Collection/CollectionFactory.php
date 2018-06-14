@@ -69,6 +69,11 @@ class CollectionFactory implements DriverFactoryInterface
             'collection' => [],
         ]);
 
-        $this->optionsResolver->setAllowedTypes('collection', 'array');
+        // FIXME: this is not proper check
+        $this->optionsResolver->setAllowedTypes('collection', array(
+            'array',
+            '\Traversable',
+            '\Doctrine\Common\Collections\Selectable',
+        ));
     }
 }

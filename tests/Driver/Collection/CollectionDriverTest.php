@@ -62,6 +62,31 @@ class CollectionDriverTest extends \PHPUnit_Framework_TestCase
         $this->em = $em;
     }
 
+    public function testWithArraySource()
+    {
+        $datasourceFactory = $this->getDataSourceFactory();
+        $driverOptions = [
+            'collection' => [['id' => 123], ['id' => 1234]],
+        ];
+
+        $datasource = $datasourceFactory
+            ->createDataSource('collection', $driverOptions, 'datasource')
+            ->addField('id', 'number', 'eq');
+
+        $parameters = [
+            $datasource->getName() => [
+                DataSourceInterface::PARAMETER_FIELDS => [
+                    'id' => 123,
+                ],
+            ],
+        ];
+        $datasource->bindParameters($parameters);
+        $result = $datasource->getResult();
+
+        $this->assertCount(1, $result);
+        $this->assertEquals(['id' => 123], $result[0]);
+    }
+
     /**
      * Test number field when comparing with 0 value.
      */
@@ -91,7 +116,7 @@ class CollectionDriverTest extends \PHPUnit_Framework_TestCase
     /**
      * General test for DataSource wtih CollectionDriver in basic configuration.
      */
-    public function testGeneral()
+    public function testWithSelectableSource()
     {
         $datasourceFactory = $this->getDataSourceFactory();
 
@@ -101,7 +126,7 @@ class CollectionDriverTest extends \PHPUnit_Framework_TestCase
         $datasources = [];
 
         $driverOptions = [
-            'collection' => $this->em->getRepository(News::class)->findAll(),
+            'collection' => $this->em->getRepository(News::class),
         ];
 
         $datasources[] = $datasourceFactory->createDataSource('collection', $driverOptions, 'datasource');
@@ -196,7 +221,7 @@ class CollectionDriverTest extends \PHPUnit_Framework_TestCase
             $datasource->bindParameters($parameters);
             $view = $datasource->createView();
             $result = $datasource->getResult();
-            $this->assertEquals(1, count($result));
+            $this->assertCount(1, $result);
 
             //Checking sorting.
             $parameters = [
@@ -208,10 +233,7 @@ class CollectionDriverTest extends \PHPUnit_Framework_TestCase
             ];
 
             $datasource->bindParameters($parameters);
-            foreach ($datasource->getResult() as $news) {
-                $this->assertEquals('title99', $news->getTitle());
-                break;
-            }
+            $this->assertEquals('title99', $datasource->getResult()->first()->getTitle());
 
             //Checking sorting.
             $parameters = [
@@ -224,10 +246,7 @@ class CollectionDriverTest extends \PHPUnit_Framework_TestCase
             ];
 
             $datasource->bindParameters($parameters);
-            foreach ($datasource->getResult() as $news) {
-                $this->assertEquals('author0@domain1.com', $news->getAuthor());
-                break;
-            }
+            $this->assertEquals('author0@domain1.com', $datasource->getResult()->first()->getAuthor());
 
             //Test for clearing fields.
             $datasource->clearFields();
@@ -243,7 +262,7 @@ class CollectionDriverTest extends \PHPUnit_Framework_TestCase
             //Since there are no fields now, we should have all of entities.
             $datasource->bindParameters($parameters);
             $result = $datasource->getResult();
-            $this->assertEquals(100, count($result));
+            $this->assertCount(100, $result);
 
             //Test boolean field
             $datasource
@@ -261,7 +280,7 @@ class CollectionDriverTest extends \PHPUnit_Framework_TestCase
             $datasource->bindParameters($parameters);
             $view = $datasource->createView();
             $result = $datasource->getResult();
-            $this->assertEquals(50, count($result));
+            $this->assertCount(50, $result);
 
             $parameters = [
                 $datasource->getName() => [
@@ -274,7 +293,7 @@ class CollectionDriverTest extends \PHPUnit_Framework_TestCase
             $datasource->bindParameters($parameters);
             $view = $datasource->createView();
             $result = $datasource->getResult();
-            $this->assertEquals(50, count($result));
+            $this->assertCount(50, $result);
 
             $parameters = [
                 $datasource->getName() => [
@@ -287,7 +306,7 @@ class CollectionDriverTest extends \PHPUnit_Framework_TestCase
             $datasource->bindParameters($parameters);
             $view = $datasource->createView();
             $result = $datasource->getResult();
-            $this->assertEquals(50, count($result));
+            $this->assertCount(50, $result);
 
             $parameters = [
                 $datasource->getName() => [
@@ -300,7 +319,7 @@ class CollectionDriverTest extends \PHPUnit_Framework_TestCase
             $datasource->bindParameters($parameters);
             $view = $datasource->createView();
             $result = $datasource->getResult();
-            $this->assertEquals(50, count($result));
+            $this->assertCount(50, $result);
 
             $parameters = [
                 $datasource->getName() => [
@@ -313,7 +332,7 @@ class CollectionDriverTest extends \PHPUnit_Framework_TestCase
             $datasource->bindParameters($parameters);
             $view = $datasource->createView();
             $result = $datasource->getResult();
-            $this->assertEquals(100, count($result));
+            $this->assertCount(100, $result);
 
             $parameters = [
                 $datasource->getName() => [
@@ -324,10 +343,7 @@ class CollectionDriverTest extends \PHPUnit_Framework_TestCase
             ];
 
             $datasource->bindParameters($parameters);
-            foreach ($datasource->getResult() as $news) {
-                $this->assertEquals(true, $news->isActive());
-                break;
-            }
+            $this->assertTrue($datasource->getResult()->first()->isActive());
 
             $parameters = [
                 $datasource->getName() => [
@@ -338,10 +354,8 @@ class CollectionDriverTest extends \PHPUnit_Framework_TestCase
             ];
 
             $datasource->bindParameters($parameters);
-            foreach ($datasource->getResult() as $news) {
-                $this->assertEquals(false, $news->isActive());
-                break;
-            }
+            $this->assertFalse(false, $datasource->getResult()->first()->isActive());
+
 
             // test 'notIn' comparison
             $datasource->addField('title_is_not', 'text', 'notIn', [
@@ -359,7 +373,7 @@ class CollectionDriverTest extends \PHPUnit_Framework_TestCase
             $datasource->bindParameters($parameters);
             $view = $datasource->createView();
             $result = $datasource->getResult();
-            $this->assertEquals(97, count($result));
+            $this->assertCount(97, $result);
         }
     }
 
@@ -385,8 +399,8 @@ class CollectionDriverTest extends \PHPUnit_Framework_TestCase
 
         $datasource->addField($field);
 
-        $this->setExpectedException(CollectionDriverException::class);
-        $result1 = $datasource->getResult();
+        $this->expectException(CollectionDriverException::class);
+        $datasource->getResult();
     }
 
     public function testExceptions2()
@@ -396,7 +410,7 @@ class CollectionDriverTest extends \PHPUnit_Framework_TestCase
         $driverFactory = $this->getCollectionFactory();
         $driver = $driverFactory->createDriver();
 
-        $this->setExpectedException(CollectionDriverException::class);
+        $this->expectException(CollectionDriverException::class);
         $driver->getCriteria();
     }
 
