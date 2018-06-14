@@ -44,7 +44,7 @@ class CollectionResult implements Countable, \IteratorAggregate, ArrayAccess
         } else {
             throw new \InvalidArgumentException(
                 sprintf(
-                    'Provided collection type "%s" should be Selectable or/and Traversable or array',
+                    'Provided collection type "%s" should be Selectable or Traversable or array',
                     \is_object($collection) ? \get_class($collection) : \gettype($collection)
                 )
             );
