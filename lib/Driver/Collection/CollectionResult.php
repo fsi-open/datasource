@@ -39,13 +39,15 @@ class CollectionResult implements Countable, \IteratorAggregate, ArrayAccess
             $collection = $collection->matching(new Criteria());
         } elseif ($collection instanceof Traversable) {
             $collection = new ArrayCollection(iterator_to_array($collection));
-        } elseif (is_array($collection)) {
+        } elseif (\is_array($collection)) {
             $collection = new ArrayCollection($collection);
         } else {
             throw new \InvalidArgumentException(
                 sprintf(
-                    'Provided collection type "%s" should be Selectable or Traversable or array',
-                    \is_object($collection) ? \get_class($collection) : \gettype($collection)
+                    'Provided collection type "%s" should be %s or %s or array',
+                    \is_object($collection) ? \get_class($collection) : \gettype($collection),
+                    Selectable::class,
+                    Traversable::class
                 )
             );
         }

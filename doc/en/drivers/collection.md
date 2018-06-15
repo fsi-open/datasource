@@ -1,13 +1,16 @@
 # Collection Driver #
 
-This driver allows DataSource to operate on data objects contained in PHP array. This array could contain i.e. objects fetched
-from database by native SQL query or objects fetched from some web API and created from JSON response. The purpose of this driver
-is to use DataSource's abilities (filtering, sorting, pagination) on data coming from source that natively doesn't support such
-operations.
+This driver allows DataSource to operate on data objects contained in:
+* plain array `[]`
+* [\Traversable](http://php.net/manual/en/class.traversable.php) object
+* [\Doctrine\Common\Collections\Selectable](https://github.com/doctrine/collections/blob/ab12b39de988ee3d80bf2d5f16b1161ee5fb2529/lib/Doctrine/Common/Collections/Selectable.php) object
+
+The purpose of this driver is to use DataSource's abilities (filtering, sorting, pagination) on data coming 
+from source that natively doesn't support such operations.
 
 ## Setup ##
 
-You can create driver manually
+You can create driver manually from plain array of objects:
 
 ```php
 <?php
@@ -18,10 +21,15 @@ use FSi\Component\DataSource\Driver\Collection\Extension\Core\CoreExtension;
 $driverExtensions = array(new CoreExtension());
 
 $driver = new CollectionDriver($driverExtensions, $arrayOfObjects);
-
 ```
 
-or through factory
+or from `\Doctrine\Common\Collections\Selectable` object:
+
+```php
+$driver = new CollectionDriver($driverExtensions, $this->em->getRepository(News::class));
+```
+
+You can also use factory to create driver:
 
 ```php
 <?php
@@ -36,7 +44,7 @@ $extensions = array(
 $driverExtensions = array(new CoreExtension());
 
 $driverFactory = new CollectionFactory($driverExtensions);
-$driver = $driverFactory->createDriver($arrayOfObjects); // All drivers created this way will have same set of $driverExtensions loaded.
+$driver = $driverFactory->createDriver(['collection' => $arrayOfObjects]); // All drivers created this way will have same set of $driverExtensions loaded.
 
 ```
 

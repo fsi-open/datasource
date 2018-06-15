@@ -2,6 +2,14 @@
 
 This is a list of changes done in version 2.0.
 
+## Collection driver enhancements
+
+Added support of:
+* `\Doctrine\Common\Collections\Selectable`
+* `\Traversable`
+
+to collection driver. Read more about it in [Collection driver documentation](doc/en/drivers/collection.md).
+
 ## Deleted Symfony extension
 
 Since it was moved to [datasource-bundle](https://github.com/fsi-open/datasource-bundle),

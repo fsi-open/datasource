@@ -7,6 +7,11 @@ to give various conditions, that fetched data must fulfill.
 DataSource to fetch specific kind of data (from database, xml, json, etc.) must be created with
 properly configured driver, that will implement methods to get that kind of data.
 
+## Available drivers
+
+* [Collection](doc/en/drivers/collection.md)
+* [Doctrine ORM](doc/en/drivers/doctrine-orm.md)
+
 ## Basic usage ##
 
 Let's assume we want to create DataSource with DoctrineDriver (you can find documentation for specific drivers in ``doc``
