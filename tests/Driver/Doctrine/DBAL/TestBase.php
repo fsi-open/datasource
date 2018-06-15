@@ -23,11 +23,12 @@ use FSi\Component\DataSource\Extension\Core;
 use FSi\Component\DataSource\Extension\Core\Ordering\OrderingExtension;
 use FSi\Component\DataSource\Tests\Driver\Doctrine\DBAL\Fixtures\DBALDriverExtension;
 use FSi\Component\DataSource\Tests\Driver\Doctrine\DBAL\Fixtures\TestConnectionRegistry;
+use PHPUnit\Framework\TestCase;
 
-abstract class TestBase extends \PHPUnit_Framework_TestCase
+abstract class TestBase extends TestCase
 {
-    const TABLE_CATEGORY_NAME = 'category';
-    const TABLE_NEWS_NAME = 'news';
+    protected const TABLE_CATEGORY_NAME = 'category';
+    protected const TABLE_NEWS_NAME = 'news';
 
     /**
      * @var Connection
@@ -39,10 +40,7 @@ abstract class TestBase extends \PHPUnit_Framework_TestCase
      */
     protected $testDoctrineExtension;
 
-    /**
-     * @return DriverFactoryInterface
-     */
-    protected function getDriverFactory()
+    protected function getDriverFactory(): DriverFactoryInterface
     {
         $this->testDoctrineExtension = new DBALDriverExtension();
 
@@ -52,12 +50,9 @@ abstract class TestBase extends \PHPUnit_Framework_TestCase
         ]);
     }
 
-    /**
-     * @return Connection
-     */
-    protected function getMemoryConnection()
+    protected function getMemoryConnection(): Connection
     {
-        if (empty($this->connection)) {
+        if (null === $this->connection) {
             $this->connection = DriverManager::getConnection([
                 'driver' => 'pdo_sqlite',
                 'memory' => true,
@@ -67,10 +62,7 @@ abstract class TestBase extends \PHPUnit_Framework_TestCase
         return $this->connection;
     }
 
-    /**
-     * @return DataSourceFactory
-     */
-    protected function getDataSourceFactory()
+    protected function getDataSourceFactory(): DataSourceFactory
     {
         $driverFactoryManager = new DriverFactoryManager([
             $this->getDriverFactory()
@@ -84,7 +76,7 @@ abstract class TestBase extends \PHPUnit_Framework_TestCase
         return new DataSourceFactory($driverFactoryManager, $extensions);
     }
 
-    protected function loadTestData(Connection $connection)
+    protected function loadTestData(Connection $connection): void
     {
         $schemaManager = $connection->getSchemaManager();
 
@@ -122,7 +114,7 @@ abstract class TestBase extends \PHPUnit_Framework_TestCase
                 'event_date' => new \DateTime('@' . (($i - 1) * 60 * 60)),
                 'event_hour' => new \DateTime('@' . (($i - 1) * 60 * 60)),
                 'content' => sprintf('Lorem ipsum %d', $i % 3),
-                'category_id' => ceil((log($i + 0.001, 101)) * 10),
+                'category_id' => ceil(log($i + 0.001, 101) * 10),
                 /*
                  * category id - how many news
                  *  1 - 1

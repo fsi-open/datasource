@@ -12,15 +12,17 @@ namespace FSi\Component\DataSource\Tests\Extension\Core;
 use FSi\Component\DataSource\Extension\Core\Ordering\OrderingExtension;
 use FSi\Component\DataSource\Extension\Core\Ordering\Field\FieldExtension;
 use FSi\Component\DataSource\Extension\Core\Ordering\Driver\DriverExtension;
-use FSi\Component\DataSource\DataSourceInterface;
 use FSi\Component\DataSource\Field\FieldAbstractType;
 use FSi\Component\DataSource\Event\DataSourceEvent;
 use FSi\Component\DataSource\Event\FieldEvent;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
+use FSi\Component\DataSource\Driver\DriverInterface;
+use FSi\Component\DataSource\DataSourceInterface;
+use FSi\Component\DataSource\Field\FieldTypeInterface;
+use FSi\Component\DataSource\Field\FieldViewInterface;
 
-/**
- * Tests for Ordering Extension.
- */
-class OrderingExtensionTest extends \PHPUnit_Framework_TestCase
+class OrderingExtensionTest extends TestCase
 {
     /**
      * Checks DataSource subscriber and storing of passed parameters.
@@ -28,34 +30,38 @@ class OrderingExtensionTest extends \PHPUnit_Framework_TestCase
     public function testStoringParameters()
     {
         $extension = new OrderingExtension();
-        $driver = $this->createMock('FSi\Component\DataSource\Driver\DriverInterface');
-        $datasource = $this->createMock('FSi\Component\DataSource\DataSourceInterface', [], [$driver]);
-        $field = $this->createMock('FSi\Component\DataSource\Field\FieldTypeInterface');
+        $driver = $this->createMock(DriverInterface::class);
+        /** @var MockObject|DataSourceInterface $datasource */
+        $datasource = $this->getMockBuilder(DataSourceInterface::class)
+            ->setConstructorArgs([$driver])
+            ->getMock();
+        /** @var MockObject|FieldTypeInterface $field */
+        $field = $this->createMock(FieldTypeInterface::class);
         $fieldExtension = new FieldExtension();
 
         $field
             ->expects($this->atLeastOnce())
             ->method('getExtensions')
-            ->will($this->returnValue([$fieldExtension]))
+            ->willReturn([$fieldExtension])
         ;
 
         $datasource
             ->expects($this->any())
             ->method('getFields')
-            ->will($this->returnValue(['test' => $field]))
+            ->willReturn(['test' => $field])
         ;
 
         $datasource
             ->expects($this->any())
             ->method('getField')
             ->with('test')
-            ->will($this->returnValue($field))
+            ->willReturn($field)
         ;
 
         $datasource
             ->expects($this->any())
             ->method('getName')
-            ->will($this->returnValue('ds'))
+            ->willReturn('ds')
         ;
 
         $subscribers = $extension->loadSubscribers();
@@ -90,17 +96,13 @@ class OrderingExtensionTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * Checks if sort order is properly calculated from default sorting options and parameters passed from user request.
+     * Each test case consists of fields options definition, ordering parameters passed to datasource
+     * and expected fields array which should be sorted in terms of priority of sorting results.
+     * Expected array contain sorting passed in parameters first and then default sorting passed in options.
      */
-    public function testOrdering()
+    public function orderingDataProvider()
     {
-        $self = $this;
-        /**
-         * Each test case consists of fields options definition, ordering parameters passed to datasource and expected fields
-         * array which should be sorted in terms of priority of sorting results. Expected array contain sorting passed in
-         * parameters first and then default sorting passed in options.
-         */
-        $input = [
+        return [
             [
                 'fields' => [
                     ['name' => 'field1'],
@@ -146,7 +148,7 @@ class OrderingExtensionTest extends \PHPUnit_Framework_TestCase
                     ['name' => 'field2'],
                     ['name' => 'field3'],
                 ],
-                'parameters'  => [
+                'parameters' => [
                     'field2' => 'asc',
                     'field1' => 'desc'
                 ],
@@ -297,113 +299,119 @@ class OrderingExtensionTest extends \PHPUnit_Framework_TestCase
                 ]
             ],
         ];
+    }
 
-        foreach ($input as $case) {
-            $datasource = $this->createMock('FSi\Component\DataSource\DataSourceInterface');
+    /**
+     * Checks if sort order is properly calculated from default sorting options and parameters passed from user request.
+     * @dataProvider orderingDataProvider
+     */
+    public function testOrdering(array $fields, array $parameters, array $expectedOrdering, array $expectedParameters)
+    {
+        $datasource = $this->createMock(DataSourceInterface::class);
 
-            $fieldExtension = new FieldExtension();
+        $fieldExtension = new FieldExtension();
 
-            $fields = [];
-            foreach ($case['fields'] as $fieldData) {
-                //Using fake class object instead of mock object is helpfull because we need functionality from AbstractFieldType.
-                $field = new FakeFieldType();
-                $field->setName($fieldData['name']);
-                $field->setDataSource($datasource);
-                $field->addExtension($fieldExtension);
-                if (isset($fieldData['options'])) {
-                    $field->setOptions($fieldData['options']);
-                }
-                $fields[$fieldData['name']] = $field;
+        $dataSourceFields = [];
+        foreach ($fields as $fieldData) {
+            // Using fake class object instead of mock object is helpful
+            // because we need functionality from AbstractFieldType.
+            $field = new FakeFieldType();
+            $field->setName($fieldData['name']);
+            $field->setDataSource($datasource);
+            $field->addExtension($fieldExtension);
+            if (isset($fieldData['options'])) {
+                $field->setOptions($fieldData['options']);
             }
+            $dataSourceFields[$fieldData['name']] = $field;
+        }
 
-            $datasource
-                ->expects($this->atLeastOnce())
-                ->method('getName')
-                ->will($this->returnValue('ds'))
-            ;
+        $datasource
+            ->expects($this->atLeastOnce())
+            ->method('getName')
+            ->willReturn('ds')
+        ;
 
-            $datasource
-                ->expects($this->any())
-                ->method('getFields')
-                ->will($this->returnValue($fields))
-            ;
+        $datasource
+            ->expects($this->any())
+            ->method('getFields')
+            ->willReturn($fields)
+        ;
 
-            $datasource
-                ->expects($this->any())
-                ->method('getField')
-                ->will($this->returnCallback(function () use ($fields) {
-                    return $fields[func_get_arg(0)];
+        $datasource
+            ->expects($this->any())
+            ->method('getField')
+            ->will($this->returnCallback(function () use ($dataSourceFields) {
+                return $dataSourceFields[func_get_arg(0)];
+            }))
+        ;
+
+        $datasource
+            ->expects($this->any())
+            ->method('getParameters')
+            ->willReturn(['ds' => [OrderingExtension::PARAMETER_SORT => $parameters]])
+        ;
+
+        $extension = new OrderingExtension();
+        $subscribers = $extension->loadSubscribers();
+        $subscriber = array_shift($subscribers);
+        $subscriber->preBindParameters(new DataSourceEvent\ParametersEventArgs(
+            $datasource,
+            ['ds' => [OrderingExtension::PARAMETER_SORT => $parameters]]
+        ));
+
+        //We use fake driver extension instead of specific driver extension because we want to test common DriverExtension functionality.
+        $driverExtension = new FakeDriverExtension();
+        $result = $driverExtension->sort($dataSourceFields);
+        $this->assertSame($expectedOrdering, $result);
+
+        foreach ($dataSourceFields as $field) {
+            $view = $this->createMock(FieldViewInterface::class);
+
+            $view
+                ->expects($this->exactly(5))
+                ->method('setAttribute')
+                ->will($this->returnCallback(function ($attribute, $value) use ($field, $parameters, $expectedParameters) {
+                    switch ($attribute) {
+                        case 'sorted_ascending':
+                            $this->assertEquals(
+                                (key($parameters) === $field->getName()) && (current($parameters) === 'asc'),
+                                $value
+                            );
+                            break;
+
+                        case 'sorted_descending':
+                            $this->assertEquals(
+                                (key($parameters) === $field->getName()) && (current($parameters) === 'desc'),
+                                $value
+                            );
+                            break;
+
+                        case 'parameters_sort_ascending':
+                            $this->assertSame(
+                                [
+                                    'ds' => [
+                                        OrderingExtension::PARAMETER_SORT => $expectedParameters[$field->getName()]['ordering_ascending']
+                                    ]
+                                ],
+                                $value
+                            );
+                            break;
+
+                        case 'parameters_sort_descending':
+                            $this->assertSame(
+                                [
+                                    'ds' => [
+                                        OrderingExtension::PARAMETER_SORT => $expectedParameters[$field->getName()]['ordering_descending']
+                                    ]
+                                ],
+                                $value
+                            );
+                            break;
+                    }
                 }))
             ;
 
-            $datasource
-                ->expects($this->any())
-                ->method('getParameters')
-                ->will($this->returnValue(['ds' => [OrderingExtension::PARAMETER_SORT => $case['parameters']]]))
-            ;
-
-            $extension = new OrderingExtension();
-            $subscribers = $extension->loadSubscribers();
-            $subscriber = array_shift($subscribers);
-            $subscriber->preBindParameters(new DataSourceEvent\ParametersEventArgs(
-                $datasource,
-                ['ds' => [OrderingExtension::PARAMETER_SORT => $case['parameters']]]
-            ));
-
-            //We use fake driver extension instead of specific driver extension because we want to test common DriverExtension functionality.
-            $driverExtension = new FakeDriverExtension();
-            $result = $driverExtension->sort($fields);
-            $this->assertSame($case['expected_ordering'], $result);
-
-            foreach ($fields as $field) {
-                $view = $this->createMock('FSi\Component\DataSource\Field\FieldViewInterface');
-
-                $view
-                    ->expects($this->exactly(5))
-                    ->method('setAttribute')
-                    ->will($this->returnCallback(function ($attribute, $value) use ($self, $field, $case) {
-                        switch ($attribute) {
-                            case 'sorted_ascending':
-                                $self->assertEquals(
-                                    (key($case['parameters']) == $field->getName()) && (current($case['parameters']) == 'asc'),
-                                    $value
-                                );
-                                break;
-
-                            case 'sorted_descending':
-                                $self->assertEquals(
-                                    (key($case['parameters']) == $field->getName()) && (current($case['parameters']) == 'desc'),
-                                    $value
-                                );
-                                break;
-
-                            case 'parameters_sort_ascending':
-                                $self->assertSame(
-                                    [
-                                        'ds' => [
-                                            OrderingExtension::PARAMETER_SORT => $case['expected_parameters'][$field->getName()]['ordering_ascending']
-                                        ]
-                                    ],
-                                    $value
-                                );
-                                break;
-
-                            case 'parameters_sort_descending':
-                                $self->assertSame(
-                                    [
-                                        'ds' => [
-                                            OrderingExtension::PARAMETER_SORT => $case['expected_parameters'][$field->getName()]['ordering_descending']
-                                        ]
-                                    ],
-                                    $value
-                                );
-                                break;
-                        }
-                    }))
-                ;
-
-                $fieldExtension->postBuildView(new FieldEvent\ViewEventArgs($field, $view));
-            }
+            $fieldExtension->postBuildView(new FieldEvent\ViewEventArgs($field, $view));
         }
     }
 }

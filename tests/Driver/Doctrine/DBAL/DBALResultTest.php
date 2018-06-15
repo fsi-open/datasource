@@ -55,13 +55,15 @@ class DBALResultTest extends TestBase
 
     public function testInvalidStringIndexField()
     {
-        $this->setExpectedException(RuntimeException::class, 'Index cannot be null');
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Index cannot be null');
         new DBALResult($this->paginator, '[invalid]');
     }
 
     public function testDuplicatedStringIndex()
     {
-        $this->setExpectedException(RuntimeException::class, 'Duplicate index "A"');
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Duplicate index "A"');
         new DBALResult($this->paginator, '[type]');
     }
 
@@ -78,7 +80,8 @@ class DBALResultTest extends TestBase
 
     public function testDuplicatedCallbackIndex()
     {
-        $this->setExpectedException(RuntimeException::class, 'Duplicate index "C"');
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Duplicate index "C"');
         new DBALResult($this->paginator, function () {
             return 'C';
         });

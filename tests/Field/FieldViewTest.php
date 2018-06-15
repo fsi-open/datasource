@@ -10,41 +10,45 @@
 namespace FSi\Component\DataSource\Tests\Field;
 
 use FSi\Component\DataSource\Field\FieldView;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
+use FSi\Component\DataSource\Field\FieldTypeInterface;
+use FSi\Component\DataSource\Driver\DriverInterface;
+use FSi\Component\DataSource\DataSource;
+use FSi\Component\DataSource\DataSourceView;
 
-/**
- * Tests for FieldView.
- */
-class DataSourceViewTest extends \PHPUnit_Framework_TestCase
+class FieldViewTest extends TestCase
 {
     /**
      * Checks creation.
      */
     public function testCreate()
     {
-        $field = $this->createMock('FSi\Component\DataSource\Field\FieldTypeInterface');
+        /** @var FieldTypeInterface|MockObject $field */
+        $field = $this->createMock(FieldTypeInterface::class);
 
         $field
             ->expects($this->atLeastOnce())
             ->method('getName')
-            ->will($this->returnValue('somename'))
+            ->willReturn('somename')
         ;
 
         $field
             ->expects($this->atLeastOnce())
             ->method('getType')
-            ->will($this->returnValue('sometype'))
+            ->willReturn('sometype')
         ;
 
         $field
             ->expects($this->atLeastOnce())
             ->method('getComparison')
-            ->will($this->returnValue('somecomp'))
+            ->willReturn('somecomp')
         ;
 
         $field
             ->expects($this->atLeastOnce())
             ->method('getCleanParameter')
-            ->will($this->returnValue('someparam'))
+            ->willReturn('someparam')
         ;
 
         $fieldView = new FieldView($field);
@@ -60,10 +64,10 @@ class DataSourceViewTest extends \PHPUnit_Framework_TestCase
      */
     public function testSetDataSourceView()
     {
-        $driver = $this->createMock('FSi\Component\DataSource\Driver\DriverInterface');
-        $datasource = $this->createMock('FSi\Component\DataSource\DataSource', [], [$driver]);
-        $view = $this->createMock('FSi\Component\DataSource\DataSourceView', [], [$datasource]);
-        $field = $this->createMock('FSi\Component\DataSource\Field\FieldTypeInterface');
+        $driver = $this->createMock(DriverInterface::class);
+        $datasource = $this->getMockBuilder(DataSource::class)->setConstructorArgs([$driver])->getMock();
+        $view = $this->getMockBuilder(DataSourceView::class)->setConstructorArgs([$datasource])->getMock();
+        $field = $this->createMock(FieldTypeInterface::class);
         $fieldView = new FieldView($field);
 
         $fieldView->setDataSourceView($view);
@@ -75,7 +79,7 @@ class DataSourceViewTest extends \PHPUnit_Framework_TestCase
      */
     public function testOptionsManipulation()
     {
-        $field = $this->createMock('FSi\Component\DataSource\Field\FieldTypeInterface');
+        $field = $this->createMock(FieldTypeInterface::class);
         $view = new FieldView($field);
 
         $this->assertFalse($view->hasAttribute('option1'));

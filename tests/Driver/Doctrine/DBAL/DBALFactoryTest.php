@@ -43,7 +43,7 @@ class DBALFactoryTest extends TestBase
 
     public function testExceptionWhenNoTableAndBuilder()
     {
-        $this->setExpectedException(InvalidOptionsException::class);
+        $this->expectException(InvalidOptionsException::class);
         $this->factory->createDriver([]);
     }
 

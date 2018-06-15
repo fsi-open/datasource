@@ -35,6 +35,9 @@ class DBALDriverTest extends TestBase
         $this->connection = $this->getMemoryConnection();
     }
 
+    /**
+     * @doesNotPerformAssertions
+     */
     public function testCreation()
     {
         $qb = $this->connection->createQueryBuilder();
@@ -48,7 +51,7 @@ class DBALDriverTest extends TestBase
      */
     public function testCreationExceptionWhenExtensionIsInvalid()
     {
-        $this->setExpectedException(DataSourceException::class);
+        $this->expectException(DataSourceException::class);
         new DBALDriver([new stdClass()], $this->connection, 'table');
     }
 
@@ -57,7 +60,7 @@ class DBALDriverTest extends TestBase
      */
     public function testCreationExceptionWhenNoQueryBuilderAndTable()
     {
-        $this->setExpectedException(DBALDriverException::class);
+        $this->expectException(DBALDriverException::class);
         new DBALDriver([], $this->connection, null);
     }
 
@@ -67,7 +70,7 @@ class DBALDriverTest extends TestBase
     public function testGetResultExceptionWhenFieldIsNotDBALField()
     {
         $driver = new DBALDriver([], $this->connection, 'table');
-        $this->setExpectedException(DBALDriverException::class);
+        $this->expectException(DBALDriverException::class);
 
         $fields = [$this->createMock(FieldTypeInterface::class)];
         $driver->getResult($fields, 0, 20);
@@ -101,7 +104,7 @@ class DBALDriverTest extends TestBase
     public function testGetQueryExceptionWhenNotInsideGetResult()
     {
         $driver = new DBALDriver([], $this->connection, 'table');
-        $this->setExpectedException(DBALDriverException::class);
+        $this->expectException(DBALDriverException::class);
         $driver->getQueryBuilder();
     }
 
@@ -121,7 +124,7 @@ class DBALDriverTest extends TestBase
         $this->assertFalse($driver->hasFieldType('wrong'));
         $this->assertFalse($driver->hasFieldType(null));
 
-        $this->setExpectedException(DataSourceException::class);
+        $this->expectException(DataSourceException::class);
         $driver->getFieldType('wrong');
     }
 
@@ -182,7 +185,7 @@ class DBALDriverTest extends TestBase
 
         $this->assertEquals($field->getOption('field'), $field->getName());
 
-        $this->setExpectedException(FieldException::class);
+        $this->expectException(FieldException::class);
         $field = $driver->getFieldType($type);
         $field->setComparison('wrong');
     }

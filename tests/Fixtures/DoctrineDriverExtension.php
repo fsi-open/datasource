@@ -9,14 +9,13 @@
 
 namespace FSi\Component\DataSource\Tests\Fixtures;
 
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use FSi\Component\DataSource\Driver\DriverAbstractExtension;
 use FSi\Component\DataSource\Event\DriverEvents;
 
 /**
  * Class to test DoctrineDriver extensions calls.
  */
-class DoctrineDriverExtension extends DriverAbstractExtension implements EventSubscriberInterface
+class DoctrineDriverExtension extends DriverAbstractExtension
 {
     /**
      * @var array
@@ -24,7 +23,7 @@ class DoctrineDriverExtension extends DriverAbstractExtension implements EventSu
     private $calls = [];
 
     /**
-     * @var Doctrine\ORM\QueryBuilder
+     * @var \Doctrine\ORM\QueryBuilder
      */
     private $queryBuilder;
 
@@ -70,7 +69,7 @@ class DoctrineDriverExtension extends DriverAbstractExtension implements EventSu
      */
     public function __call($name, $arguments)
     {
-        if ($name == 'preGetResult') {
+        if ($name === 'preGetResult') {
             $args = array_shift($arguments);
             $this->queryBuilder = $args->getDriver()->getQueryBuilder();
         }

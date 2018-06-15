@@ -26,17 +26,19 @@ use FSi\Component\DataSource\Tests\Fixtures\DoctrineDriverExtension;
 use FSi\Component\DataSource\Tests\Fixtures\Group;
 use FSi\Component\DataSource\Tests\Fixtures\News;
 use FSi\Component\DataSource\Tests\Fixtures\TestManagerRegistry;
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 
-/**
- * Tests for Doctrine driver.
- */
-class DoctrineDriverTest extends PHPUnit_Framework_TestCase
+class DoctrineDriverTest extends TestCase
 {
     /**
      * @var DoctrineDriverExtension
      */
     protected $testDoctrineExtension;
+
+    /**
+     * @var EntityManager
+     */
+    private $em;
 
     /**
      * {@inheritdoc}
@@ -87,7 +89,7 @@ class DoctrineDriverTest extends PHPUnit_Framework_TestCase
         ];
         $datasource->bindParameters($parameters);
         $result = $datasource->getResult();
-        $this->assertEquals(0, count($result));
+        $this->assertCount(0, $result);
     }
 
     /**
@@ -137,7 +139,7 @@ class DoctrineDriverTest extends PHPUnit_Framework_TestCase
             ;
 
             $result1 = $datasource->getResult();
-            $this->assertEquals(100, count($result1));
+            $this->assertCount(100, $result1);
             $view1 = $datasource->createView();
 
             //Checking if result cache works.
@@ -156,10 +158,9 @@ class DoctrineDriverTest extends PHPUnit_Framework_TestCase
             //Checking cache.
             $this->assertSame($result2, $datasource->getResult());
 
-            $this->assertEquals(50, count($result2));
+            $this->assertCount(50, $result2);
             $this->assertNotSame($result1, $result2);
-            unset($result1);
-            unset($result2);
+            unset($result1, $result2);
 
             $this->assertEquals($parameters, $datasource->getParameters());
 
@@ -172,20 +173,15 @@ class DoctrineDriverTest extends PHPUnit_Framework_TestCase
 
             $datasource->bindParameters($parameters);
             $result = $datasource->getResult();
-            $this->assertEquals(100, count($result));
-            $i = 0;
-            foreach ($result as $item) {
-                $i++;
-            }
-
-            $this->assertEquals(20, $i);
+            $this->assertCount(100, $result);
+            $this->assertCount(20, iterator_to_array($result));
 
             $parameters = [
                 $datasource->getName() => [
                     DataSourceInterface::PARAMETER_FIELDS => [
                         'author' => 'domain1.com',
                         'title' => ['title44', 'title58'],
-                        'created' => ['from' => new DateTime(date("Y:m:d H:i:s", 35 * 24 * 60 * 60))],
+                        'created' => ['from' => new DateTime(date('Y:m:d H:i:s', 35 * 24 * 60 * 60))],
                     ],
                 ],
             ];
@@ -193,7 +189,7 @@ class DoctrineDriverTest extends PHPUnit_Framework_TestCase
             $datasource->bindParameters($parameters);
             $view = $datasource->createView();
             $result = $datasource->getResult();
-            $this->assertEquals(2, count($result));
+            $this->assertCount(2, $result);
 
             //Checking entity fields. We assume that database was created so first category and first group have ids equal to 1.
             $parameters = [
@@ -206,7 +202,7 @@ class DoctrineDriverTest extends PHPUnit_Framework_TestCase
 
             $datasource->bindParameters($parameters);
             $result = $datasource->getResult();
-            $this->assertEquals(25, count($result));
+            $this->assertCount(25, $result);
 
             $parameters = [
                 $datasource->getName() => [
@@ -218,7 +214,7 @@ class DoctrineDriverTest extends PHPUnit_Framework_TestCase
 
             $datasource->bindParameters($parameters);
             $result = $datasource->getResult();
-            $this->assertEquals(75, count($result));
+            $this->assertCount(75, $result);
 
             $parameters = [
                 $datasource->getName() => [
@@ -230,7 +226,7 @@ class DoctrineDriverTest extends PHPUnit_Framework_TestCase
 
             $datasource->bindParameters($parameters);
             $result = $datasource->getResult();
-            $this->assertEquals(20, count($result));
+            $this->assertCount(20, $result);
 
             $parameters = [
                 $datasource->getName() => [
@@ -242,7 +238,7 @@ class DoctrineDriverTest extends PHPUnit_Framework_TestCase
 
             $datasource->bindParameters($parameters);
             $result = $datasource->getResult();
-            $this->assertEquals(40, count($result));
+            $this->assertCount(40, $result);
 
             $parameters = [
                 $datasource->getName() => [
@@ -255,7 +251,7 @@ class DoctrineDriverTest extends PHPUnit_Framework_TestCase
 
             $datasource->bindParameters($parameters);
             $result = $datasource->getResult();
-            $this->assertEquals(5, count($result));
+            $this->assertCount(5, $result);
 
             //Checking sorting.
             $parameters = [
@@ -299,7 +295,7 @@ class DoctrineDriverTest extends PHPUnit_Framework_TestCase
 
             $datasource->bindParameters($parameters);
             $result1 = $datasource->getResult();
-            $this->assertEquals(50, count($result1));
+            $this->assertCount(50, $result1);
             $ids = [];
 
             foreach($result1 as $item) {
@@ -316,16 +312,15 @@ class DoctrineDriverTest extends PHPUnit_Framework_TestCase
 
             $datasource->bindParameters($parameters);
             $result2 = $datasource->getResult();
-            $this->assertEquals(50, count($result2));
+            $this->assertCount(50, $result2);
 
             foreach($result2 as $item) {
-                $this->assertTrue(!in_array($item->getId(),$ids));
+                $this->assertNotContains($item->getId(), $ids);
             }
 
-            unset($result1);
-            unset($result2);
+            unset($result1, $result2);
 
-             $parameters = [
+            $parameters = [
                 $datasource->getName() => [
                     DataSourceInterface::PARAMETER_FIELDS => [
                         'category2' => 'null'
@@ -336,7 +331,7 @@ class DoctrineDriverTest extends PHPUnit_Framework_TestCase
             //checking isnull & notnull - field type entity
             $datasource->bindParameters($parameters);
             $result1 = $datasource->getResult();
-            $this->assertEquals(50, count($result1));
+            $this->assertCount(50, $result1);
             $ids = [];
 
             foreach($result1 as $item) {
@@ -353,14 +348,13 @@ class DoctrineDriverTest extends PHPUnit_Framework_TestCase
 
             $datasource->bindParameters($parameters);
             $result2 = $datasource->getResult();
-            $this->assertEquals(50, count($result2));
+            $this->assertCount(50, $result2);
 
             foreach($result2 as $item) {
-                $this->assertTrue(!in_array($item->getId(),$ids));
+                $this->assertNotContains($item->getId(), $ids);
             }
 
-            unset($result1);
-            unset($result2);
+            unset($result1, $result2);
 
             //checking - field type boolean
             $parameters = [
@@ -373,7 +367,7 @@ class DoctrineDriverTest extends PHPUnit_Framework_TestCase
 
             $datasource->bindParameters($parameters);
             $result1 = $datasource->getResult();
-            $this->assertEquals(100, count($result1));
+            $this->assertCount(100, $result1);
 
             $parameters = [
                 $datasource->getName() => [
@@ -385,7 +379,7 @@ class DoctrineDriverTest extends PHPUnit_Framework_TestCase
 
             $datasource->bindParameters($parameters);
             $result2 = $datasource->getResult();
-            $this->assertEquals(50, count($result2));
+            $this->assertCount(50, $result2);
             $ids = [];
 
             foreach($result2 as $item) {
@@ -402,10 +396,10 @@ class DoctrineDriverTest extends PHPUnit_Framework_TestCase
 
             $datasource->bindParameters($parameters);
             $result3 = $datasource->getResult();
-            $this->assertEquals(50, count($result3));
+            $this->assertCount(50, $result3);
 
             foreach($result3 as $item) {
-                $this->assertTrue(!in_array($item->getId(),$ids));
+                $this->assertNotContains($item->getId(), $ids);
             }
 
             $parameters = [
@@ -418,10 +412,10 @@ class DoctrineDriverTest extends PHPUnit_Framework_TestCase
 
             $datasource->bindParameters($parameters);
             $result2 = $datasource->getResult();
-            $this->assertEquals(50, count($result2));
+            $this->assertCount(50, $result2);
 
             foreach($result2 as $item) {
-                $this->assertTrue(in_array($item->getId(),$ids));
+                $this->assertContains($item->getId(), $ids);
             }
 
             $parameters = [
@@ -434,15 +428,13 @@ class DoctrineDriverTest extends PHPUnit_Framework_TestCase
 
             $datasource->bindParameters($parameters);
             $result3 = $datasource->getResult();
-            $this->assertEquals(50, count($result3));
+            $this->assertCount(50, $result3);
 
             foreach($result3 as $item) {
-                $this->assertTrue(!in_array($item->getId(),$ids));
+                $this->assertNotContains($item->getId(), $ids);
             }
 
-            unset($result1);
-            unset($result2);
-            unset($result3);
+            unset($result1, $result2, $result3);
 
             $parameters = [
                 $datasource->getName() => [
@@ -454,7 +446,7 @@ class DoctrineDriverTest extends PHPUnit_Framework_TestCase
 
             $datasource->bindParameters($parameters);
             foreach ($datasource->getResult() as $news) {
-                $this->assertEquals(true, $news->isActive());
+                $this->assertTrue($news->isActive());
                 break;
             }
 
@@ -468,7 +460,7 @@ class DoctrineDriverTest extends PHPUnit_Framework_TestCase
 
             $datasource->bindParameters($parameters);
             foreach ($datasource->getResult() as $news) {
-                $this->assertEquals(false, $news->isActive());
+                $this->assertFalse($news->isActive());
                 break;
             }
 
@@ -485,7 +477,7 @@ class DoctrineDriverTest extends PHPUnit_Framework_TestCase
             //Since there are no fields now, we should have all of entities.
             $datasource->bindParameters($parameters);
             $result = $datasource->getResult();
-            $this->assertEquals(100, count($result));
+            $this->assertCount(100, $result);
         }
     }
 
@@ -526,7 +518,7 @@ class DoctrineDriverTest extends PHPUnit_Framework_TestCase
         ];
 
         $datasource->bindParameters($parameters);
-        $this->assertEquals(25, count($datasource->getResult()));
+        $this->assertCount(25, $datasource->getResult());
 
         $parameters = [
             $datasource->getName() => [
@@ -537,7 +529,7 @@ class DoctrineDriverTest extends PHPUnit_Framework_TestCase
         ];
 
         $datasource->bindParameters($parameters);
-        $this->assertEquals(100, count($datasource->getResult()));
+        $this->assertCount(100, $datasource->getResult());
 
         $parameters = [
             $datasource->getName() => [
@@ -549,7 +541,7 @@ class DoctrineDriverTest extends PHPUnit_Framework_TestCase
         ];
 
         $datasource->bindParameters($parameters);
-        $this->assertEquals(5, count($datasource->getResult()));
+        $this->assertCount(5, $datasource->getResult());
     }
 
     /**
@@ -712,12 +704,7 @@ class DoctrineDriverTest extends PHPUnit_Framework_TestCase
         unset($this->em);
     }
 
-    /**
-     * Return configured DoctrinFactory.
-     *
-     * @return DoctrineFactory.
-     */
-    private function getDoctrineFactory()
+    private function getDoctrineFactory(): DoctrineFactory
     {
         $this->testDoctrineExtension = new DoctrineDriverExtension();
 
@@ -729,12 +716,7 @@ class DoctrineDriverTest extends PHPUnit_Framework_TestCase
         return new DoctrineFactory(new TestManagerRegistry($this->em), $extensions);
     }
 
-    /**
-     * Return configured DataSourceFactory.
-     *
-     * @return DataSourceFactory
-     */
-    private function getDataSourceFactory()
+    private function getDataSourceFactory(): DataSourceFactory
     {
         $driverFactoryManager = new DriverFactoryManager([
             $this->getDoctrineFactory()
@@ -748,9 +730,6 @@ class DoctrineDriverTest extends PHPUnit_Framework_TestCase
         return new DataSourceFactory($driverFactoryManager, $extensions);
     }
 
-    /**
-     * @param EntityManager $em
-     */
     private function load(EntityManager $em)
     {
         //Injects 5 categories.
@@ -791,8 +770,8 @@ class DoctrineDriverTest extends PHPUnit_Framework_TestCase
             }
 
             //Each entity has different date of creation and one of four hours of creation.
-            $createDate = new DateTime(date("Y:m:d H:i:s", $i * 24 * 60 * 60));
-            $createTime = new DateTime(date("H:i:s", (($i % 4) + 1 ) * 60 * 60));
+            $createDate = new DateTime(date('Y:m:d H:i:s', $i * 24 * 60 * 60));
+            $createTime = new DateTime(date('H:i:s', (($i % 4) + 1 ) * 60 * 60));
 
             $news->setCreateDate($createDate);
             $news->setCreateTime($createTime);

@@ -21,14 +21,13 @@ use FSi\Component\DataSource\Exception\DataSourceException;
 use FSi\Component\DataSource\Field\FieldTypeInterface;
 use FSi\Component\DataSource\Tests\Fixtures\TestResult;
 use FSi\Component\DataSource\Tests\Fixtures\DataSourceExtension;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-/**
- * Tests for DataSource.
- */
-class DataSourceTest extends \PHPUnit_Framework_TestCase
+class DataSourceTest extends TestCase
 {
     /**
-     * Basic creation of DataSource.
+     * @doesNotPerformAssertions
      */
     public function testDataSourceCreate()
     {
@@ -54,7 +53,7 @@ class DataSourceTest extends \PHPUnit_Framework_TestCase
      */
     public function testDataSourceCreateException2()
     {
-        $this->setExpectedException(DataSourceException::class);
+        $this->expectException(DataSourceException::class);
         new DataSource($this->createDriverMock(), 'wrong-name');
     }
 
@@ -63,7 +62,7 @@ class DataSourceTest extends \PHPUnit_Framework_TestCase
      */
     public function testDataSourceCreateException3()
     {
-        $this->setExpectedException(DataSourceException::class);
+        $this->expectException(DataSourceException::class);
         new DataSource($this->createDriverMock(), '');
     }
 
@@ -79,18 +78,18 @@ class DataSourceTest extends \PHPUnit_Framework_TestCase
         $extension1
             ->expects($this->once())
             ->method('loadDriverExtensions')
-            ->will($this->returnValue([]))
+            ->willReturn([])
         ;
         $extension2
             ->expects($this->once())
             ->method('loadDriverExtensions')
-            ->will($this->returnValue([]))
+            ->willReturn([])
         ;
 
         $datasource->addExtension($extension1);
         $datasource->addExtension($extension2);
 
-        $this->assertEquals(count($datasource->getExtensions()), 2);
+        $this->assertCount(2, $datasource->getExtensions());
     }
 
     /**
@@ -99,7 +98,7 @@ class DataSourceTest extends \PHPUnit_Framework_TestCase
     public function testWrongFieldAddException1()
     {
         $datasource = new DataSource($this->createDriverMock());
-        $this->setExpectedException(DataSourceException::class);
+        $this->expectException(DataSourceException::class);
         $datasource->addField('field', 'type');
     }
 
@@ -109,7 +108,7 @@ class DataSourceTest extends \PHPUnit_Framework_TestCase
     public function testWrongFieldAddException2()
     {
         $datasource = new DataSource($this->createDriverMock());
-        $this->setExpectedException(DataSourceException::class);
+        $this->expectException(DataSourceException::class);
         $datasource->addField('field', '', 'type');
     }
 
@@ -119,7 +118,7 @@ class DataSourceTest extends \PHPUnit_Framework_TestCase
     public function testWrongFieldAddException3()
     {
         $datasource = new DataSource($this->createDriverMock());
-        $this->setExpectedException(DataSourceException::class);
+        $this->expectException(DataSourceException::class);
         $datasource->addField('field');
     }
 
@@ -129,14 +128,14 @@ class DataSourceTest extends \PHPUnit_Framework_TestCase
     public function testWrongFieldAddException4()
     {
         $datasource = new DataSource($this->createDriverMock());
-        $this->setExpectedException(DataSourceException::class);
+        $this->expectException(DataSourceException::class);
 
         $field = $this->createMock(FieldTypeInterface::class);
 
         $field
             ->expects($this->once())
             ->method('getName')
-            ->will($this->returnValue(null))
+            ->willReturn(null)
         ;
 
         $datasource->addField($field);
@@ -172,27 +171,27 @@ class DataSourceTest extends \PHPUnit_Framework_TestCase
         $field
             ->expects($this->once())
             ->method('getName')
-            ->will($this->returnValue('name'))
+            ->willReturn('name')
         ;
 
         $driver
             ->expects($this->once())
             ->method('getFieldType')
             ->with('text')
-            ->will($this->returnValue($field))
+            ->willReturn($field)
         ;
 
         $datasource->addField('name1', 'text', 'comp1');
 
-        $this->assertEquals(count($datasource->getFields()), 1);
+        $this->assertCount(1, $datasource->getFields());
         $this->assertTrue($datasource->hasField('name1'));
         $this->assertFalse($datasource->hasField('wrong'));
 
         $datasource->clearFields();
-        $this->assertEquals(count($datasource->getFields()), 0);
+        $this->assertCount(0, $datasource->getFields());
 
         $datasource->addField($field);
-        $this->assertEquals(count($datasource->getFields()), 1);
+        $this->assertCount(1, $datasource->getFields());
         $this->assertTrue($datasource->hasField('name'));
         $this->assertFalse($datasource->hasField('name1'));
         $this->assertFalse($datasource->hasField('name2'));
@@ -200,10 +199,10 @@ class DataSourceTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($field, $datasource->getField('name'));
 
         $this->assertTrue($datasource->removeField('name'));
-        $this->assertEquals(count($datasource->getFields()), 0);
+        $this->assertCount(0, $datasource->getFields());
         $this->assertFalse($datasource->removeField('name'));
 
-        $this->setExpectedException(DataSourceException::class);
+        $this->expectException(DataSourceException::class);
         $datasource->getField('wrong');
     }
 
@@ -214,7 +213,7 @@ class DataSourceTest extends \PHPUnit_Framework_TestCase
     {
         $datasource = new DataSource($this->createDriverMock());
         $datasource->bindParameters([]);
-        $this->setExpectedException(DataSourceException::class);
+        $this->expectException(DataSourceException::class);
         $datasource->bindParameters('nonarray');
     }
 
@@ -245,7 +244,7 @@ class DataSourceTest extends \PHPUnit_Framework_TestCase
         $field
             ->expects($this->any())
             ->method('getName')
-            ->will($this->returnValue('field'))
+            ->willReturn('field')
         ;
 
         $field
@@ -257,7 +256,7 @@ class DataSourceTest extends \PHPUnit_Framework_TestCase
             ->expects($this->once())
             ->method('getResult')
             ->with(['field' => $field])
-            ->will($this->returnValue($testResult))
+            ->willReturn($testResult)
         ;
 
         $datasource->addField($field);
@@ -278,9 +277,9 @@ class DataSourceTest extends \PHPUnit_Framework_TestCase
         $driver
             ->expects($this->once())
             ->method('getResult')
-            ->will($this->returnValue('scalar'))
+            ->willReturn('scalar')
         ;
-        $this->setExpectedException(DataSourceException::class);
+        $this->expectException(DataSourceException::class);
         $datasource->getResult();
     }
 
@@ -295,9 +294,9 @@ class DataSourceTest extends \PHPUnit_Framework_TestCase
         $driver
             ->expects($this->once())
             ->method('getResult')
-            ->will($this->returnValue(new \stdClass()))
+            ->willReturn(new \stdClass())
         ;
-        $this->setExpectedException(DataSourceException::class);
+        $this->expectException(DataSourceException::class);
         $datasource->getResult();
     }
 
@@ -331,7 +330,7 @@ class DataSourceTest extends \PHPUnit_Framework_TestCase
         $field
             ->expects($this->atLeastOnce())
             ->method('getName')
-            ->will($this->returnValue('key'))
+            ->willReturn('key')
         ;
 
         $field
@@ -343,7 +342,7 @@ class DataSourceTest extends \PHPUnit_Framework_TestCase
         $field2
             ->expects($this->atLeastOnce())
             ->method('getName')
-            ->will($this->returnValue('key2'))
+            ->willReturn('key2')
         ;
 
         $field2
@@ -366,12 +365,12 @@ class DataSourceTest extends \PHPUnit_Framework_TestCase
         $driver
             ->expects($this->once())
             ->method('getResult')
-            ->will($this->returnValue(new ArrayCollection()))
+            ->willReturn(new ArrayCollection())
         ;
 
         $datasource = new DataSource($driver);
         $view = $datasource->createView();
-        $this->assertTrue($view instanceof DataSourceViewInterface);
+        $this->assertInstanceOf(DataSourceViewInterface::class, $view);
     }
 
     /**
@@ -423,19 +422,19 @@ class DataSourceTest extends \PHPUnit_Framework_TestCase
         $extension
             ->expects($this->once())
             ->method('loadDriverExtensions')
-            ->will($this->returnValue([$driverExtension]))
+            ->willReturn([$driverExtension])
         ;
 
         $driverExtension
             ->expects($this->once())
             ->method('getExtendedDriverTypes')
-            ->will($this->returnValue(['fake']))
+            ->willReturn(['fake'])
         ;
 
         $driver
             ->expects($this->once())
             ->method('getType')
-            ->will($this->returnValue('fake'))
+            ->willReturn('fake')
         ;
 
         $driver
@@ -462,7 +461,7 @@ class DataSourceTest extends \PHPUnit_Framework_TestCase
         $driver
             ->expects($this->any())
             ->method('getResult')
-            ->will($this->returnValue($testResult))
+            ->willReturn($testResult)
         ;
 
         $datasource->bindParameters([]);
@@ -482,7 +481,7 @@ class DataSourceTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return DriverInterface|MockObject
      */
     private function createDriverMock()
     {

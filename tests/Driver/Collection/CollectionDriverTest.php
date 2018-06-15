@@ -322,7 +322,7 @@ class CollectionDriverTest extends TestCase
         $field
             ->expects($this->any())
             ->method('getName')
-            ->will($this->returnValue('example'))
+            ->willReturn('example')
         ;
 
         $datasource->addField($field);
