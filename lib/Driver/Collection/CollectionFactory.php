@@ -9,8 +9,10 @@
 
 namespace FSi\Component\DataSource\Driver\Collection;
 
+use Doctrine\Common\Collections\Selectable;
 use FSi\Component\DataSource\Driver\DriverFactoryInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Traversable;
 
 /**
  * {@inheritdoc}
@@ -69,6 +71,10 @@ class CollectionFactory implements DriverFactoryInterface
             'collection' => [],
         ]);
 
-        $this->optionsResolver->setAllowedTypes('collection', 'array');
+        $this->optionsResolver->setAllowedTypes('collection', [
+            'array',
+            Traversable::class,
+            Selectable::class
+        ]);
     }
 }

@@ -258,7 +258,7 @@ class DataSource implements DataSourceInterface
         }
 
         if (!is_object($result)) {
-            throw new DataSourceException('Returned result must be object implementing both Conutable and IteratorAggregate.');
+            throw new DataSourceException('Returned result must be object implementing both Countable and IteratorAggregate.');
         }
 
         if ((!$result instanceof \IteratorAggregate) || (!$result instanceof \Countable)) {

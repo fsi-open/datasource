@@ -14,6 +14,7 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Tools\SchemaTool;
 use Doctrine\ORM\Tools\Setup;
+use FSi\Component\DataSource\DataSource;
 use FSi\Component\DataSource\DataSourceFactory;
 use FSi\Component\DataSource\DataSourceInterface;
 use FSi\Component\DataSource\Driver\Collection\CollectionFactory;
@@ -27,20 +28,15 @@ use FSi\Component\DataSource\Field\FieldTypeInterface;
 use FSi\Component\DataSource\Tests\Fixtures\Category;
 use FSi\Component\DataSource\Tests\Fixtures\Group;
 use FSi\Component\DataSource\Tests\Fixtures\News;
+use PHPUnit\Framework\TestCase;
 
-/**
- * Tests for Doctrine driver.
- */
-class CollectionDriverTest extends \PHPUnit_Framework_TestCase
+class CollectionDriverTest extends TestCase
 {
     /**
      * @var EntityManager
      */
     private $em;
 
-    /**
-     * {@inheritdoc}
-     */
     public function setUp()
     {
         //The connection configuration.
@@ -62,18 +58,9 @@ class CollectionDriverTest extends \PHPUnit_Framework_TestCase
         $this->em = $em;
     }
 
-    /**
-     * Test number field when comparing with 0 value.
-     */
-    public function testComparingWithZero()
+    public function testComparingWithZero(): void
     {
-        $datasourceFactory = $this->getDataSourceFactory();
-        $driverOptions = [
-            'collection' => $this->em->getRepository(News::class)->findAll(),
-        ];
-
-        $datasource = $datasourceFactory
-            ->createDataSource('collection', $driverOptions, 'datasource')
+        $datasource = $this->prepareArrayDataSource()
             ->addField('id', 'number', 'eq');
 
         $parameters = [
@@ -85,296 +72,251 @@ class CollectionDriverTest extends \PHPUnit_Framework_TestCase
         ];
         $datasource->bindParameters($parameters);
         $result = $datasource->getResult();
-        $this->assertEquals(0, count($result));
+        $this->assertCount(0, $result);
     }
 
-    /**
-     * General test for DataSource wtih CollectionDriver in basic configuration.
-     */
-    public function testGeneral()
+    public function testSelectableSource(): void
     {
-        $datasourceFactory = $this->getDataSourceFactory();
+        $this->driverTests($this->prepareSelectableDataSource());
+    }
 
-        $driverFactory = $this->getCollectionFactory();
-        $driver = $driverFactory->createDriver();
+    public function testArraySource(): void
+    {
+        $this->driverTests($this->prepareArrayDataSource());
+    }
 
-        $datasources = [];
-
-        $driverOptions = [
-            'collection' => $this->em->getRepository(News::class)->findAll(),
-        ];
-
-        $datasources[] = $datasourceFactory->createDataSource('collection', $driverOptions, 'datasource');
-
-        $qb = $this->em
-            ->createQueryBuilder()
-            ->select('n')
-            ->from(News::class, 'n')
+    private function driverTests(DataSource $datasource): void
+    {
+        $datasource
+            ->addField('title', 'text', 'contains')
+            ->addField('author', 'text', 'contains')
+            ->addField('created', 'datetime', 'between', [
+                'field' => 'create_date',
+            ])
         ;
 
-        $driverOptions = [
-            'collection' => $qb->getQuery()->execute()
+        $result1 = $datasource->getResult();
+        $this->assertCount(100, $result1);
+        $datasource->createView();
+
+        //Checking if result cache works.
+        $this->assertSame($result1, $datasource->getResult());
+
+        $parameters = [
+            $datasource->getName() => [
+                DataSourceInterface::PARAMETER_FIELDS => [
+                    'author' => 'domain1.com',
+                ],
+            ],
+        ];
+        $datasource->bindParameters($parameters);
+        $result2 = $datasource->getResult();
+
+        //Checking cache.
+        $this->assertSame($result2, $datasource->getResult());
+
+        $this->assertCount(50, $result2);
+        $this->assertNotSame($result1, $result2);
+        unset($result1, $result2);
+
+        $this->assertEquals($parameters, $datasource->getParameters());
+
+        $datasource->setMaxResults(20);
+        $parameters = [
+            $datasource->getName() => [
+                PaginationExtension::PARAMETER_PAGE => 1,
+            ],
         ];
 
-        $datasources[] = $datasourceFactory->createDataSource('collection', $driverOptions, 'datasource2');
+        $datasource->bindParameters($parameters);
+        $result = $datasource->getResult();
+        $this->assertCount(100, $result);
+        $this->assertCount(20, iterator_to_array($result));
 
-        foreach ($datasources as $datasource) {
-            $datasource
-                ->addField('title', 'text', 'contains')
-                ->addField('author', 'text', 'contains')
-                ->addField('created', 'datetime', 'between', [
-                    'field' => 'create_date',
-                ])
-            ;
-
-            $result1 = $datasource->getResult();
-            $this->assertEquals(100, count($result1));
-            $view1 = $datasource->createView();
-
-            //Checking if result cache works.
-            $this->assertSame($result1, $datasource->getResult());
-
-            $parameters = [
-                $datasource->getName() => [
-                    DataSourceInterface::PARAMETER_FIELDS => [
-                        'author' => 'domain1.com',
+        $parameters = [
+            $datasource->getName() => [
+                DataSourceInterface::PARAMETER_FIELDS => [
+                    'author' => 'domain1.com',
+                    'title' => 'title3',
+                    'created' => [
+                        'from' => new DateTime(date('Y:m:d H:i:s', 35 * 24 * 60 * 60)),
                     ],
                 ],
-            ];
-            $datasource->bindParameters($parameters);
-            $result2 = $datasource->getResult();
+            ],
+        ];
+        $datasource->bindParameters($parameters);
+        $datasource->createView();
+        $result = $datasource->getResult();
+        $this->assertCount(2, $result);
 
-            //Checking cache.
-            $this->assertSame($result2, $datasource->getResult());
-
-            $this->assertEquals(50, count($result2));
-            $this->assertNotSame($result1, $result2);
-            unset($result1);
-            unset($result2);
-
-            $this->assertEquals($parameters, $datasource->getParameters());
-
-            $datasource->setMaxResults(20);
-            $parameters = [
-                $datasource->getName() => [
-                    PaginationExtension::PARAMETER_PAGE => 1,
+        $parameters = [
+            $datasource->getName() => [
+                DataSourceInterface::PARAMETER_FIELDS => [
+                    'author' => 'author3@domain2.com',
                 ],
-            ];
+            ]
+        ];
+        $datasource->bindParameters($parameters);
+        $datasource->createView();
+        $result = $datasource->getResult();
+        $this->assertCount(1, $result);
 
-            $datasource->bindParameters($parameters);
-            $result = $datasource->getResult();
-            $this->assertEquals(100, count($result));
-            $i = 0;
-            foreach ($result as $item) {
-                $i++;
-            }
-            $this->assertEquals(20, $i);
-
-            $parameters = [
-                $datasource->getName() => [
-                    DataSourceInterface::PARAMETER_FIELDS => [
-                        'author' => 'domain1.com',
-                        'title' => 'title3',
-                        'created' => [
-                            'from' => new DateTime(date("Y:m:d H:i:s", 35 * 24 * 60 * 60)),
-                        ],
-                    ],
+        //Checking sorting.
+        $parameters = [
+            $datasource->getName() => [
+                OrderingExtension::PARAMETER_SORT => [
+                    'title' => 'desc'
                 ],
-            ];
-            $datasource->bindParameters($parameters);
-            $view = $datasource->createView();
-            $result = $datasource->getResult();
-            $this->assertEquals(2, count($result));
+            ],
+        ];
 
-            $parameters = [
-                $datasource->getName() => [
-                    DataSourceInterface::PARAMETER_FIELDS => [
-                        'author' => 'author3@domain2.com',
-                    ],
-                ]
-            ];
-            $datasource->bindParameters($parameters);
-            $view = $datasource->createView();
-            $result = $datasource->getResult();
-            $this->assertEquals(1, count($result));
+        $datasource->bindParameters($parameters);
+        $this->assertEquals('title99', $datasource->getResult()->first()->getTitle());
 
-            //Checking sorting.
-            $parameters = [
-                $datasource->getName() => [
-                    OrderingExtension::PARAMETER_SORT => [
-                        'title' => 'desc'
-                    ],
+        //Checking sorting.
+        $parameters = [
+            $datasource->getName() => [
+                OrderingExtension::PARAMETER_SORT => [
+                    'author' => 'asc',
+                    'title' => 'desc',
                 ],
-            ];
+            ],
+        ];
 
-            $datasource->bindParameters($parameters);
-            foreach ($datasource->getResult() as $news) {
-                $this->assertEquals('title99', $news->getTitle());
-                break;
-            }
+        $datasource->bindParameters($parameters);
+        $this->assertEquals('author0@domain1.com', $datasource->getResult()->first()->getAuthor());
 
-            //Checking sorting.
-            $parameters = [
-                $datasource->getName() => [
-                    OrderingExtension::PARAMETER_SORT => [
-                        'author' => 'asc',
-                        'title' => 'desc',
-                    ],
+        //Test for clearing fields.
+        $datasource->clearFields();
+        $datasource->setMaxResults(null);
+        $parameters = [
+            $datasource->getName() => [
+                DataSourceInterface::PARAMETER_FIELDS => [
+                    'author' => 'domain1.com',
                 ],
-            ];
+            ],
+        ];
 
-            $datasource->bindParameters($parameters);
-            foreach ($datasource->getResult() as $news) {
-                $this->assertEquals('author0@domain1.com', $news->getAuthor());
-                break;
-            }
+        //Since there are no fields now, we should have all of entities.
+        $datasource->bindParameters($parameters);
+        $result = $datasource->getResult();
+        $this->assertCount(100, $result);
 
-            //Test for clearing fields.
-            $datasource->clearFields();
-            $datasource->setMaxResults(null);
-            $parameters = [
-                $datasource->getName() => [
-                    DataSourceInterface::PARAMETER_FIELDS => [
-                        'author' => 'domain1.com',
-                    ],
+        //Test boolean field
+        $datasource
+            ->addField('active', 'boolean', 'eq')
+        ;
+        $datasource->setMaxResults(null);
+        $parameters = [
+            $datasource->getName() => [
+                DataSourceInterface::PARAMETER_FIELDS => [
+                    'active' => 1,
                 ],
-            ];
+            ]
+        ];
 
-            //Since there are no fields now, we should have all of entities.
-            $datasource->bindParameters($parameters);
-            $result = $datasource->getResult();
-            $this->assertEquals(100, count($result));
+        $datasource->bindParameters($parameters);
+        $datasource->createView();
+        $result = $datasource->getResult();
+        $this->assertCount(50, $result);
 
-            //Test boolean field
-            $datasource
-                ->addField('active', 'boolean', 'eq')
-            ;
-            $datasource->setMaxResults(null);
-            $parameters = [
-                $datasource->getName() => [
-                    DataSourceInterface::PARAMETER_FIELDS => [
-                        'active' => 1,
-                    ],
-                ]
-            ];
-
-            $datasource->bindParameters($parameters);
-            $view = $datasource->createView();
-            $result = $datasource->getResult();
-            $this->assertEquals(50, count($result));
-
-            $parameters = [
-                $datasource->getName() => [
-                    DataSourceInterface::PARAMETER_FIELDS => [
-                        'active' => 0,
-                    ],
-                ]
-            ];
-
-            $datasource->bindParameters($parameters);
-            $view = $datasource->createView();
-            $result = $datasource->getResult();
-            $this->assertEquals(50, count($result));
-
-            $parameters = [
-                $datasource->getName() => [
-                    DataSourceInterface::PARAMETER_FIELDS => [
-                        'active' => true,
-                    ],
-                ]
-            ];
-
-            $datasource->bindParameters($parameters);
-            $view = $datasource->createView();
-            $result = $datasource->getResult();
-            $this->assertEquals(50, count($result));
-
-            $parameters = [
-                $datasource->getName() => [
-                    DataSourceInterface::PARAMETER_FIELDS => [
-                        'active' => false,
-                    ],
-                ]
-            ];
-
-            $datasource->bindParameters($parameters);
-            $view = $datasource->createView();
-            $result = $datasource->getResult();
-            $this->assertEquals(50, count($result));
-
-            $parameters = [
-                $datasource->getName() => [
-                    DataSourceInterface::PARAMETER_FIELDS => [
-                        'active' => null,
-                    ],
-                ]
-            ];
-
-            $datasource->bindParameters($parameters);
-            $view = $datasource->createView();
-            $result = $datasource->getResult();
-            $this->assertEquals(100, count($result));
-
-            $parameters = [
-                $datasource->getName() => [
-                    OrderingExtension::PARAMETER_SORT => [
-                        'active' => 'desc'
-                    ],
+        $parameters = [
+            $datasource->getName() => [
+                DataSourceInterface::PARAMETER_FIELDS => [
+                    'active' => 0,
                 ],
-            ];
+            ]
+        ];
 
-            $datasource->bindParameters($parameters);
-            foreach ($datasource->getResult() as $news) {
-                $this->assertEquals(true, $news->isActive());
-                break;
-            }
+        $datasource->bindParameters($parameters);
+        $datasource->createView();
+        $result = $datasource->getResult();
+        $this->assertCount(50, $result);
 
-            $parameters = [
-                $datasource->getName() => [
-                    OrderingExtension::PARAMETER_SORT => [
-                        'active' => 'asc'
-                    ],
+        $parameters = [
+            $datasource->getName() => [
+                DataSourceInterface::PARAMETER_FIELDS => [
+                    'active' => true,
                 ],
-            ];
+            ]
+        ];
 
-            $datasource->bindParameters($parameters);
-            foreach ($datasource->getResult() as $news) {
-                $this->assertEquals(false, $news->isActive());
-                break;
-            }
+        $datasource->bindParameters($parameters);
+        $datasource->createView();
+        $result = $datasource->getResult();
+        $this->assertCount(50, $result);
 
-            // test 'notIn' comparison
-            $datasource->addField('title_is_not', 'text', 'notIn', [
-                'field' => 'title',
-            ]);
-
-            $parameters = [
-                $datasource->getName() => [
-                    DataSourceInterface::PARAMETER_FIELDS => [
-                        'title_is_not' => ['title1', 'title2', 'title3']
-                    ],
+        $parameters = [
+            $datasource->getName() => [
+                DataSourceInterface::PARAMETER_FIELDS => [
+                    'active' => false,
                 ],
-            ];
+            ]
+        ];
 
-            $datasource->bindParameters($parameters);
-            $view = $datasource->createView();
-            $result = $datasource->getResult();
-            $this->assertEquals(97, count($result));
-        }
+        $datasource->bindParameters($parameters);
+        $datasource->createView();
+        $result = $datasource->getResult();
+        $this->assertCount(50, $result);
+
+        $parameters = [
+            $datasource->getName() => [
+                DataSourceInterface::PARAMETER_FIELDS => [
+                    'active' => null,
+                ],
+            ]
+        ];
+
+        $datasource->bindParameters($parameters);
+        $datasource->createView();
+        $result = $datasource->getResult();
+        $this->assertCount(100, $result);
+
+        $parameters = [
+            $datasource->getName() => [
+                OrderingExtension::PARAMETER_SORT => [
+                    'active' => 'desc'
+                ],
+            ],
+        ];
+
+        $datasource->bindParameters($parameters);
+        $this->assertTrue($datasource->getResult()->first()->isActive());
+
+        $parameters = [
+            $datasource->getName() => [
+                OrderingExtension::PARAMETER_SORT => [
+                    'active' => 'asc'
+                ],
+            ],
+        ];
+
+        $datasource->bindParameters($parameters);
+        $this->assertFalse(false, $datasource->getResult()->first()->isActive());
+
+
+        // test 'notIn' comparison
+        $datasource->addField('title_is_not', 'text', 'notIn', [
+            'field' => 'title',
+        ]);
+
+        $parameters = [
+            $datasource->getName() => [
+                DataSourceInterface::PARAMETER_FIELDS => [
+                    'title_is_not' => ['title1', 'title2', 'title3']
+                ],
+            ],
+        ];
+
+        $datasource->bindParameters($parameters);
+        $datasource->createView();
+        $result = $datasource->getResult();
+        $this->assertCount(97, $result);
     }
 
-    public function testExceptions()
+    public function testExceptions(): void
     {
-        $datasourceFactory = $this->getDataSourceFactory();
-
-        $driverFactory = $this->getCollectionFactory();
-        $driver = $driverFactory->createDriver();
-
-        $driverOptions = [
-            'collection' => $this->em->getRepository(News::class)->findAll(),
-        ];
-
-        $datasource = $datasourceFactory->createDataSource('collection', $driverOptions, 'datasource');
+        $datasource = $this->prepareArrayDataSource();
         $field = $this->createMock(FieldTypeInterface::class);
 
         $field
@@ -385,35 +327,25 @@ class CollectionDriverTest extends \PHPUnit_Framework_TestCase
 
         $datasource->addField($field);
 
-        $this->setExpectedException(CollectionDriverException::class);
-        $result1 = $datasource->getResult();
+        $this->expectException(CollectionDriverException::class);
+        $datasource->getResult();
     }
 
-    public function testExceptions2()
+    public function testExceptions2(): void
     {
-        $datasourceFactory = $this->getDataSourceFactory();
-
         $driverFactory = $this->getCollectionFactory();
         $driver = $driverFactory->createDriver();
 
-        $this->setExpectedException(CollectionDriverException::class);
+        $this->expectException(CollectionDriverException::class);
         $driver->getCriteria();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function tearDown()
     {
         unset($this->em);
     }
 
-    /**
-     * Return configured DoctrinFactory.
-     *
-     * @return CollectionFactory.
-     */
-    private function getCollectionFactory()
+    private function getCollectionFactory(): CollectionFactory
     {
         $extensions = [
             new CoreExtension(),
@@ -422,12 +354,7 @@ class CollectionDriverTest extends \PHPUnit_Framework_TestCase
         return new CollectionFactory($extensions);
     }
 
-    /**
-     * Return configured DataSourceFactory.
-     *
-     * @return DataSourceFactory
-     */
-    private function getDataSourceFactory()
+    private function getDataSourceFactory(): DataSourceFactory
     {
         $driverFactoryManager = new DriverFactoryManager([
             $this->getCollectionFactory()
@@ -441,10 +368,30 @@ class CollectionDriverTest extends \PHPUnit_Framework_TestCase
         return new DataSourceFactory($driverFactoryManager, $extensions);
     }
 
-    /**
-     * @param EntityManagerInterface $em
-     */
-    private function load(EntityManagerInterface $em)
+    private function prepareSelectableDataSource(): DataSource
+    {
+        $driverOptions = [
+            'collection' => $this->em->getRepository(News::class),
+        ];
+
+        return $this->getDataSourceFactory()->createDataSource('collection', $driverOptions, 'datasource1');
+    }
+
+    private function prepareArrayDataSource(): DataSource
+    {
+        $driverOptions = [
+            'collection' => $this->em
+                ->createQueryBuilder()
+                ->select('n')
+                ->from(News::class, 'n')
+                ->getQuery()
+                ->execute()
+        ];
+
+        return $this->getDataSourceFactory()->createDataSource('collection', $driverOptions, 'datasource2');
+    }
+
+    private function load(EntityManagerInterface $em): void
     {
         //Injects 5 categories.
         $categories = [];
@@ -470,7 +417,7 @@ class CollectionDriverTest extends \PHPUnit_Framework_TestCase
             $news->setTitle('title'.$i);
 
             //Half of entities will have different author and content.
-            if ($i % 2 == 0) {
+            if ($i % 2 === 0) {
                 $news->setAuthor('author'.$i.'@domain1.com');
                 $news->setShortContent('Lorem ipsum.');
                 $news->setContent('Content lorem ipsum.');
@@ -482,8 +429,8 @@ class CollectionDriverTest extends \PHPUnit_Framework_TestCase
             }
 
             //Each entity has different date of creation and one of four hours of creation.
-            $createDate = new DateTime(date("Y:m:d H:i:s", $i * 24 * 60 * 60));
-            $createTime = new DateTime(date("H:i:s", (($i % 4) + 1 ) * 60 * 60));
+            $createDate = new DateTime(date('Y:m:d H:i:s', $i * 24 * 60 * 60));
+            $createTime = new DateTime(date('H:i:s', (($i % 4) + 1 ) * 60 * 60));
 
             $news->setCreateDate($createDate);
             $news->setCreateTime($createTime);

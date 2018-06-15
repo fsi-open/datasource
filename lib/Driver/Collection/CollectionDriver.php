@@ -26,9 +26,9 @@ class CollectionDriver extends DriverAbstract
 
     /**
      * @param array $extensions
-     * @param array $collection
+     * @param $collection
      */
-    public function __construct(array $extensions, array $collection)
+    public function __construct(array $extensions, $collection)
     {
         parent::__construct($extensions);
         $this->collection = $collection;
@@ -58,7 +58,9 @@ class CollectionDriver extends DriverAbstract
     {
         foreach ($fields as $field) {
             if (!$field instanceof CollectionFieldInterface) {
-                throw new CollectionDriverException(sprintf('All fields must be instances of FSi\Component\DataSource\Driver\Collection\CollectionFieldInterface.'));
+                throw new CollectionDriverException(
+                    sprintf('All fields must be instances of %s', CollectionFieldInterface::class)
+                );
             }
 
             $field->buildCriteria($this->currentCriteria);
@@ -82,7 +84,7 @@ class CollectionDriver extends DriverAbstract
      */
     public function getCriteria()
     {
-        if (!isset($this->currentCriteria)) {
+        if ($this->currentCriteria === null) {
             throw new CollectionDriverException('Criteria is accessible only during preGetResult event.');
         }
 
