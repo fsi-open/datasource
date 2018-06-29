@@ -18,9 +18,14 @@ class CollectionDriver extends DriverAbstract
     private $collection;
 
     /**
+     * @var Criteria
+     */
+    private $baseCriteria;
+
+    /**
      * Criteria available during preGetResult event.
      *
-     * @var \Doctrine\Common\Collections\Criteria
+     * @var Criteria
      */
     private $currentCriteria;
 
@@ -28,10 +33,12 @@ class CollectionDriver extends DriverAbstract
      * @param array $extensions
      * @param $collection
      */
-    public function __construct(array $extensions, $collection)
+    public function __construct(array $extensions, $collection, ?Criteria $criteria = null)
     {
         parent::__construct($extensions);
+
         $this->collection = $collection;
+        $this->baseCriteria = $criteria ?? Criteria::create();
     }
 
     /**
@@ -44,7 +51,7 @@ class CollectionDriver extends DriverAbstract
 
     protected function initResult()
     {
-        $this->currentCriteria = new Criteria();
+        $this->currentCriteria = clone $this->baseCriteria;
     }
 
     /**
@@ -80,7 +87,7 @@ class CollectionDriver extends DriverAbstract
      * If criteria is set to null (so when getResult method is NOT executed at the moment) exception is throwed.
      *
      * @throws Exception\CollectionDriverException
-     * @return \Doctrine\Common\Collections\Criteria
+     * @return Criteria
      */
     public function getCriteria()
     {

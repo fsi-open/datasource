@@ -10,6 +10,7 @@
 namespace FSi\Component\DataSource\Tests\Driver\Doctrine;
 
 use DateTime;
+use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Tools\SchemaTool;
@@ -184,7 +185,7 @@ class CollectionDriverTest extends TestCase
         ];
 
         $datasource->bindParameters($parameters);
-        $this->assertEquals('author0@domain1.com', $datasource->getResult()->first()->getAuthor());
+        $this->assertEquals('author99@domain2.com', $datasource->getResult()->first()->getAuthor());
 
         //Test for clearing fields.
         $datasource->clearFields();
@@ -281,7 +282,7 @@ class CollectionDriverTest extends TestCase
         ];
 
         $datasource->bindParameters($parameters);
-        $this->assertTrue($datasource->getResult()->first()->isActive());
+        $this->assertFalse($datasource->getResult()->first()->isActive());
 
         $parameters = [
             $datasource->getName() => [
@@ -372,6 +373,7 @@ class CollectionDriverTest extends TestCase
     {
         $driverOptions = [
             'collection' => $this->em->getRepository(News::class),
+            'criteria' => Criteria::create()->orderBy(['title' => Criteria::ASC]),
         ];
 
         return $this->getDataSourceFactory()->createDataSource('collection', $driverOptions, 'datasource1');
@@ -385,7 +387,8 @@ class CollectionDriverTest extends TestCase
                 ->select('n')
                 ->from(News::class, 'n')
                 ->getQuery()
-                ->execute()
+                ->execute(),
+            'criteria' => Criteria::create()->orderBy(['title' => Criteria::ASC]),
         ];
 
         return $this->getDataSourceFactory()->createDataSource('collection', $driverOptions, 'datasource2');

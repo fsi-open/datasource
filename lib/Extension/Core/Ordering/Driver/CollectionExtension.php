@@ -58,7 +58,7 @@ class CollectionExtension extends DriverExtension implements EventSubscriberInte
 
         $driver = $event->getDriver();
         $c = $driver->getCriteria();
-        $orderings = [];
+        $orderings = $c->getOrderings();
         foreach ($sortedFields as $fieldName => $direction) {
             $field = $fields[$fieldName];
             $fieldName = $field->hasOption('field')?$field->getOption('field'):$field->getName();

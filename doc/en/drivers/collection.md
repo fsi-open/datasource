@@ -5,7 +5,7 @@ This driver allows DataSource to operate on data objects contained in:
 * [\Traversable](http://php.net/manual/en/class.traversable.php) object
 * [\Doctrine\Common\Collections\Selectable](https://github.com/doctrine/collections/blob/ab12b39de988ee3d80bf2d5f16b1161ee5fb2529/lib/Doctrine/Common/Collections/Selectable.php) object
 
-The purpose of this driver is to use DataSource's abilities (filtering, sorting, pagination) on data coming 
+The purpose of this driver is to use DataSource's abilities (filtering, sorting, pagination) on data coming
 from source that natively doesn't support such operations.
 
 ## Setup ##
@@ -15,18 +15,20 @@ You can create driver manually from plain array of objects:
 ```php
 <?php
 
+use Doctrine\Common\Collections\Criteria;
 use FSi\Component\DataSource\Driver\Collection\CollectionDriver;
 use FSi\Component\DataSource\Driver\Collection\Extension\Core\CoreExtension;
 
 $driverExtensions = array(new CoreExtension());
+$baseCriteria = Criteria::create()->orderBy(['name' => Criteria::ASC]);
 
-$driver = new CollectionDriver($driverExtensions, $arrayOfObjects);
+$driver = new CollectionDriver($driverExtensions, $arrayOfObjects, $baseCriteria);
 ```
 
 or from `\Doctrine\Common\Collections\Selectable` object:
 
 ```php
-$driver = new CollectionDriver($driverExtensions, $this->em->getRepository(News::class));
+$driver = new CollectionDriver($driverExtensions, $this->em->getRepository(News::class), $baseCriteria);
 ```
 
 You can also use factory to create driver:
@@ -34,6 +36,7 @@ You can also use factory to create driver:
 ```php
 <?php
 
+use Doctrine\Common\Collections\Criteria;
 use FSi\Component\DataSource\Driver\Collection\CollectionFactory;
 use FSi\Component\DataSource\Driver\Collection\Extension\Core\CoreExtension;
 
@@ -44,7 +47,8 @@ $extensions = array(
 $driverExtensions = array(new CoreExtension());
 
 $driverFactory = new CollectionFactory($driverExtensions);
-$driver = $driverFactory->createDriver(['collection' => $arrayOfObjects]); // All drivers created this way will have same set of $driverExtensions loaded.
+$baseCriteria = Criteria::create()->orderBy(['name' => Criteria::ASC]);
+$driver = $driverFactory->createDriver(['collection' => $arrayOfObjects, 'criteria' => $baseCriteria]); // All drivers created this way will have same set of $driverExtensions loaded.
 
 ```
 
@@ -62,7 +66,7 @@ Provided field types:
 * ``datetime`` - allowed comparisons: eq, neq, lt, lte, gt, gte, in, nin (not in), between.
 * ``boolean`` - allowed comparisons: eq.
 
-Note: When using ``between`` comparison, you must bind parameters as array('from' => $value1, 'to' => $value2), 
+Note: When using ``between`` comparison, you must bind parameters as array('from' => $value1, 'to' => $value2),
 
 All fields allow by default to set option ``field`` which usage is explained below.
 
