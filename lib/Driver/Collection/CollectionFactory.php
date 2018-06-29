@@ -9,6 +9,7 @@
 
 namespace FSi\Component\DataSource\Driver\Collection;
 
+use Doctrine\Common\Collections\Criteria;
 use Doctrine\Common\Collections\Selectable;
 use FSi\Component\DataSource\Driver\DriverFactoryInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -59,7 +60,7 @@ class CollectionFactory implements DriverFactoryInterface
     {
         $options = $this->optionsResolver->resolve($options);
 
-        return new CollectionDriver($this->extensions, $options['collection']);
+        return new CollectionDriver($this->extensions, $options['collection'], $options['criteria']);
     }
 
     /**
@@ -68,6 +69,7 @@ class CollectionFactory implements DriverFactoryInterface
     private function initOptions()
     {
         $this->optionsResolver->setDefaults([
+            'criteria' => null,
             'collection' => [],
         ]);
 
@@ -76,5 +78,7 @@ class CollectionFactory implements DriverFactoryInterface
             Traversable::class,
             Selectable::class
         ]);
+
+        $this->optionsResolver->setAllowedTypes('criteria', ['null', Criteria::class]);
     }
 }
