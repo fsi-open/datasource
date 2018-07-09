@@ -35,28 +35,29 @@ class CollectionResult implements Countable, \IteratorAggregate, ArrayAccess
      */
     public function __construct($collection, Criteria $criteria)
     {
-        if ($collection instanceof Selectable) {
-            $collection = $collection->matching(new Criteria());
-        } elseif ($collection instanceof Traversable) {
-            $collection = new ArrayCollection(iterator_to_array($collection));
-        } elseif (\is_array($collection)) {
-            $collection = new ArrayCollection($collection);
-        } else {
-            throw new \InvalidArgumentException(
-                sprintf(
-                    'Provided collection type "%s" should be %s or %s or array',
-                    \is_object($collection) ? \get_class($collection) : \gettype($collection),
-                    Selectable::class,
-                    Traversable::class
-                )
-            );
+        if (false === $collection instanceof Selectable) {
+            if ($collection instanceof Traversable) {
+                $collection = new ArrayCollection(iterator_to_array($collection));
+            } elseif (\is_array($collection)) {
+                $collection = new ArrayCollection($collection);
+            } else {
+                throw new \InvalidArgumentException(
+                    sprintf(
+                        'Provided collection type "%s" should be %s or %s or array',
+                        \is_object($collection) ? \get_class($collection) : \gettype($collection),
+                        Selectable::class,
+                        Traversable::class
+                    )
+                );
+            }
         }
 
         $this->collection = $collection->matching($criteria);
 
-        $criteria->setFirstResult(null);
-        $criteria->setMaxResults(null);
-        $this->count = \count($collection->matching($criteria));
+        $countCriteria = clone $criteria;
+        $countCriteria->setFirstResult(null);
+        $countCriteria->setMaxResults(null);
+        $this->count = $collection->matching($countCriteria)->count();
     }
 
     public function count()
