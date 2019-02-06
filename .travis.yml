@@ -1,5 +1,9 @@
 language: php
 
+cache:
+  directories:
+    - vendor
+
 matrix:
   include:
     - php: 7.1
