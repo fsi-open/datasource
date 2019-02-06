@@ -2,7 +2,7 @@
     "name": "fsi/datasource",
     "type": "library",
     "description": "FSi DataSource Component",
-    "keywords": ["fsi", "component", "datasource"],
+    "keywords": ["component", "datasource", "fsi"],
     "license": "MIT",
     "authors": [
         {
@@ -37,7 +37,7 @@
         }
     },
     "config": {
-        "bin-dir": "bin"
+        "bin-dir": "vendor/bin"
     },
     "extra": {
         "branch-alias": {
