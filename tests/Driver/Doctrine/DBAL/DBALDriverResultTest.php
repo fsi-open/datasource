@@ -7,6 +7,8 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace FSi\Component\DataSource\Tests\Driver\Doctrine\DBAL;
 
 use Doctrine\DBAL\Connection;
@@ -20,12 +22,6 @@ class DBALDriverResultTest extends TestBase
      * @var Connection
      */
     private $connection;
-
-    protected function setUp()
-    {
-        $this->connection = $this->getMemoryConnection();
-        $this->loadTestData($this->connection);
-    }
 
     public function testTableResultCount()
     {
@@ -199,11 +195,11 @@ class DBALDriverResultTest extends TestBase
         $this->assertCount(6, $result);
         $this->assertCount(3, iterator_to_array($result));
 
-        $this->assertEquals(
-            $this->testDoctrineExtension->getQueryBuilder()->getSQL(),
-            'SELECT c.*, COUNT(n.id) newscount FROM category c LEFT JOIN news n'
-            . ' ON n.category_id = c.id GROUP BY c.id HAVING newscount > :newscount'
-            . ' LIMIT 3 OFFSET 0'
+        $this->assertRegExp(
+            '/^SELECT c\.\*, COUNT\(n\.id\) newscount FROM category c '
+            . 'LEFT JOIN news n ON n\.category_id = c\.id '
+            . 'GROUP BY c\.id HAVING newscount > :newscount LIMIT 3( OFFSET 0)?$/',
+            $this->testDoctrineExtension->getQueryBuilder()->getSQL()
         );
 
         $datasource->bindParameters([
@@ -216,10 +212,10 @@ class DBALDriverResultTest extends TestBase
         $this->assertCount(10, $result);
         $this->assertCount(3, iterator_to_array($result));
 
-        $this->assertEquals(
-            'SELECT c.*, COUNT(n.id) newscount FROM category c LEFT JOIN news n'
-            . ' ON n.category_id = c.id GROUP BY c.id HAVING newscount > :newscount'
-            . ' LIMIT 3 OFFSET 0',
+        $this->assertRegExp(
+            '/^SELECT c\.\*, COUNT\(n\.id\) newscount FROM category c '
+            . 'LEFT JOIN news n ON n\.category_id = c\.id '
+            . 'GROUP BY c\.id HAVING newscount > :newscount LIMIT 3( OFFSET 0)?$/',
             $this->testDoctrineExtension->getQueryBuilder()->getSQL()
         );
 
@@ -249,10 +245,10 @@ class DBALDriverResultTest extends TestBase
         $this->assertCount(3, $result);
         $this->assertCount(2, iterator_to_array($result));
 
-        $this->assertEquals(
-            'SELECT c.*, COUNT(n.id) newscount FROM category c LEFT JOIN news n'
-            . ' ON n.category_id = c.id GROUP BY c.id HAVING newscount BETWEEN'
-            . ' :newscount_from AND :newscount_to LIMIT 2 OFFSET 0',
+        $this->assertRegExp(
+            '/^SELECT c\.\*, COUNT\(n\.id\) newscount FROM category c '
+            . 'LEFT JOIN news n ON n\.category_id = c\.id '
+            . 'GROUP BY c\.id HAVING newscount BETWEEN :newscount_from AND :newscount_to LIMIT 2( OFFSET 0)?$/',
             $this->testDoctrineExtension->getQueryBuilder()->getSQL()
         );
     }
@@ -296,6 +292,12 @@ class DBALDriverResultTest extends TestBase
             'SELECT n FROM news n INNER JOIN category c ON n.category_id = c.id HAVING n.category IN (:dcValue1, :dcValue2)',
             $this->testDoctrineExtension->getQueryBuilder()->getSQL()
         );
+    }
+
+    protected function setUp()
+    {
+        $this->connection = $this->getMemoryConnection();
+        $this->loadTestData($this->connection);
     }
 
     private function getNewsDataSource()
