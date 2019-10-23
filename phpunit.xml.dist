@@ -4,7 +4,7 @@
          colors="true">
     <testsuites>
         <testsuite name="FSi Datasource Component Test Suite">
-            <directory>tests</directory>
+            <directory suffix="Test.php">tests</directory>
         </testsuite>
     </testsuites>
 </phpunit>

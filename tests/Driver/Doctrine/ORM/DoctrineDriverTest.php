@@ -43,7 +43,7 @@ class DoctrineDriverTest extends TestCase
     /**
      * {@inheritdoc}
      */
-    public function setUp()
+    protected function setUp()
     {
         //The connection configuration.
         $dbParams = [
@@ -699,7 +699,7 @@ class DoctrineDriverTest extends TestCase
     /**
      * {@inheritdoc}
      */
-    public function tearDown()
+    protected function tearDown()
     {
         unset($this->em);
     }

@@ -168,13 +168,13 @@ class DBALDriverTest extends TestBase
         $driver = new DBALDriver([new CoreExtension()], $this->connection, 'table');
         $this->assertTrue($driver->hasFieldType($type));
         $field = $driver->getFieldType($type);
-        $this->assertTrue($field instanceof FieldTypeInterface);
-        $this->assertTrue($field instanceof DBALFieldInterface);
+        $this->assertInstanceOf(FieldTypeInterface::class, $field);
+        $this->assertInstanceOf(DBALFieldInterface::class, $field);
 
         $this->assertTrue($field->getOptionsResolver()->isDefined('field'));
 
         $comparisons = $field->getAvailableComparisons();
-        $this->assertTrue(count($comparisons) > 0);
+        $this->assertGreaterThan(0, count($comparisons));
 
         foreach ($comparisons as $cmp) {
             $field = $driver->getFieldType($type);

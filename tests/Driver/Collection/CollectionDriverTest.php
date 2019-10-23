@@ -38,7 +38,7 @@ class CollectionDriverTest extends TestCase
      */
     private $em;
 
-    public function setUp()
+    protected function setUp()
     {
         //The connection configuration.
         $dbParams = [
@@ -341,7 +341,7 @@ class CollectionDriverTest extends TestCase
         $driver->getCriteria();
     }
 
-    public function tearDown()
+    protected function tearDown()
     {
         unset($this->em);
     }

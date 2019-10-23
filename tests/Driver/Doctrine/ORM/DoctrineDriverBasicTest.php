@@ -259,7 +259,7 @@ class DoctrineDriverBasicTest extends TestCase
         $this->assertTrue($field->getOptionsResolver()->isDefined('field'));
 
         $comparisons = $field->getAvailableComparisons();
-        $this->assertTrue(count($comparisons) > 0);
+        $this->assertGreaterThan(0, count($comparisons));
 
         foreach ($comparisons as $cmp) {
             $field = $driver->getFieldType($type);

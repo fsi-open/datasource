@@ -242,8 +242,7 @@ final class DataSourceViewTest extends TestCase
      */
     private function createDatasourceMock()
     {
-        return $this->getMockBuilder(DataSource::class)
-            ->setConstructorArgs([$this->createMock(DriverInterface::class)])
+        return $this->getMockBuilder(DataSourceInterface::class)
             ->getMock();
     }
 }

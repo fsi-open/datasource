@@ -100,6 +100,6 @@ class FieldViewTest extends TestCase
 
         $this->assertEquals(['option2' => null, 'option3' => 'value3', 'option4' => 'value4'], $view->getAttributes());
 
-        $this->assertEquals(null, $view->getAttribute('option5'));
+        $this->assertNull($view->getAttribute('option5'));
     }
 }

@@ -42,10 +42,10 @@ class DataSourceTest extends TestCase
         $driver = $this->createDriverMock();
 
         $datasource = new DataSource($driver, 'name1');
-        $this->assertEquals($datasource->getName(), 'name1');
+        $this->assertEquals('name1', $datasource->getName());
 
         $datasource = new DataSource($driver, 'name2');
-        $this->assertEquals($datasource->getName(), 'name2');
+        $this->assertEquals('name2', $datasource->getName());
     }
 
     /**
@@ -263,7 +263,7 @@ class DataSourceTest extends TestCase
         $datasource->bindParameters($firstData);
         $datasource->bindParameters($secondData);
 
-        $result = $datasource->getResult();
+        $datasource->getResult();
     }
 
     /**
@@ -313,8 +313,8 @@ class DataSourceTest extends TestCase
         $datasource->setMaxResults($max);
         $datasource->setFirstResult($first);
 
-        $this->assertEquals($datasource->getMaxResults(), $max);
-        $this->assertEquals($datasource->getFirstResult(), $first);
+        $this->assertEquals($max, $datasource->getMaxResults());
+        $this->assertEquals($first, $datasource->getFirstResult());
     }
 
     /**
@@ -382,7 +382,7 @@ class DataSourceTest extends TestCase
 
         $datasource = new DataSource($this->createDriverMock());
         $datasource->setFactory($factory);
-        $this->assertEquals($datasource->getFactory(), $factory);
+        $this->assertEquals($factory, $datasource->getFactory());
     }
 
     /**
