@@ -9,12 +9,14 @@
 
 namespace FSi\Component\DataSource;
 
+use ArrayIterator;
+use Doctrine\Common\Collections\ArrayCollection;
 use FSi\Component\DataSource\Exception\DataSourceViewException;
+use FSi\Component\DataSource\Field\FieldViewInterface;
 use FSi\Component\DataSource\Util\AttributesContainer;
+use InvalidArgumentException;
+use function count;
 
-/**
- * {@inheritdoc}
- */
 class DataSourceView extends AttributesContainer implements DataSourceViewInterface
 {
     /**
@@ -33,27 +35,20 @@ class DataSourceView extends AttributesContainer implements DataSourceViewInterf
     private $otherParameters = [];
 
     /**
-     * Array of field views.
-     *
      * @var array
      */
     private $fields = [];
 
     /**
-     * Fields iterator.
-     *
-     * @var \ArrayIterator
+     * @var ArrayIterator
      */
     private $iterator;
 
     /**
-     * @var \Doctrine\Common\Collections\ArrayCollection
+     * @var ArrayCollection
      */
     private $result;
 
-    /**
-     * @param \FSi\Component\DataSource\DataSourceInterface $datasource
-     */
     public function __construct(DataSourceInterface $datasource)
     {
         $this->name = $datasource->getName();
@@ -62,49 +57,31 @@ class DataSourceView extends AttributesContainer implements DataSourceViewInterf
         $this->result = $datasource->getResult();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getName()
     {
         return $this->name;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getParameters()
     {
         return $this->parameters;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getAllParameters()
     {
         return array_merge($this->otherParameters, $this->parameters);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getOtherParameters()
     {
         return $this->otherParameters;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function hasField($name)
     {
         return isset($this->fields[$name]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function removeField($name)
     {
         if (isset($this->fields[$name])) {
@@ -114,28 +91,20 @@ class DataSourceView extends AttributesContainer implements DataSourceViewInterf
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getField($name)
     {
-        if (!$this->hasField($name)) {
-            throw new DataSourceViewException(sprintf('There\'s no field with name "%s"', $name));
+        if (false === $this->hasField($name)) {
+            throw new DataSourceViewException("There's no field with name \"{$name}\"");
         }
+
         return $this->fields[$name];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getFields()
     {
         return $this->fields;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function clearFields()
     {
         $this->fields = [];
@@ -143,31 +112,28 @@ class DataSourceView extends AttributesContainer implements DataSourceViewInterf
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function addField(Field\FieldViewInterface $fieldView)
+    public function addField(FieldViewInterface $fieldView)
     {
         $name = $fieldView->getName();
         if ($this->hasField($name)) {
-            throw new DataSourceViewException(sprintf('There\'s already field with name "%s"', $name));
+            throw new DataSourceViewException("There's already field with name \"{$name}\"");
         }
+
         $this->fields[$name] = $fieldView;
         $fieldView->setDataSourceView($this);
         $this->iterator = null;
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setFields(array $fields)
     {
         $this->fields = [];
 
         foreach ($fields as $field) {
-            if (!$field instanceof Field\FieldViewInterface) {
-                throw new \InvalidArgumentException('Field must implement FSi\Component\DataSource\Field\FieldViewInterface');
+            if (false === $field instanceof FieldViewInterface) {
+                throw new InvalidArgumentException(
+                    sprintf('Field must implement %s', FieldViewInterface::class)
+                );
             }
 
             $this->fields[$field->getName()] = $field;
@@ -213,8 +179,6 @@ class DataSourceView extends AttributesContainer implements DataSourceViewInterf
     }
 
     /**
-     * Implementation of \ArrayAccess interface method.
-     *
      * In fact it does nothing - view shouldn't unset its fields in this way.
      *
      * @param mixed $offset
@@ -224,8 +188,6 @@ class DataSourceView extends AttributesContainer implements DataSourceViewInterf
     }
 
     /**
-     * Implementation of \Countable interface method.
-     *
      * @return integer
      */
     public function count()
@@ -234,88 +196,68 @@ class DataSourceView extends AttributesContainer implements DataSourceViewInterf
     }
 
     /**
-     * Implementation of \SeekableIterator interface method.
-     *
      * @param integer $position
      */
     public function seek($position)
     {
-        $this->checkIterator();
+        $this->initIterator();
 
         return $this->iterator->seek($position);
     }
 
     /**
-     * Implementation of \SeekableIterator interface method.
-     *
      * @return mixed
      */
     public function current()
     {
-        $this->checkIterator();
+        $this->initIterator();
 
         return $this->iterator->current();
     }
 
     /**
-     * Implementation of \SeekableIterator interface method.
-     *
      * @return mixed
      */
     public function key()
     {
-        $this->checkIterator();
+        $this->initIterator();
 
         return $this->iterator->key();
     }
 
-    /**
-     * Implementation of \SeekableIterator interface method.
-     */
     public function next()
     {
-        $this->checkIterator();
+        $this->initIterator();
 
         return $this->iterator->next();
     }
 
-    /**
-     * Implementation of \SeekableIterator interface method.
-     */
     public function rewind()
     {
-        $this->checkIterator();
+        $this->initIterator();
 
         return $this->iterator->rewind();
     }
 
     /**
-     * Implementation of \SeekableIterator interface method.
-     *
      * @return bool
      */
     public function valid()
     {
-        $this->checkIterator();
+        $this->initIterator();
 
         return $this->iterator->valid();
     }
 
-    /**
-     * Init iterator.
-     */
-    private function checkIterator()
-    {
-        if (!isset($this->iterator)) {
-            $this->iterator = new \ArrayIterator($this->fields);
-        }
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function getResult()
     {
         return $this->result;
+    }
+
+    private function initIterator()
+    {
+        if (!isset($this->iterator)) {
+            $this->iterator = new ArrayIterator($this->fields);
+        }
     }
 }

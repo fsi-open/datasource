@@ -9,6 +9,8 @@
 
 namespace FSi\Component\DataSource\Driver;
 
+use InvalidArgumentException;
+
 class DriverFactoryManager implements DriverFactoryManagerInterface
 {
     /**
@@ -18,24 +20,23 @@ class DriverFactoryManager implements DriverFactoryManagerInterface
 
     /**
      * @param array $factories
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     public function __construct($factories = [])
     {
         $this->factories = [];
 
         foreach ($factories as $factory) {
-            if (!$factory instanceof DriverFactoryInterface) {
-                throw new \InvalidArgumentException("Factory must implement \\FSi\\Component\\DataSource\\Driver\\DriverFactoryInterface");
+            if (false === $factory instanceof DriverFactoryInterface) {
+                throw new InvalidArgumentException(
+                    sprintf("Factory must implement %s", DriverFactoryInterface::class)
+                );
             }
 
             $this->addFactory($factory);
         }
     }
 
-    /**
-     * @param \FSi\Component\DataSource\Driver\DriverFactoryInterface $factory
-     */
     public function addFactory(DriverFactoryInterface $factory)
     {
         $this->factories[$factory->getDriverType()] = $factory;
@@ -43,7 +44,7 @@ class DriverFactoryManager implements DriverFactoryManagerInterface
 
     /**
      * @param string $driverType
-     * @return null|\FSi\Component\DataSource\Driver\DriverFactoryInterface
+     * @return null|DriverFactoryInterface
      */
     public function getFactory($driverType)
     {

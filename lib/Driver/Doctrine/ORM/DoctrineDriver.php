@@ -14,15 +14,12 @@ use Doctrine\ORM\QueryBuilder;
 use FSi\Component\DataSource\Driver\Doctrine\ORM\Exception\DoctrineDriverException;
 use FSi\Component\DataSource\Driver\DriverAbstract;
 
-/**
- * Driver to fetch data from databases using Doctrine.
- */
 class DoctrineDriver extends DriverAbstract
 {
     /**
      * Default alias for entity during building query when no alias is specified.
      */
-    const DEFAULT_ENTITY_ALIAS = 'e';
+    public const DEFAULT_ENTITY_ALIAS = 'e';
 
     /**
      * @var EntityManagerInterface
@@ -65,15 +62,20 @@ class DoctrineDriver extends DriverAbstract
      *
      * @throws DoctrineDriverException
      */
-    public function __construct($extensions, EntityManagerInterface $em, $entity, $alias = null, $useOutputWalkers = null)
-    {
+    public function __construct(
+        $extensions,
+        EntityManagerInterface $em,
+        $entity,
+        $alias = null,
+        $useOutputWalkers = null
+    ) {
         parent::__construct($extensions);
 
         $this->em = $em;
 
         if (isset($alias)) {
             $this->alias = (string) $alias;
-        } else if ($entity instanceof QueryBuilder) {
+        } elseif (true === $entity instanceof QueryBuilder) {
             $this->alias = $entity->getRootAlias();
         } else {
             $this->alias = self::DEFAULT_ENTITY_ALIAS;
@@ -126,9 +128,10 @@ class DoctrineDriver extends DriverAbstract
     public function buildResult($fields, $first, $max)
     {
         foreach ($fields as $field) {
-            if (!$field instanceof DoctrineFieldInterface) {
+            if (false === $field instanceof DoctrineFieldInterface) {
                 throw new DoctrineDriverException(sprintf(
-                    'All fields must be instances of FSi\Component\DataSource\Driver\Doctrine\ORM\DoctrineFieldInterface.'
+                    'All fields must be instances of %s.',
+                    DoctrineFieldInterface::class
                 ));
             }
 

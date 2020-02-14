@@ -9,33 +9,28 @@
 
 namespace FSi\Component\DataSource\Driver;
 
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use FSi\Component\DataSource\Exception\DataSourceException;
-use FSi\Component\DataSource\Field\FieldTypeInterface;
 use FSi\Component\DataSource\Field\FieldExtensionInterface;
+use FSi\Component\DataSource\Field\FieldTypeInterface;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-/**
- * {@inheritdoc}
- */
 abstract class DriverAbstractExtension implements DriverExtensionInterface, EventSubscriberInterface
 {
     /**
-     * Array of fields types.
-     *
      * @var array
      */
     private $fieldTypes;
 
     /**
-     * Array of fields extensions.
-     *
      * @var array
      */
     private $fieldTypesExtensions;
 
-    /**
-     * {@inheritdoc}
-     */
+    public static function getSubscribedEvents()
+    {
+        return [];
+    }
+
     public function hasFieldType($type)
     {
         if (!isset($this->fieldTypes)) {
@@ -45,9 +40,6 @@ abstract class DriverAbstractExtension implements DriverExtensionInterface, Even
         return isset($this->fieldTypes[$type]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getFieldType($type)
     {
         if (!isset($this->fieldTypes)) {
@@ -61,9 +53,6 @@ abstract class DriverAbstractExtension implements DriverExtensionInterface, Even
         return $this->fieldTypes[$type];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function hasFieldTypeExtensions($type)
     {
         if (!isset($this->fieldTypesExtensions)) {
@@ -73,9 +62,6 @@ abstract class DriverAbstractExtension implements DriverExtensionInterface, Even
         return isset($this->fieldTypesExtensions[$type]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getFieldTypeExtensions($type)
     {
         if (!isset($this->fieldTypesExtensions)) {
@@ -89,17 +75,16 @@ abstract class DriverAbstractExtension implements DriverExtensionInterface, Even
         return $this->fieldTypesExtensions[$type];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    public function loadSubscribers()
+    {
+        return [$this];
+    }
+
     protected function loadFieldTypesExtensions()
     {
         return [];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function loadFieldTypes()
     {
         return [];
@@ -108,7 +93,7 @@ abstract class DriverAbstractExtension implements DriverExtensionInterface, Even
     /**
      * Initializes every field type in extension.
      *
-     * @throws \FSi\Component\DataSource\Exception\DataSourceException
+     * @throws DataSourceException
      */
     private function initFieldsTypes()
     {
@@ -118,11 +103,17 @@ abstract class DriverAbstractExtension implements DriverExtensionInterface, Even
 
         foreach ($fieldTypes as $fieldType) {
             if (!$fieldType instanceof FieldTypeInterface) {
-                throw new DataSourceException(sprintf('Expected instance of FieldTypeInterface, "%s" given.', get_class($fieldType)));
+                throw new DataSourceException(sprintf(
+                    'Expected instance of %s, "%s" given.',
+                    FieldTypeInterface::class,
+                    get_class($fieldType)
+                ));
             }
 
             if (isset($this->fieldTypes[$fieldType->getType()])) {
-                throw new DataSourceException(sprintf('Error during field types loading. Name "%s" already in use.', $fieldType->getType()));
+                throw new DataSourceException(
+                    sprintf('Error during field types loading. Name "%s" already in use.', $fieldType->getType())
+                );
             }
 
             $this->fieldTypes[$fieldType->getType()] = $fieldType;
@@ -132,14 +123,18 @@ abstract class DriverAbstractExtension implements DriverExtensionInterface, Even
     /**
      * Initializes every field extension if extension.
      *
-     * @throws \FSi\Component\DataSource\Exception\DataSourceException
+     * @throws DataSourceException
      */
     private function initFieldTypesExtensions()
     {
         $fieldTypesExtensions = $this->loadFieldTypesExtensions();
         foreach ($fieldTypesExtensions as $extension) {
             if (!$extension instanceof FieldExtensionInterface) {
-                throw new DataSourceException(sprintf("Expected instance of FSi\Component\DataSource\Field\FieldExtensionInterface but %s got", get_class($extension)));
+                throw new DataSourceException(sprintf(
+                    "Expected instance of %s but %s got",
+                    FieldExtensionInterface::class,
+                    get_class($extension)
+                ));
             }
 
             $types = $extension->getExtendedFieldTypes();
@@ -150,21 +145,5 @@ abstract class DriverAbstractExtension implements DriverExtensionInterface, Even
                 $this->fieldTypesExtensions[$type][] = $extension;
             }
         }
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function loadSubscribers()
-    {
-        return [$this];
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedEvents()
-    {
-        return [];
     }
 }

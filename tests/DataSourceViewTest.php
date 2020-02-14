@@ -7,10 +7,12 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace FSi\Component\DataSource\Tests;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use FSi\Component\DataSource\DataSourceInterface;
+use FSi\Component\DataSource\DataSource;
 use FSi\Component\DataSource\DataSourceView;
 use FSi\Component\DataSource\Driver\DriverInterface;
 use FSi\Component\DataSource\Exception\DataSourceViewException;
@@ -18,10 +20,7 @@ use FSi\Component\DataSource\Field\FieldViewInterface;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-/**
- * Tests for DataSourceView.
- */
-class DataSourceViewTest extends TestCase
+final class DataSourceViewTest extends TestCase
 {
     /**
      * Checks creation of view.
@@ -239,11 +238,11 @@ class DataSourceViewTest extends TestCase
     }
 
     /**
-     * @return MockObject|DataSourceInterface
+     * @return MockObject|DataSource
      */
     private function createDatasourceMock()
     {
-        return $this->getMockBuilder(DataSourceInterface::class)
+        return $this->getMockBuilder(DataSource::class)
             ->setConstructorArgs([$this->createMock(DriverInterface::class)])
             ->getMock();
     }

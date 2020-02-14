@@ -15,13 +15,10 @@ use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-/**
- * {@inheritdoc}
- */
 class DoctrineFactory implements DriverFactoryInterface
 {
     /**
-     * @var \Doctrine\Common\Persistence\ManagerRegistry
+     * @var ManagerRegistry
      */
     private $registry;
 
@@ -33,7 +30,7 @@ class DoctrineFactory implements DriverFactoryInterface
     private $extensions;
 
     /**
-     * @var \Symfony\Component\OptionsResolver\OptionsResolver
+     * @var OptionsResolver
      */
     private $optionsResolver;
 
@@ -77,7 +74,7 @@ class DoctrineFactory implements DriverFactoryInterface
     /**
      * Initialize Options Resolvers for driver and datasource builder.
      *
-     * @throws \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
+     * @throws InvalidOptionsException
      */
     private function initOptions()
     {
@@ -95,7 +92,7 @@ class DoctrineFactory implements DriverFactoryInterface
         $this->optionsResolver->setAllowedTypes('em', ['null', 'string']);
         $this->optionsResolver->setAllowedTypes('useOutputWalkers', ['null', 'bool']);
 
-        $entityNormalizer = function(Options $options, $value) {
+        $entityNormalizer = function (Options $options, $value) {
             if (is_null($options['qb']) && is_null($value)) {
                 throw new InvalidOptionsException('You must specify at least one option, "qb" or "entity".');
             }
