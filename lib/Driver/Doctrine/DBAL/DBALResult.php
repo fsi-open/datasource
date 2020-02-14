@@ -9,11 +9,11 @@
 
 namespace FSi\Component\DataSource\Driver\Doctrine\DBAL;
 
+use Closure;
 use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Persistence\ManagerRegistry;
-use Doctrine\ORM\Tools\Pagination\Paginator as DoctrinePaginator;
-use FSi\Component\DataIndexer\DoctrineDataIndexer;
 use FSi\Component\DataSource\Driver\Doctrine\DBAL\Paginator;
+use InvalidArgumentException;
+use RuntimeException;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 
 class DBALResult extends ArrayCollection
@@ -24,13 +24,15 @@ class DBALResult extends ArrayCollection
     private $count;
 
     /**
-     * @param string|\Closure $indexField
+     * @param Paginator $paginator
+     * @param string|Closure $indexField
      */
     public function __construct(Paginator $paginator, $indexField)
     {
-        if (!is_string($indexField) && !$indexField instanceof \Closure) {
-            throw new \InvalidArgumentException(sprintf(
-                'indexField should be string or \Closure but is %s',
+        if (false === is_string($indexField) && false === $indexField instanceof Closure) {
+            throw new InvalidArgumentException(sprintf(
+                'indexField should be string or %s but is %s',
+                Closure::class,
                 is_object($indexField) ? 'an instance of ' . get_class($indexField) : gettype($indexField)
             ));
         }
@@ -40,19 +42,20 @@ class DBALResult extends ArrayCollection
         $data = $paginator->getIterator();
 
         $propertyAccessor = new PropertyAccessor();
-
-        if (count($data)) {
-            foreach ($data as $key => $element) {
+        if (0 !== $data->count()) {
+            foreach ($data as $element) {
                 if (is_string($indexField)) {
                     $index = $propertyAccessor->getValue($element, $indexField);
                 } else {
                     $index = $indexField($element);
                 }
-                if (is_null($index)) {
-                    throw new \RuntimeException('Index cannot be null');
+
+                if (null === $index) {
+                    throw new RuntimeException('Index cannot be null');
                 }
-                if (array_key_exists($index, $result)) {
-                    throw new \RuntimeException(sprintf('Duplicate index "%s"', $index));
+
+                if (true === array_key_exists($index, $result)) {
+                    throw new RuntimeException("'Duplicate index \"{$index}\"'");
                 }
 
                 $result[$index] = $element;

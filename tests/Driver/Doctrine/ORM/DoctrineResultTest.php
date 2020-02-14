@@ -7,15 +7,18 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace FSi\Component\DataSource\Tests\Driver\Doctrine\ORM;
 
-use FSi\Component\DataSource\Driver\Doctrine\ORM\DoctrineResult;
+use ArrayIterator;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\Tools\Pagination\Paginator;
+use FSi\Component\DataSource\Driver\Doctrine\ORM\DoctrineResult;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-class DoctrineResultTest extends TestCase
+final class DoctrineResultTest extends TestCase
 {
     public function testEmptyPaginator()
     {
@@ -24,9 +27,7 @@ class DoctrineResultTest extends TestCase
         /** @var MockObject|Paginator $paginator */
         $paginator = $this->createMock(Paginator::class);
 
-        $paginator->expects($this->any())
-            ->method('getIterator')
-            ->willReturn([]);
+        $paginator->expects($this->any())->method('getIterator')->willReturn(new ArrayIterator([]));
 
         $result = new DoctrineResult($registry, $paginator);
         $this->assertCount(0, $result);
@@ -41,10 +42,10 @@ class DoctrineResultTest extends TestCase
 
         $paginator->expects($this->any())
             ->method('getIterator')
-            ->will($this->returnValue([
+            ->will($this->returnValue(new ArrayIterator([
                 '0' => ['foo', 'bar'],
                 '1' => ['foo1', 'bar1']
-            ]));
+            ])));
 
         $result = new DoctrineResult($registry, $paginator);
         $this->assertSame($result['0'], ['foo', 'bar']);
