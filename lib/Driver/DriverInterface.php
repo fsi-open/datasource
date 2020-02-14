@@ -55,7 +55,8 @@ interface DriverInterface
     /**
      * Returns collection with result.
      *
-     * Returned object must implement interfaces Countable and IteratorAggregate. Count on this object must return amount
+     * Returned object must implement interfaces Countable and IteratorAggregate.
+     * Count on this object must return amount
      * of all available results.
      *
      * @param array $fields

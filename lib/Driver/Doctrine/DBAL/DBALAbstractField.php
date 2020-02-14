@@ -102,14 +102,14 @@ abstract class DBALAbstractField extends FieldAbstractType implements DBALFieldI
             ->setAllowedValues('clause', ['where', 'having'])
             ->setAllowedTypes('field', ['string', 'null'])
             ->setAllowedTypes('auto_alias', 'bool')
-            ->setNormalizer('field', function($options, $value) use ($field) {
+            ->setNormalizer('field', function ($options, $value) use ($field) {
                 if (!isset($value) && $field->getName()) {
                     return $field->getName();
                 } else {
                     return $value;
                 }
             })
-            ->setNormalizer('clause', function($options, $value) {
+            ->setNormalizer('clause', function ($options, $value) {
                 return strtolower($value);
             })
         ;

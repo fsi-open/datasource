@@ -9,25 +9,20 @@
 
 namespace FSi\Component\DataSource\Driver\Collection;
 
-use FSi\Component\DataSource\Driver\Collection\Exception\CollectionDriverException;
 use Doctrine\Common\Collections\Criteria;
+use FSi\Component\DataSource\Driver\Collection\Exception\CollectionDriverException;
 use FSi\Component\DataSource\Field\FieldAbstractType;
+use function count;
 
-/**
- * {@inheritdoc}
- */
 abstract class CollectionAbstractField extends FieldAbstractType implements CollectionFieldInterface
 {
-    /**
-     * {@inheritdoc}
-     */
     public function initOptions()
     {
         $field = $this;
         $this->getOptionsResolver()
             ->setDefined(['field'])
             ->setAllowedTypes('field', ['string', 'null'])
-            ->setNormalizer('field', function($options, $value) use ($field) {
+            ->setNormalizer('field', function ($options, $value) use ($field) {
                 if (!isset($value) && $field->getName()) {
                     return $field->getName();
                 } else {
@@ -37,9 +32,6 @@ abstract class CollectionAbstractField extends FieldAbstractType implements Coll
         ;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function buildCriteria(Criteria $c)
     {
         $data = $this->getCleanParameter();
@@ -54,8 +46,10 @@ abstract class CollectionAbstractField extends FieldAbstractType implements Coll
         $eb = Criteria::expr();
 
         if ($comparison == 'between') {
-            if (!is_array($data)) {
-                throw new CollectionDriverException('Fields with \'between\' comparison require to bind an array.');
+            if (false === is_array($data)) {
+                throw new CollectionDriverException(
+                    'Fields with \'between\' comparison require to bind an array.'
+                );
             }
 
             $from = count($data) ? array_shift($data) : null;
@@ -92,7 +86,9 @@ abstract class CollectionAbstractField extends FieldAbstractType implements Coll
         }
 
         if (in_array($comparison, ['in', 'nin', 'notIn']) && !is_array($data)) {
-            throw new CollectionDriverException('Fields with \'in\' and \'notIn\' comparisons require to bind an array.');
+            throw new CollectionDriverException(
+                'Fields with \'in\' and \'notIn\' comparisons require to bind an array.'
+            );
         }
 
         if (isset($type)) {
@@ -101,9 +97,6 @@ abstract class CollectionAbstractField extends FieldAbstractType implements Coll
         $c->andWhere($eb->$comparison($field, $data));
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getPHPType()
     {
         return null;

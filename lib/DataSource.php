@@ -9,93 +9,82 @@
 
 namespace FSi\Component\DataSource;
 
+use Countable;
 use FSi\Component\DataSource\Driver\DriverInterface;
+use FSi\Component\DataSource\Event\DataSourceEvent;
+use FSi\Component\DataSource\Event\DataSourceEvents;
 use FSi\Component\DataSource\Exception\DataSourceException;
 use FSi\Component\DataSource\Field\FieldTypeInterface;
+use IteratorAggregate;
 use Symfony\Component\EventDispatcher\EventDispatcher;
-use FSi\Component\DataSource\Event\DataSourceEvents;
-use FSi\Component\DataSource\Event\DataSourceEvent;
 
-/**
- * {@inheritdoc}
- */
 class DataSource implements DataSourceInterface
 {
     /**
-     * Driver.
-     *
-     * @var \FSi\Component\DataSource\Driver\DriverInterface
+     * @var DriverInterface
      */
     private $driver;
 
     /**
-     * Name of data source.
-     *
      * @var string
      */
     private $name;
 
     /**
-     * Fields of data source.
-     *
      * @var array
      */
     private $fields = [];
 
     /**
-     * Extensions of DataSource.
-     *
      * @var array
      */
     private $extensions = [];
 
     /**
-     * @var \FSi\Component\DataSource\DataSourceView
+     * @var DataSourceView
      */
     private $view;
 
     /**
-     * @var \FSi\Component\DataSource\DataSourceFactoryInterface
+     * @var DataSourceFactoryInterface
      */
     private $factory;
 
     /**
-     * Max results fetched at once.
-     *
      * @var int
      */
     private $maxResults;
 
     /**
-     * Offset for first result.
-     *
      * @var int
      */
     private $firstResult;
 
     /**
-     * Cache for methods that depends on fields data (cache is dropped whenever any of fields is dirty, or fields have changed).
+     * Cache for methods that depends on fields data (cache is dropped whenever
+     * any of fields is dirty, or fields have changed).
      *
      * @var array
      */
     private $cache = [];
 
     /**
-     * Flag set as true when fields or their data is modifying, or even new extension is added.
+     * Flag set as true when fields or their data is modifying, or even new
+     * extension is added.
      *
      * @var bool
      */
     private $dirty = true;
 
     /**
-     * @var \Symfony\Component\EventDispatcher\EventDispatcher
+     * @var EventDispatcher
      */
     private $eventDispatcher;
 
     /**
-     * @param \FSi\Component\DataSource\Driver\DriverInterface $driver
+     * @param DriverInterface $driver
      * @param string $name
-     * @throws \FSi\Component\DataSource\Exception\DataSourceException
+     * @throws DataSourceException
      */
     public function __construct(DriverInterface $driver, $name = 'datasource')
     {
@@ -239,8 +228,7 @@ class DataSource implements DataSourceInterface
     {
         $this->checkFieldsClarity();
 
-        if (
-            isset($this->cache['result'])
+        if (isset($this->cache['result'])
             && $this->cache['result']['maxresults'] == $this->getMaxResults()
             && $this->cache['result']['firstresult'] == $this->getFirstResult()
         ) {
@@ -257,12 +245,21 @@ class DataSource implements DataSourceInterface
             $field->setDirty(false);
         }
 
-        if (!is_object($result)) {
-            throw new DataSourceException('Returned result must be object implementing both Countable and IteratorAggregate.');
+        if (false === is_object($result)) {
+            throw new DataSourceException(sprintf(
+                'Returned result must be object implementing both %s and %s.',
+                Countable::class,
+                IteratorAggregate::class
+            ));
         }
 
-        if ((!$result instanceof \IteratorAggregate) || (!$result instanceof \Countable)) {
-            throw new DataSourceException(sprintf('Returned result must be both Countable and IteratorAggregate, instance of "%s" given.', get_class($result)));
+        if ((false === $result instanceof IteratorAggregate) || (false === $result instanceof Countable)) {
+            throw new DataSourceException(sprintf(
+                'Returned result must be both %s and %s, instance of "%s" given.',
+                Countable::class,
+                IteratorAggregate::class,
+                get_class($result)
+            ));
         }
 
         //PostGetResult event.
@@ -396,7 +393,7 @@ class DataSource implements DataSourceInterface
         $this->eventDispatcher->dispatch(DataSourceEvents::POST_GET_PARAMETERS, $event);
         $parameters = $event->getParameters();
 
-        $cleanfunc = function(array $array) use (&$cleanfunc) {
+        $cleanfunc = function (array $array) use (&$cleanfunc) {
             $newArray = [];
             foreach ($array as $key => $value) {
                 if (is_array($value)) {

@@ -10,17 +10,19 @@
 namespace FSi\Component\DataSource;
 
 /**
- * DataSource abstracts fetching data from various sources. For more information about usage please view README file.
+ * DataSource abstracts fetching data from various sources. For more information
+ * about usage please view README file.
  *
- * DataSource maintains communication with driver, manipulating fields (adding, removing, etc.), calling DataSource extensions events,
- * view creation and more. It's first and main interface client will communicate with.
+ * DataSource maintains communication with driver, manipulating fields (adding,
+ * removing, etc.), calling DataSource extensions events, view creation and more.
+ *  It's first and main interface client will communicate with.
  */
 interface DataSourceInterface
 {
     /**
      * Key for fields data.
      */
-    const PARAMETER_FIELDS = 'fields';
+    public const PARAMETER_FIELDS = 'fields';
 
     /**
      * Returns name of the DataSource.

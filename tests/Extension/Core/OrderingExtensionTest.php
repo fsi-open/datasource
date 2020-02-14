@@ -7,22 +7,25 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace FSi\Component\DataSource\Tests\Extension\Core;
 
-use FSi\Component\DataSource\Extension\Core\Ordering\OrderingExtension;
-use FSi\Component\DataSource\Extension\Core\Ordering\Field\FieldExtension;
-use FSi\Component\DataSource\Extension\Core\Ordering\Driver\DriverExtension;
-use FSi\Component\DataSource\Field\FieldAbstractType;
+use FSi\Component\DataSource\DataSource;
+use FSi\Component\DataSource\DataSourceInterface;
+use FSi\Component\DataSource\Driver\DriverInterface;
 use FSi\Component\DataSource\Event\DataSourceEvent;
 use FSi\Component\DataSource\Event\FieldEvent;
-use PHPUnit\Framework\MockObject\MockObject;
-use PHPUnit\Framework\TestCase;
-use FSi\Component\DataSource\Driver\DriverInterface;
-use FSi\Component\DataSource\DataSourceInterface;
+use FSi\Component\DataSource\Extension\Core\Ordering\Driver\DriverExtension;
+use FSi\Component\DataSource\Extension\Core\Ordering\Field\FieldExtension;
+use FSi\Component\DataSource\Extension\Core\Ordering\OrderingExtension;
+use FSi\Component\DataSource\Field\FieldAbstractType;
 use FSi\Component\DataSource\Field\FieldTypeInterface;
 use FSi\Component\DataSource\Field\FieldViewInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class OrderingExtensionTest extends TestCase
+final class OrderingExtensionTest extends TestCase
 {
     /**
      * Checks DataSource subscriber and storing of passed parameters.
@@ -31,8 +34,8 @@ class OrderingExtensionTest extends TestCase
     {
         $extension = new OrderingExtension();
         $driver = $this->createMock(DriverInterface::class);
-        /** @var MockObject|DataSourceInterface $datasource */
-        $datasource = $this->getMockBuilder(DataSourceInterface::class)
+        /** @var MockObject|DataSource $datasource */
+        $datasource = $this->getMockBuilder(DataSource::class)
             ->setConstructorArgs([$driver])
             ->getMock();
         /** @var MockObject|FieldTypeInterface $field */
@@ -67,32 +70,19 @@ class OrderingExtensionTest extends TestCase
         $subscribers = $extension->loadSubscribers();
         $subscriber = array_shift($subscribers);
 
-        $parameters = [
-            'ds'    => [
-                OrderingExtension::PARAMETER_SORT    => [
-                    'test'    => 'asc'
-                ]
-            ]
-        ];
-
+        $parameters = ['ds' => [OrderingExtension::PARAMETER_SORT => ['test' => 'asc']]];
         $subscriber->preBindParameters(new DataSourceEvent\ParametersEventArgs($datasource, $parameters));
 
         //Assert that request parameters are properly stored in FieldExtension.
         $this->assertEquals(
-            [
-                'priority'    => 0,
-                'direction'   => 'asc'
-            ],
+            ['priority' => 0, 'direction' => 'asc'],
             $fieldExtension->getOrdering($field)
         );
 
         $event = new DataSourceEvent\ParametersEventArgs($datasource, []);
         $subscriber->postGetParameters($event);
 
-        $this->assertEquals(
-            $parameters,
-            $event->getParameters()
-        );
+        $this->assertEquals($parameters, $event->getParameters());
     }
 
     /**

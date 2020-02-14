@@ -9,11 +9,11 @@
 
 namespace FSi\Component\DataSource\Driver;
 
-use FSi\Component\DataSource\Exception\DataSourceException;
 use FSi\Component\DataSource\DataSourceInterface;
-use Symfony\Component\EventDispatcher\EventDispatcher;
-use FSi\Component\DataSource\Event\DriverEvents;
 use FSi\Component\DataSource\Event\DriverEvent;
+use FSi\Component\DataSource\Event\DriverEvents;
+use FSi\Component\DataSource\Exception\DataSourceException;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 
 /**
  * {@inheritdoc}
@@ -42,19 +42,23 @@ abstract class DriverAbstract implements DriverInterface
     protected $fieldExtensions = [];
 
     /**
-     * @var \Symfony\Component\EventDispatcher\EventDispatcher
+     * @var EventDispatcher
      */
     private $eventDispatcher;
 
     /**
      * @param $extensions array with extensions
-     * @throws \FSi\Component\DataSource\Exception\DataSourceException
+     * @throws DataSourceException
      */
     public function __construct(array $extensions = [])
     {
         foreach ($extensions as $extension) {
             if (!$extension instanceof DriverExtensionInterface) {
-                throw new DataSourceException(sprintf('Instance of DriverExtensionInterface expected, "%s" given.', get_class($extension)));
+                throw new DataSourceException(sprintf(
+                    'Instance of %s expected, "%s" given.',
+                    DriverExtensionInterface::class,
+                    get_class($extension)
+                ));
             }
             $this->addExtension($extension);
         }
@@ -155,11 +159,17 @@ abstract class DriverAbstract implements DriverInterface
      */
     public function addExtension(DriverExtensionInterface $extension)
     {
-        if (!in_array($this->getType(), $extension->getExtendedDriverTypes()))
-            throw new DataSourceException(sprintf('DataSource driver extension of class %s does not support %s driver', get_class($extension), $this->getType()));
+        if (false === in_array($this->getType(), $extension->getExtendedDriverTypes())) {
+            throw new DataSourceException(sprintf(
+                'DataSource driver extension of class %s does not support %s driver',
+                get_class($extension),
+                $this->getType()
+            ));
+        }
 
-        if (in_array($extension, $this->extensions, true))
+        if (true === in_array($extension, $this->extensions, true)) {
             return;
+        }
 
         $eventDispatcher = $this->getEventDispatcher();
         foreach ($extension->loadSubscribers() as $subscriber) {
@@ -172,7 +182,7 @@ abstract class DriverAbstract implements DriverInterface
     /**
      * Returns reference to EventDispatcher.
      *
-     * @return \Symfony\Component\EventDispatcher\EventDispatcher
+     * @return EventDispatcher
      */
     protected function getEventDispatcher()
     {

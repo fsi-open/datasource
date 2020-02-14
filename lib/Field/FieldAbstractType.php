@@ -9,16 +9,13 @@
 
 namespace FSi\Component\DataSource\Field;
 
-use FSi\Component\DataSource\Exception\FieldException;
 use FSi\Component\DataSource\DataSourceInterface;
-use Symfony\Component\EventDispatcher\EventDispatcher;
-use FSi\Component\DataSource\Event\FieldEvents;
 use FSi\Component\DataSource\Event\FieldEvent;
+use FSi\Component\DataSource\Event\FieldEvents;
+use FSi\Component\DataSource\Exception\FieldException;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-/**
- * {@inheritdoc}
- */
 abstract class FieldAbstractType implements FieldTypeInterface
 {
     /**
@@ -64,17 +61,17 @@ abstract class FieldAbstractType implements FieldTypeInterface
     protected $dirty = true;
 
     /**
-     * @var \FSi\Component\DataSource\DataSourceInterface
+     * @var DataSourceInterface
      */
     protected $datasource;
 
     /**
-     * @var \Symfony\Component\EventDispatcher\EventDispatcher
+     * @var EventDispatcher
      */
     private $eventDispatcher;
 
     /**
-     * @var \Symfony\Component\OptionsResolver\OptionsResolver
+     * @var OptionsResolver
      */
     private $optionsResolver;
 
@@ -83,17 +80,11 @@ abstract class FieldAbstractType implements FieldTypeInterface
      */
     private $extensions = [];
 
-    /**
-     * {@inheritdoc}
-     */
     public function setName($name)
     {
         $this->name = $name;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getName()
     {
         return $this->name;
@@ -106,75 +97,61 @@ abstract class FieldAbstractType implements FieldTypeInterface
     }
 
     /**
-     * {@inheritdoc}
-     *
-     * @throws \FSi\Component\DataSource\Exception\FieldException
+     * @throws FieldException
      */
     public function setComparison($comparison)
     {
-        if (!in_array($comparison, $this->getAvailableComparisons())) {
-            throw new FieldException(sprintf('Comparison "%s" not allowed for this type of field ("%s").', $comparison, $this->getType()));
+        if (false === in_array($comparison, $this->getAvailableComparisons())) {
+            throw new FieldException(sprintf(
+                'Comparison "%s" not allowed for this type of field ("%s").',
+                $comparison,
+                $this->getType()
+            ));
         }
 
         $this->comparison = $comparison;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getComparison()
     {
         return $this->comparison;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getAvailableComparisons()
     {
         return $this->comparisons;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setOptions($options)
     {
         $this->options = $this->getOptionsResolver()->resolve($options);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function hasOption($name)
     {
         return isset($this->options[$name]);
     }
 
     /**
-     * {@inheritdoc}
-     *
-     * @throws \FSi\Component\DataSource\Exception\FieldException
+     * @throws FieldException
      */
     public function getOption($name)
     {
-        if (!$this->hasOption($name)) {
-            throw new FieldException(sprintf('There\'s no option named "%s"', is_scalar($name) ? $name : gettype($name)));
+        if (false === $this->hasOption($name)) {
+            throw new FieldException(sprintf(
+                'There\'s no option named "%s"',
+                is_scalar($name) ? $name : gettype($name)
+            ));
         }
+
         return $this->options[$name];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getOptions()
     {
         return $this->options;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function bindParameter($parameter)
     {
         $this->setDirty();
@@ -185,7 +162,9 @@ abstract class FieldAbstractType implements FieldTypeInterface
         $parameter = $event->getParameter();
 
         $datasourceName = $this->getDataSource() ? $this->getDataSource()->getName() : null;
-        if (!empty($datasourceName) && isset($parameter[$datasourceName][DataSourceInterface::PARAMETER_FIELDS][$this->getName()])) {
+        if (!empty($datasourceName)
+            && isset($parameter[$datasourceName][DataSourceInterface::PARAMETER_FIELDS][$this->getName()])
+        ) {
             $parameter = $parameter[$datasourceName][DataSourceInterface::PARAMETER_FIELDS][$this->getName()];
         } else {
             $parameter = null;
@@ -198,9 +177,6 @@ abstract class FieldAbstractType implements FieldTypeInterface
         $this->getEventDispatcher()->dispatch(FieldEvents::POST_BIND_PARAMETER, $event);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getParameter(&$parameters)
     {
         $datasourceName = $this->getDataSource() ? $this->getDataSource()->getName() : null;
@@ -224,17 +200,11 @@ abstract class FieldAbstractType implements FieldTypeInterface
         $parameters = array_merge_recursive($parameters, $parameter);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getCleanParameter()
     {
         return $this->parameter;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function addExtension(FieldExtensionInterface $extension)
     {
         if (in_array($extension, $this->extensions, true)) {
@@ -248,15 +218,17 @@ abstract class FieldAbstractType implements FieldTypeInterface
         $this->options = $this->getOptionsResolver()->resolve($this->options);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setExtensions(array $extensions)
     {
         foreach ($extensions as $extension) {
-            if (!$extension instanceof FieldExtensionInterface) {
-                throw new FieldException(sprintf('Expected instance of FieldExtensionInterface, %s given', get_class($extension)));
+            if (false === $extension instanceof FieldExtensionInterface) {
+                throw new FieldException(sprintf(
+                    'Expected instance of %s, %s given',
+                    FieldExtensionInterface::class,
+                    get_class($extension)
+                ));
             }
+
             $this->getEventDispatcher()->addSubscriber($extension);
             $extension->initOptions($this);
         }
@@ -264,17 +236,11 @@ abstract class FieldAbstractType implements FieldTypeInterface
         $this->extensions = $extensions;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getExtensions()
     {
         return $this->extensions;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function createView()
     {
         $view = new FieldView($this);
@@ -286,48 +252,30 @@ abstract class FieldAbstractType implements FieldTypeInterface
         return $view;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function isDirty()
     {
         return $this->dirty;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setDirty($dirty = true)
     {
         $this->dirty = (bool) $dirty;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setDataSource(DataSourceInterface $datasource)
     {
         $this->datasource = $datasource;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getDataSource()
     {
         return $this->datasource;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function initOptions()
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getOptionsResolver()
     {
         if (!isset($this->optionsResolver)) {
@@ -337,9 +285,6 @@ abstract class FieldAbstractType implements FieldTypeInterface
         return $this->optionsResolver;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getEventDispatcher()
     {
         if (!isset($this->eventDispatcher)) {

@@ -12,9 +12,6 @@ namespace FSi\Component\DataSource;
 use FSi\Component\DataSource\Driver\DriverFactoryManagerInterface;
 use FSi\Component\DataSource\Exception\DataSourceException;
 
-/**
- * {@inheritdoc}
- */
 class DataSourceFactory implements DataSourceFactoryInterface
 {
     /**
@@ -25,7 +22,7 @@ class DataSourceFactory implements DataSourceFactoryInterface
     protected $datasources;
 
     /**
-     * @var \FSi\Component\DataSource\Driver\DriverFactoryManagerInterface
+     * @var DriverFactoryManagerInterface
      */
     protected $driverFactoryManager;
 
@@ -37,17 +34,21 @@ class DataSourceFactory implements DataSourceFactoryInterface
     protected $extensions = [];
 
     /**
-     * @param \FSi\Component\DataSource\Driver\DriverFactoryManagerInterface $driverFactoryManager
+     * @param DriverFactoryManagerInterface $driverFactoryManager
      * @param array $extensions
-     * @throws \FSi\Component\DataSource\Exception\DataSourceException
+     * @throws DataSourceException
      */
     public function __construct(DriverFactoryManagerInterface $driverFactoryManager, $extensions = [])
     {
         $this->driverFactoryManager = $driverFactoryManager;
 
         foreach ($extensions as $extension) {
-            if (!$extension instanceof DataSourceExtensionInterface) {
-                throw new DataSourceException(sprintf('Instance of DataSourceExtensionInterface expected, "%s" given.', is_object($extension) ? get_class($extension) : gettype($extension)));
+            if (false === $extension instanceof DataSourceExtensionInterface) {
+                throw new DataSourceException(sprintf(
+                    'Instance of %s expected, "%s" given.',
+                    DataSourceExtensionInterface::class,
+                    is_object($extension) ? get_class($extension) : gettype($extension)
+                ));
             }
         }
 
@@ -61,7 +62,7 @@ class DataSourceFactory implements DataSourceFactoryInterface
     {
         $name = (string) $name;
 
-        if (!$this->driverFactoryManager->hasFactory($driver)) {
+        if (false === $this->driverFactoryManager->hasFactory($driver)) {
             throw new DataSourceException(sprintf('Driver "%s" doesn\'t exist.', $driver));
         }
 
@@ -148,9 +149,9 @@ class DataSourceFactory implements DataSourceFactoryInterface
     /**
      * Method to checking datasources name.
      *
-     * @throws \FSi\Component\DataSource\Exception\DataSourceException
+     * @throws DataSourceException
      * @param string $name
-     * @param \FSi\Component\DataSource\DataSourceInterface $datasource
+     * @param DataSourceInterface $datasource
      *
      */
     private function checkDataSourceName($name, DataSourceInterface $datasource = null)

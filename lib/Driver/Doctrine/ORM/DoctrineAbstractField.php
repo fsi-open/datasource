@@ -13,14 +13,8 @@ use FSi\Component\DataSource\Field\FieldAbstractType;
 use FSi\Component\DataSource\Driver\Doctrine\ORM\Exception\DoctrineDriverException;
 use Doctrine\ORM\QueryBuilder;
 
-/**
- * {@inheritdoc}
- */
 abstract class DoctrineAbstractField extends FieldAbstractType implements DoctrineFieldInterface
 {
-    /**
-     * {@inheritdoc}
-     */
     public function buildQuery(QueryBuilder $qb, $alias)
     {
         $data = $this->getCleanParameter();
@@ -97,17 +91,16 @@ abstract class DoctrineAbstractField extends FieldAbstractType implements Doctri
             ->setAllowedValues('clause', ['where', 'having'])
             ->setAllowedTypes('field', ['string', 'null'])
             ->setAllowedTypes('auto_alias', 'bool')
-            ->setNormalizer('field', function($options, $value) use ($field) {
-                    if (!isset($value) && $field->getName()) {
-                        return $field->getName();
-                    } else {
-                        return $value;
-                    }
-                })
-            ->setNormalizer('clause', function($options, $value) {
-                    return strtolower($value);
+            ->setNormalizer('field', function ($options, $value) use ($field) {
+                if (!isset($value) && $field->getName()) {
+                    return $field->getName();
+                } else {
+                    return $value;
                 }
-            );
+            })
+            ->setNormalizer('clause', function ($options, $value) {
+                return strtolower($value);
+            });
         ;
     }
 

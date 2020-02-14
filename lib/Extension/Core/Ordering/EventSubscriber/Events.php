@@ -9,18 +9,15 @@
 
 namespace FSi\Component\DataSource\Extension\Core\Ordering\EventSubscriber;
 
-
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use FSi\Component\DataSource\Event\DataSourceEvents;
 use FSi\Component\DataSource\Event\DataSourceEvent;
+use FSi\Component\DataSource\Event\DataSourceEvents;
 use FSi\Component\DataSource\Exception\DataSourceException;
-use FSi\Component\DataSource\Extension\Core\Ordering\OrderingExtension;
 use FSi\Component\DataSource\Extension\Core\Ordering\Field\FieldExtension;
+use FSi\Component\DataSource\Extension\Core\Ordering\OrderingExtension;
+use FSi\Component\DataSource\Field\FieldExtensionInterface;
 use FSi\Component\DataSource\Field\FieldTypeInterface;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-/**
- * Class contains method called during DataSource events.
- */
 class Events implements EventSubscriberInterface
 {
     /**
@@ -28,9 +25,6 @@ class Events implements EventSubscriberInterface
      */
     private $ordering = [];
 
-    /**
-     * {@inheritdoc}
-     */
     public static function getSubscribedEvents()
     {
         return [
@@ -39,9 +33,6 @@ class Events implements EventSubscriberInterface
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function preBindParameters(DataSourceEvent\ParametersEventArgs $event)
     {
         $datasource = $event->getDataSource();
@@ -49,24 +40,25 @@ class Events implements EventSubscriberInterface
         $datasourceName = $datasource->getName();
         $parameters = $event->getParameters();
 
-        if (isset($parameters[$datasourceName][OrderingExtension::PARAMETER_SORT]) && is_array($parameters[$datasourceName][OrderingExtension::PARAMETER_SORT])) {
+        if (isset($parameters[$datasourceName][OrderingExtension::PARAMETER_SORT])
+            && is_array($parameters[$datasourceName][OrderingExtension::PARAMETER_SORT])
+        ) {
             $priority = 0;
             foreach ($parameters[$datasourceName][OrderingExtension::PARAMETER_SORT] as $fieldName => $direction) {
-                if (!in_array($direction, ['asc', 'desc'])) {
+                if (false === in_array($direction, ['asc', 'desc'])) {
                     throw new DataSourceException(sprintf("Unknown sorting direction %s specified", $direction));
                 }
+
                 $field = $datasource->getField($fieldName);
                 $fieldExtension = $this->getFieldExtension($field);
                 $fieldExtension->setOrdering($field, ['priority' => $priority, 'direction' => $direction]);
                 $priority++;
             }
+
             $this->ordering[$datasource_oid] = $parameters[$datasourceName][OrderingExtension::PARAMETER_SORT];
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function postGetParameters(DataSourceEvent\ParametersEventArgs $event)
     {
         $datasource = $event->getDataSource();
@@ -74,16 +66,17 @@ class Events implements EventSubscriberInterface
         $datasourceName = $datasource->getName();
         $parameters = $event->getParameters();
 
-        if (isset($this->ordering[$datasource_oid]))
+        if (isset($this->ordering[$datasource_oid])) {
             $parameters[$datasourceName][OrderingExtension::PARAMETER_SORT] = $this->ordering[$datasource_oid];
+        }
 
         $event->setParameters($parameters);
     }
 
     /**
-     * @param \FSi\Component\DataSource\Field\FieldTypeInterface $field
-     * @return \FSi\Component\DataSource\Field\FieldExtensionInterface
-     * @throws \FSi\Component\DataSource\Exception\DataSourceException
+     * @param FieldTypeInterface $field
+     * @return FieldExtensionInterface
+     * @throws DataSourceException
      */
     protected function getFieldExtension(FieldTypeInterface $field)
     {
@@ -93,6 +86,11 @@ class Events implements EventSubscriberInterface
                 return $extension;
             }
         }
-        throw new DataSourceException('In order to use ' . __CLASS__ . ' there must be FSi\Component\DataSource\Extension\Core\Ordering\Field\FieldExtension registered in all fields');
+
+        throw new DataSourceException(sprintf(
+            'In order to use %s there must be %s registered in all fields',
+            __CLASS__,
+            FieldExtension::class
+        ));
     }
 }

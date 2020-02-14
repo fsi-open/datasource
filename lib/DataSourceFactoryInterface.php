@@ -9,9 +9,6 @@
 
 namespace FSi\Component\DataSource;
 
-/**
- * Factory maintains building new DataSources with preconfigured extensions.
- */
 interface DataSourceFactoryInterface
 {
     /**
@@ -19,10 +16,10 @@ interface DataSourceFactoryInterface
      *
      * @param string $driver
      * @param array $driverOptions
-     * @param $name
-     * @return \FSi\Component\DataSource\DataSource
+     * @param string $name
+     * @return \FSi\Component\DataSource\DataSourceInterface
      */
-    public function createDataSource($driver, $driverOptions = [], $name);
+    public function createDataSource($driver, $driverOptions = [], $name = 'datasource');
 
     /**
      * Adds extension to list.

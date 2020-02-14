@@ -16,7 +16,7 @@ use FSi\Component\DataSource\Driver\DriverAbstract;
 
 class DBALDriver extends DriverAbstract
 {
-    const DEFAULT_TABLE_ALIAS = 'e';
+    public const DEFAULT_TABLE_ALIAS = 'e';
 
     /**
      * @var Connection
@@ -54,7 +54,7 @@ class DBALDriver extends DriverAbstract
     private $indexField;
 
     public function __construct(
-        array $extensions = [],
+        array $extensions,
         Connection $connection,
         $table,
         $alias = null,
