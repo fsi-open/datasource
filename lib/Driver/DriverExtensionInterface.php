@@ -9,6 +9,9 @@
 
 namespace FSi\Component\DataSource\Driver;
 
+use FSi\Component\DataSource\Field\FieldExtensionInterface;
+use FSi\Component\DataSource\Field\FieldTypeInterface;
+
 /**
  * Extension of driver.
  */
@@ -33,7 +36,7 @@ interface DriverExtensionInterface
      * Returns field for given type, or, if can't fine one, throws exception.
      *
      * @param string $type
-     * @return \FSi\Component\DataSource\Field\FieldTypeInterface
+     * @return FieldTypeInterface
      */
     public function getFieldType($type);
 
@@ -49,7 +52,7 @@ interface DriverExtensionInterface
      * Returns collection of extensions for given field type.
      *
      * @param string $type
-     * @return \Traversable
+     * @return array<FieldExtensionInterface>
      */
     public function getFieldTypeExtensions($type);
 
