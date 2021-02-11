@@ -13,6 +13,7 @@ namespace FSi\Component\DataSource\Tests;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use FSi\Component\DataSource\DataSource;
+use FSi\Component\DataSource\DataSourceInterface;
 use FSi\Component\DataSource\DataSourceView;
 use FSi\Component\DataSource\Driver\DriverInterface;
 use FSi\Component\DataSource\Exception\DataSourceViewException;
@@ -25,125 +26,99 @@ final class DataSourceViewTest extends TestCase
     /**
      * Checks creation of view.
      */
-    public function testViewCreate()
+    public function testViewCreate(): void
     {
         $datasource = $this->createDatasourceMock();
-        $datasource
-            ->expects($this->once())
-            ->method('getName')
-            ->willReturn('ds')
-        ;
+        $datasource->expects(self::once())->method('getName')->willReturn('ds');
 
         $view = new DataSourceView($datasource);
-        $this->assertEquals($view->getName(), 'ds');
+        self::assertEquals($view->getName(), 'ds');
     }
 
     /**
      * Checks if view properly proxy some requests to datasource.
      */
-    public function testGetParameters()
+    public function testGetParameters(): void
     {
         $datasource = $this->createDatasourceMock();
-
-        $datasource
-            ->expects($this->once())
-            ->method('getParameters')
-            ->willReturn(['datasource' => []])
-        ;
-
-        $datasource
-            ->expects($this->once())
-            ->method('getOtherParameters')
-            ->willReturn(['other_datasource' => []])
-        ;
+        $datasource->expects(self::once())->method('getParameters')->willReturn(['datasource' => []]);
+        $datasource->expects(self::once())->method('getOtherParameters')->willReturn(['other_datasource' => []]);
 
         $view = new DataSourceView($datasource);
         $view->getParameters();
         $view->getOtherParameters();
         $allParameters = $view->getAllParameters();
 
-        $this->assertEquals(
-            $allParameters,
-            ['datasource' => [], 'other_datasource' => []]
+        self::assertEquals(
+            ['datasource' => [], 'other_datasource' => []],
+            $allParameters
         );
     }
 
     /**
      * Checks if view properly proxy some requests to datasource.
      */
-    public function testGetResults()
+    public function testGetResults(): void
     {
         $datasource = $this->createDatasourceMock();
-
-        $datasource
-            ->expects($this->once())
-            ->method('getResult')
-            ->willReturn(new ArrayCollection());
+        $datasource->expects(self::once())->method('getResult')->willReturn(new ArrayCollection());
 
         $view = new DataSourceView($datasource);
         $view->getParameters();
 
-        $this->assertInstanceOf(ArrayCollection::class, $view->getResult());
+        self::assertInstanceOf(ArrayCollection::class, $view->getResult());
     }
 
     /**
      * Checks the correctness of options related methods.
      */
-    public function testOptionsManipulation()
+    public function testOptionsManipulation(): void
     {
         $view = new DataSourceView($this->createDatasourceMock());
 
-        $this->assertFalse($view->hasAttribute('option1'));
+        self::assertFalse($view->hasAttribute('option1'));
         $view->setAttribute('option1', 'value1');
-        $this->assertTrue($view->hasAttribute('option1'));
-        $this->assertEquals($view->getAttribute('option1'), 'value1');
+        self::assertTrue($view->hasAttribute('option1'));
+        self::assertEquals('value1', $view->getAttribute('option1'));
         $view->removeAttribute('option1');
-        $this->assertFalse($view->hasAttribute('option1'));
+        self::assertFalse($view->hasAttribute('option1'));
 
         $view->setAttribute('option2', '');
-        $this->assertTrue($view->hasAttribute('option2'));
+        self::assertTrue($view->hasAttribute('option2'));
 
         $view->setAttribute('option2', null);
-        $this->assertTrue($view->hasAttribute('option2'));
+        self::assertTrue($view->hasAttribute('option2'));
 
         $view->setAttribute('option3', 'value3');
         $view->setAttribute('option4', 'value4');
 
-        $this->assertEquals($view->getAttributes(), ['option2' => null, 'option3' => 'value3', 'option4' => 'value4']);
+        self::assertEquals(['option2' => null, 'option3' => 'value3', 'option4' => 'value4'], $view->getAttributes());
 
-        $this->assertEquals(null, $view->getAttribute('option2'));
+        self::assertEquals(null, $view->getAttribute('option2'));
     }
 
     /**
      * Checks the correctness of field related methods.
      */
-    public function testFieldsManipulation()
+    public function testFieldsManipulation(): void
     {
-        $fieldView1 = $this->createMock(FieldViewInterface::class);
-        $fieldView2 = $this->createMock(FieldViewInterface::class);
         $view = new DataSourceView($this->createDatasourceMock());
 
-        $fieldView1
-            ->expects($this->any())
-            ->method('getName')
-            ->willReturn('name1')
-        ;
+        $fieldView1 = $this->createMock(FieldViewInterface::class);
+        $fieldView1->method('getName')->willReturn('name1');
 
-        $fieldView2
-            ->expects($this->any())
-            ->method('getName')
-            ->willReturn('name2')
-        ;
+        $fieldView2 = $this->createMock(FieldViewInterface::class);
+        $fieldView2->method('getName')->willReturn('name2');
 
         $view->addField($fieldView1);
         $view->addField($fieldView2);
 
-        $this->assertCount(2, $view->getFields());
-        $this->assertTrue($view->hasField('name1'));
-        $this->assertTrue($view->hasField('name2'));
-        $this->assertFalse($view->hasField('wrong'));
+        self::assertCount(2, $view->getFields());
+        self::assertTrue($view->hasField('name1'));
+        self::assertTrue($view->hasField('name2'));
+        self::assertFalse($view->hasField('wrong'));
 
-        //Should be no exception throwed.
+        // Should be no exception thrown.
         $view->getField('name1');
         $view->getField('name2');
 
@@ -152,18 +127,14 @@ final class DataSourceViewTest extends TestCase
     }
 
     /**
-     * Checks exception throwed when adding another field with the same name.
+     * Checks exception thrown when adding another field with the same name.
      */
-    public function testAddFieldException2()
+    public function testAddFieldException2(): void
     {
-        $fieldView = $this->createMock(FieldViewInterface::class);
         $view = new DataSourceView($this->createDatasourceMock());
 
-        $fieldView
-            ->expects($this->any())
-            ->method('getName')
-            ->willReturn('name')
-        ;
+        $fieldView = $this->createMock(FieldViewInterface::class);
+        $fieldView->method('getName')->willReturn('name');
 
         $view->addField($fieldView);
 
@@ -175,13 +146,13 @@ final class DataSourceViewTest extends TestCase
     /**
      * Checks implementation of \Countable, \SeekableIterator and \ArrayAccess interface.
      */
-    public function testInterfaces()
+    public function testInterfaces(): void
     {
+        $fieldsViews = [];
         for ($x = 0; $x < 5; $x++) {
             $fieldView = $this->createMock(FieldViewInterface::class);
 
             $fieldView
-                ->expects($this->any())
                 ->method('getName')
                 ->willReturn("name$x")
             ;
@@ -192,33 +163,33 @@ final class DataSourceViewTest extends TestCase
         $view = new DataSourceView($this->createDatasourceMock());
         $view->addField($fieldsViews[0]);
 
-        $this->assertCount(1, $view);
-        $this->assertTrue(isset($view['name0']));
-        $this->assertFalse(isset($view['name1']));
+        self::assertCount(1, $view);
+        self::assertTrue(isset($view['name0']));
+        self::assertFalse(isset($view['name1']));
 
         foreach ($view as $key => $value) {
-            $this->assertEquals('name0', $key);
+            self::assertEquals('name0', $key);
         }
 
         $view->addField($fieldsViews[1]);
         $view->addField($fieldsViews[2]);
 
-        $this->assertEquals('name0', $view->key());
+        self::assertEquals('name0', $view->key());
         $view->next();
-        $this->assertEquals('name1', $view->key());
+        self::assertEquals('name1', $view->key());
 
         $view->addField($fieldsViews[3]);
         $view->addField($fieldsViews[4]);
 
-        //After adding fields iterator resets on its own.
-        $this->assertEquals('name0', $view->key());
+        // After adding fields iterator resets on its own.
+        self::assertEquals('name0', $view->key());
 
-        $this->assertCount(5, $view);
-        $this->assertTrue(isset($view['name1']));
+        self::assertCount(5, $view);
+        self::assertTrue(isset($view['name1']));
 
         $view->seek(1);
-        $this->assertEquals('name1', $view->current()->getName());
-        $this->assertEquals('name1', $view->key());
+        self::assertEquals('name1', $view->current()->getName());
+        self::assertEquals('name1', $view->key());
 
         $fields = [];
         for ($view->rewind(); $view->valid(); $view->next()) {
@@ -226,23 +197,22 @@ final class DataSourceViewTest extends TestCase
         }
 
         $expected = ['name0', 'name1', 'name2', 'name3', 'name4'];
-        $this->assertEquals($expected, $fields);
+        self::assertEquals($expected, $fields);
 
-        $this->assertEquals('name3', $view['name3']->getName());
+        self::assertEquals('name3', $view['name3']->getName());
 
-        //Checking fake methods.
+        // Checking fake methods.
         $view['name0'] = 'trash';
-        $this->assertNotEquals('trash', $view['name0']);
+        self::assertNotEquals('trash', $view['name0']);
         unset($view['name0']);
-        $this->assertTrue(isset($view['name0']));
+        self::assertTrue(isset($view['name0']));
     }
 
     /**
-     * @return MockObject|DataSource
+     * @return MockObject&DataSourceInterface
      */
-    private function createDatasourceMock()
+    private function createDatasourceMock(): DataSourceInterface
     {
-        return $this->getMockBuilder(DataSourceInterface::class)
-            ->getMock();
+        return $this->getMockBuilder(DataSourceInterface::class)->getMock();
     }
 }

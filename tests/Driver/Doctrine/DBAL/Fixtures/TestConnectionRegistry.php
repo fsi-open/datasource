@@ -9,7 +9,7 @@
 
 namespace FSi\Component\DataSource\Tests\Driver\Doctrine\DBAL\Fixtures;
 
-use Doctrine\Common\Persistence\ConnectionRegistry;
+use Doctrine\Persistence\ConnectionRegistry;
 use Doctrine\DBAL\Driver\Connection;
 
 class TestConnectionRegistry implements ConnectionRegistry
@@ -24,12 +24,12 @@ class TestConnectionRegistry implements ConnectionRegistry
         $this->connection = $connection;
     }
 
-    public function getDefaultConnectionName()
+    public function getDefaultConnectionName(): string
     {
         return 'test';
     }
 
-    public function getConnection($name = null)
+    public function getConnection($name = null): ?Connection
     {
         if ($name !== $this->getDefaultConnectionName()) {
             throw new \InvalidArgumentException('invalid connection');
@@ -38,12 +38,12 @@ class TestConnectionRegistry implements ConnectionRegistry
         return $this->connection;
     }
 
-    public function getConnections()
+    public function getConnections(): array
     {
         return [$this->connection];
     }
 
-    public function getConnectionNames()
+    public function getConnectionNames(): array
     {
         return [$this->getDefaultConnectionName()];
     }

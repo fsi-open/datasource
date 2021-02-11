@@ -30,7 +30,7 @@ class DBALDriverTest extends TestBase
      */
     private $connection;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->connection = $this->getMemoryConnection();
     }
@@ -38,7 +38,7 @@ class DBALDriverTest extends TestBase
     /**
      * @doesNotPerformAssertions
      */
-    public function testCreation()
+    public function testCreation(): void
     {
         $qb = $this->connection->createQueryBuilder();
 
@@ -49,7 +49,7 @@ class DBALDriverTest extends TestBase
     /**
      * Checks creation exception.
      */
-    public function testCreationExceptionWhenExtensionIsInvalid()
+    public function testCreationExceptionWhenExtensionIsInvalid(): void
     {
         $this->expectException(DataSourceException::class);
         new DBALDriver([new stdClass()], $this->connection, 'table');
@@ -58,7 +58,7 @@ class DBALDriverTest extends TestBase
     /**
      * Checks creation exception.
      */
-    public function testCreationExceptionWhenNoQueryBuilderAndTable()
+    public function testCreationExceptionWhenNoQueryBuilderAndTable(): void
     {
         $this->expectException(DBALDriverException::class);
         new DBALDriver([], $this->connection, null);
@@ -67,7 +67,7 @@ class DBALDriverTest extends TestBase
     /**
      * Checks exception when fields aren't proper instances.
      */
-    public function testGetResultExceptionWhenFieldIsNotDBALField()
+    public function testGetResultExceptionWhenFieldIsNotDBALField(): void
     {
         $driver = new DBALDriver([], $this->connection, 'table');
         $this->expectException(DBALDriverException::class);
@@ -79,17 +79,13 @@ class DBALDriverTest extends TestBase
     /**
      * Checks basic getResult call.
      */
-    public function testAllFieldsBuildQueryMethod()
+    public function testAllFieldsBuildQueryMethod(): void
     {
         $fields = [];
 
         for ($x = 0; $x < 6; $x++) {
             $field = $this->createMock(DBALAbstractField::class);
-
-            $field
-                ->expects($this->once())
-                ->method('buildQuery')
-            ;
+            $field->expects(self::once())->method('buildQuery');
 
             $fields[] = $field;
         }
@@ -101,7 +97,7 @@ class DBALDriverTest extends TestBase
     /**
      * Checks exception when trying to access the query builder not during getResult method.
      */
-    public function testGetQueryExceptionWhenNotInsideGetResult()
+    public function testGetQueryExceptionWhenNotInsideGetResult(): void
     {
         $driver = new DBALDriver([], $this->connection, 'table');
         $this->expectException(DBALDriverException::class);
@@ -111,18 +107,18 @@ class DBALDriverTest extends TestBase
     /**
      * Checks CoreExtension.
      */
-    public function testCoreExtension()
+    public function testCoreExtension(): void
     {
         $driver = new DBALDriver([new CoreExtension()], $this->connection, 'table');
 
-        $this->assertTrue($driver->hasFieldType('text'));
-        $this->assertTrue($driver->hasFieldType('number'));
-        $this->assertTrue($driver->hasFieldType('date'));
-        $this->assertTrue($driver->hasFieldType('time'));
-        $this->assertTrue($driver->hasFieldType('datetime'));
-        $this->assertTrue($driver->hasFieldType('boolean'));
-        $this->assertFalse($driver->hasFieldType('wrong'));
-        $this->assertFalse($driver->hasFieldType(null));
+        self::assertTrue($driver->hasFieldType('text'));
+        self::assertTrue($driver->hasFieldType('number'));
+        self::assertTrue($driver->hasFieldType('date'));
+        self::assertTrue($driver->hasFieldType('time'));
+        self::assertTrue($driver->hasFieldType('datetime'));
+        self::assertTrue($driver->hasFieldType('boolean'));
+        self::assertFalse($driver->hasFieldType('wrong'));
+        self::assertFalse($driver->hasFieldType(null));
 
         $this->expectException(DataSourceException::class);
         $driver->getFieldType('wrong');
@@ -131,22 +127,22 @@ class DBALDriverTest extends TestBase
     /**
      * Checks extensions calls.
      */
-    public function testExtensionsCalls()
+    public function testExtensionsCalls(): void
     {
         $extension = new DBALDriverExtension();
         $driver = new DBALDriver([], $this->connection, 'table');
         $driver->addExtension($extension);
 
         $driver->getResult([], 0, 20);
-        $this->assertEquals(['preGetResult', 'postGetResult'], $extension->getCalls());
+        self::assertEquals(['preGetResult', 'postGetResult'], $extension->getCalls());
     }
 
     /**
      * Provides names of fields.
      *
-     * @return array
+     * @return array<array<string>>
      */
-    public static function fieldNameProvider()
+    public static function fieldNameProvider(): array
     {
         return [
             ['text'],
@@ -163,18 +159,18 @@ class DBALDriverTest extends TestBase
      *
      * @dataProvider fieldNameProvider
      */
-    public function testCoreFields($type)
+    public function testCoreFields(string $type): void
     {
         $driver = new DBALDriver([new CoreExtension()], $this->connection, 'table');
-        $this->assertTrue($driver->hasFieldType($type));
+        self::assertTrue($driver->hasFieldType($type));
         $field = $driver->getFieldType($type);
-        $this->assertInstanceOf(FieldTypeInterface::class, $field);
-        $this->assertInstanceOf(DBALFieldInterface::class, $field);
+        self::assertInstanceOf(FieldTypeInterface::class, $field);
+        self::assertInstanceOf(DBALFieldInterface::class, $field);
 
-        $this->assertTrue($field->getOptionsResolver()->isDefined('field'));
+        self::assertTrue($field->getOptionsResolver()->isDefined('field'));
 
         $comparisons = $field->getAvailableComparisons();
-        $this->assertGreaterThan(0, count($comparisons));
+        self::assertGreaterThan(0, count($comparisons));
 
         foreach ($comparisons as $cmp) {
             $field = $driver->getFieldType($type);
@@ -183,7 +179,7 @@ class DBALDriverTest extends TestBase
             $field->setOptions([]);
         }
 
-        $this->assertEquals($field->getOption('field'), $field->getName());
+        self::assertEquals($field->getOption('field'), $field->getName());
 
         $this->expectException(FieldException::class);
         $field = $driver->getFieldType($type);
@@ -193,7 +189,7 @@ class DBALDriverTest extends TestBase
     /**
      * Checks fields extensions calls.
      */
-    public function testFieldsExtensionsCalls()
+    public function testFieldsExtensionsCalls(): void
     {
         $extension = new FieldExtension();
         $parameter = [];
@@ -210,15 +206,15 @@ class DBALDriverTest extends TestBase
             $field->addExtension($extension);
 
             $field->bindParameter([]);
-            $this->assertEquals(['preBindParameter', 'postBindParameter'], $extension->getCalls());
+            self::assertEquals(['preBindParameter', 'postBindParameter'], $extension->getCalls());
             $extension->resetCalls();
 
             $field->getParameter($parameter);
-            $this->assertEquals(['postGetParameter'], $extension->getCalls());
+            self::assertEquals(['postGetParameter'], $extension->getCalls());
             $extension->resetCalls();
 
-            $field->createView([]);
-            $this->assertEquals(['postBuildView'], $extension->getCalls());
+            $field->createView();
+            self::assertEquals(['postBuildView'], $extension->getCalls());
             $extension->resetCalls();
         }
     }

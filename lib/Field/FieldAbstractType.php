@@ -66,12 +66,12 @@ abstract class FieldAbstractType implements FieldTypeInterface
     protected $datasource;
 
     /**
-     * @var EventDispatcher
+     * @var EventDispatcher|null
      */
     private $eventDispatcher;
 
     /**
-     * @var OptionsResolver
+     * @var OptionsResolver|null
      */
     private $optionsResolver;
 
@@ -162,7 +162,8 @@ abstract class FieldAbstractType implements FieldTypeInterface
         $parameter = $event->getParameter();
 
         $datasourceName = $this->getDataSource() ? $this->getDataSource()->getName() : null;
-        if (!empty($datasourceName)
+        if (
+            !empty($datasourceName)
             && isset($parameter[$datasourceName][DataSourceInterface::PARAMETER_FIELDS][$this->getName()])
         ) {
             $parameter = $parameter[$datasourceName][DataSourceInterface::PARAMETER_FIELDS][$this->getName()];

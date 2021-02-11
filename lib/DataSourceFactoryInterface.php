@@ -17,21 +17,21 @@ interface DataSourceFactoryInterface
      * @param string $driver
      * @param array $driverOptions
      * @param string $name
-     * @return \FSi\Component\DataSource\DataSourceInterface
+     * @return DataSourceInterface
      */
     public function createDataSource($driver, $driverOptions = [], $name = 'datasource');
 
     /**
      * Adds extension to list.
      *
-     * @param \FSi\Component\DataSource\DataSourceExtensionInterface $extension
+     * @param DataSourceExtensionInterface $extension
      */
     public function addExtension(DataSourceExtensionInterface $extension);
 
     /**
      * Return array of loaded extensions.
      *
-     * @return array
+     * @return array<DataSourceExtensionInterface>
      */
     public function getExtensions();
 
@@ -45,7 +45,7 @@ interface DataSourceFactoryInterface
     /**
      * Return array of all parameters form all datasources except given.
      *
-     * @param \FSi\Component\DataSource\DataSourceInterface $datasource
+     * @param DataSourceInterface $datasource
      * @return array
      */
     public function getOtherParameters(DataSourceInterface $datasource);
@@ -56,7 +56,7 @@ interface DataSourceFactoryInterface
      *
      * Factory also automatically sets its (datasource) factory to itself.
      *
-     * @param \FSi\Component\DataSource\DataSourceInterface $datasource
+     * @param DataSourceInterface $datasource
      */
     public function addDataSource(DataSourceInterface $datasource);
 }

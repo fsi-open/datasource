@@ -10,14 +10,10 @@
 namespace FSi\Component\DataSource\Tests\Driver\Doctrine\DBAL\Fixtures;
 
 use Doctrine\DBAL\Query\QueryBuilder;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use FSi\Component\DataSource\Driver\DriverAbstractExtension;
 use FSi\Component\DataSource\Event\DriverEvents;
 
-/**
- * Class to test DoctrineDriver extensions calls.
- */
-class DBALDriverExtension extends DriverAbstractExtension implements EventSubscriberInterface
+class DBALDriverExtension extends DriverAbstractExtension
 {
     /**
      * @var array
@@ -29,12 +25,12 @@ class DBALDriverExtension extends DriverAbstractExtension implements EventSubscr
      */
     private $queryBuilder;
 
-    public function getExtendedDriverTypes()
+    public function getExtendedDriverTypes(): array
     {
         return ['doctrine-dbal'];
     }
 
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             DriverEvents::PRE_GET_RESULT => ['preGetResult', 128],
@@ -47,7 +43,7 @@ class DBALDriverExtension extends DriverAbstractExtension implements EventSubscr
      *
      * @return array
      */
-    public function getCalls()
+    public function getCalls(): array
     {
         return $this->calls;
     }
@@ -55,7 +51,7 @@ class DBALDriverExtension extends DriverAbstractExtension implements EventSubscr
     /**
      * Resets calls.
      */
-    public function resetCalls()
+    public function resetCalls(): void
     {
         $this->calls = [];
     }
@@ -63,29 +59,21 @@ class DBALDriverExtension extends DriverAbstractExtension implements EventSubscr
     /**
      * Catches called method.
      */
-    public function __call($name, $arguments)
+    public function __call(string $name, array $arguments)
     {
-        if ($name == 'preGetResult') {
-            $args = array_shift($arguments);
-            $this->queryBuilder = $args->getDriver()->getQueryBuilder();
+        if ('preGetResult' === $name) {
+            $event = array_shift($arguments);
+            $this->queryBuilder = $event->getDriver()->getQueryBuilder();
         }
         $this->calls[] = $name;
     }
 
-    /**
-     * Loads itself as subscriber.
-     *
-     * @return array
-     */
-    public function loadSubscribers()
+    public function loadSubscribers(): array
     {
         return [$this];
     }
 
-    /**
-     * @return QueryBuilder
-     */
-    public function getQueryBuilder()
+    public function getQueryBuilder(): QueryBuilder
     {
         return $this->queryBuilder;
     }

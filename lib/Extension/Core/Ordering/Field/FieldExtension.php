@@ -51,7 +51,7 @@ class FieldExtension extends FieldAbstractExtension
 
     /**
      * @param FieldTypeInterface $field
-     * @param string $ordering
+     * @param array{priority: string, direction: string}|null $ordering
      */
     public function setOrdering(FieldTypeInterface $field, $ordering)
     {
@@ -61,7 +61,7 @@ class FieldExtension extends FieldAbstractExtension
 
     /**
      * @param FieldTypeInterface $field
-     * @return string|null
+     * @return array{priority: string, direction: string}|null
      */
     public function getOrdering(FieldTypeInterface $field)
     {
@@ -69,6 +69,8 @@ class FieldExtension extends FieldAbstractExtension
         if (isset($this->ordering[$field_oid])) {
             return $this->ordering[$field_oid];
         }
+
+        return null;
     }
 
     public function postBuildView(FieldEvent\ViewEventArgs $event)
@@ -85,7 +87,8 @@ class FieldExtension extends FieldAbstractExtension
         $parameters = $field->getDataSource()->getParameters();
         $dataSourceName = $field->getDataSource()->getName();
 
-        if (isset($this->ordering[$field_oid]['direction'])
+        if (
+            isset($this->ordering[$field_oid]['direction'])
             && (key($parameters[$dataSourceName][OrderingExtension::PARAMETER_SORT]) == $field->getName())
         ) {
             $view->setAttribute('sorted_ascending', $this->ordering[$field_oid]['direction'] == 'asc');

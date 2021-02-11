@@ -25,7 +25,7 @@ class OrderingExtension extends DataSourceAbstractExtension
     /**
      * Key for passing data and ordering attribute.
      */
-    const PARAMETER_SORT = 'sort';
+    public const PARAMETER_SORT = 'sort';
 
     /**
      * {@inheritdoc}

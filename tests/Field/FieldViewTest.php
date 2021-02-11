@@ -22,47 +22,28 @@ class FieldViewTest extends TestCase
     /**
      * Checks creation.
      */
-    public function testCreate()
+    public function testCreate(): void
     {
         /** @var FieldTypeInterface|MockObject $field */
         $field = $this->createMock(FieldTypeInterface::class);
 
-        $field
-            ->expects($this->atLeastOnce())
-            ->method('getName')
-            ->willReturn('somename')
-        ;
-
-        $field
-            ->expects($this->atLeastOnce())
-            ->method('getType')
-            ->willReturn('sometype')
-        ;
-
-        $field
-            ->expects($this->atLeastOnce())
-            ->method('getComparison')
-            ->willReturn('somecomp')
-        ;
-
-        $field
-            ->expects($this->atLeastOnce())
-            ->method('getCleanParameter')
-            ->willReturn('someparam')
-        ;
+        $field->expects(self::atLeastOnce())->method('getName')->willReturn('somename');
+        $field->expects(self::atLeastOnce())->method('getType')->willReturn('sometype');
+        $field->expects(self::atLeastOnce())->method('getComparison')->willReturn('somecomp');
+        $field->expects(self::atLeastOnce())->method('getCleanParameter')->willReturn('someparam');
 
         $fieldView = new FieldView($field);
 
-        $this->assertEquals($field->getName(), $fieldView->getName());
-        $this->assertEquals($field->getType(), $fieldView->getType());
-        $this->assertEquals($field->getComparison(), $fieldView->getComparison());
-        $this->assertEquals($field->getCleanParameter(), $fieldView->getParameter());
+        self::assertEquals($field->getName(), $fieldView->getName());
+        self::assertEquals($field->getType(), $fieldView->getType());
+        self::assertEquals($field->getComparison(), $fieldView->getComparison());
+        self::assertEquals($field->getCleanParameter(), $fieldView->getParameter());
     }
 
     /**
      * Checks correctness of reference to DataSourceView.
      */
-    public function testSetDataSourceView()
+    public function testSetDataSourceView(): void
     {
         $driver = $this->createMock(DriverInterface::class);
         $datasource = $this->getMockBuilder(DataSource::class)->setConstructorArgs([$driver])->getMock();
@@ -71,35 +52,35 @@ class FieldViewTest extends TestCase
         $fieldView = new FieldView($field);
 
         $fieldView->setDataSourceView($view);
-        $this->assertEquals($fieldView->getDataSourceView(), $view);
+        self::assertEquals($fieldView->getDataSourceView(), $view);
     }
 
     /**
      * Checks the correctness of options related methods.
      */
-    public function testOptionsManipulation()
+    public function testOptionsManipulation(): void
     {
         $field = $this->createMock(FieldTypeInterface::class);
         $view = new FieldView($field);
 
-        $this->assertFalse($view->hasAttribute('option1'));
+        self::assertFalse($view->hasAttribute('option1'));
         $view->setAttribute('option1', 'value1');
-        $this->assertTrue($view->hasAttribute('option1'));
-        $this->assertEquals($view->getAttribute('option1'), 'value1');
+        self::assertTrue($view->hasAttribute('option1'));
+        self::assertEquals('value1', $view->getAttribute('option1'));
         $view->removeAttribute('option1');
-        $this->assertFalse($view->hasAttribute('option1'));
+        self::assertFalse($view->hasAttribute('option1'));
 
         $view->setAttribute('option2', '');
-        $this->assertTrue($view->hasAttribute('option2'));
+        self::assertTrue($view->hasAttribute('option2'));
 
         $view->setAttribute('option2', null);
-        $this->assertTrue($view->hasAttribute('option2'));
+        self::assertTrue($view->hasAttribute('option2'));
 
         $view->setAttribute('option3', 'value3');
         $view->setAttribute('option4', 'value4');
 
-        $this->assertEquals(['option2' => null, 'option3' => 'value3', 'option4' => 'value4'], $view->getAttributes());
+        self::assertEquals(['option2' => null, 'option3' => 'value3', 'option4' => 'value4'], $view->getAttributes());
 
-        $this->assertNull($view->getAttribute('option5'));
+        self::assertNull($view->getAttribute('option5'));
     }
 }

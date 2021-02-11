@@ -10,11 +10,14 @@
 namespace FSi\Component\DataSource;
 
 use ArrayIterator;
+use Countable;
 use Doctrine\Common\Collections\ArrayCollection;
 use FSi\Component\DataSource\Exception\DataSourceViewException;
 use FSi\Component\DataSource\Field\FieldViewInterface;
 use FSi\Component\DataSource\Util\AttributesContainer;
 use InvalidArgumentException;
+use IteratorAggregate;
+
 use function count;
 
 class DataSourceView extends AttributesContainer implements DataSourceViewInterface
@@ -27,12 +30,12 @@ class DataSourceView extends AttributesContainer implements DataSourceViewInterf
     /**
      * @var array
      */
-    private $parameters = [];
+    private $parameters;
 
     /**
      * @var array
      */
-    private $otherParameters = [];
+    private $otherParameters;
 
     /**
      * @var array
@@ -40,12 +43,12 @@ class DataSourceView extends AttributesContainer implements DataSourceViewInterf
     private $fields = [];
 
     /**
-     * @var ArrayIterator
+     * @var ArrayIterator|null
      */
     private $iterator;
 
     /**
-     * @var ArrayCollection
+     * @var Countable&IteratorAggregate
      */
     private $result;
 
@@ -202,7 +205,7 @@ class DataSourceView extends AttributesContainer implements DataSourceViewInterf
     {
         $this->initIterator();
 
-        return $this->iterator->seek($position);
+        $this->iterator->seek($position);
     }
 
     /**
@@ -229,14 +232,14 @@ class DataSourceView extends AttributesContainer implements DataSourceViewInterf
     {
         $this->initIterator();
 
-        return $this->iterator->next();
+        $this->iterator->next();
     }
 
     public function rewind()
     {
         $this->initIterator();
 
-        return $this->iterator->rewind();
+        $this->iterator->rewind();
     }
 
     /**

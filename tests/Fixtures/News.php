@@ -189,7 +189,7 @@ class News
      *
      * @return \DateTime
      */
-    public function getCreate_Date()
+    public function getCreateDate()
     {
         return $this->create_date;
     }
@@ -237,7 +237,7 @@ class News
     /**
      * Set category2.
      *
-     * @param Category $category
+     * @param Category $category2
      */
     public function setCategory2(Category $category2)
     {

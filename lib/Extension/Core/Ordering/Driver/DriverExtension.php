@@ -42,6 +42,8 @@ abstract class DriverExtension extends DriverAbstractExtension
                 return $extension;
             }
         }
+
+        return null;
     }
 
     /**

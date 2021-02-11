@@ -13,8 +13,11 @@ namespace FSi\Component\DataSource\Tests\Driver\Doctrine\DBAL;
 
 use Doctrine\DBAL\Connection;
 use FSi\Component\DataSource\DataSourceInterface;
+use FSi\Component\DataSource\Driver\Doctrine\DBAL\Paginator;
 use FSi\Component\DataSource\Extension\Core\Ordering\OrderingExtension;
 use FSi\Component\DataSource\Extension\Core\Pagination\PaginationExtension;
+
+use function preg_replace;
 
 class DBALDriverResultTest extends TestBase
 {
@@ -23,22 +26,21 @@ class DBALDriverResultTest extends TestBase
      */
     private $connection;
 
-    public function testTableResultCount()
+    public function testTableResultCount(): void
     {
         $datasource = $this->getNewsDataSource();
-        $this->assertCount(100, $datasource->getResult());
+        self::assertCount(100, $datasource->getResult());
     }
 
-    public function testDoubleCallToGetResultReturnSameResultSet()
+    public function testDoubleCallToGetResultReturnSameResultSet(): void
     {
         $datasource = $this->getNewsDataSource();
-        $this->assertSame($datasource->getResult(), $datasource->getResult());
+        self::assertSame($datasource->getResult(), $datasource->getResult());
     }
 
-    public function testParametersFiltering()
+    public function testParametersFiltering(): void
     {
-        $datasource = $this->getNewsDataSource();
-        $datasource->addField('title', 'text', 'like');
+        $datasource = $this->getNewsDataSource()->addField('title', 'text', 'like');
 
         $parameters = [
             $datasource->getName() => [
@@ -49,11 +51,11 @@ class DBALDriverResultTest extends TestBase
         ];
         $datasource->bindParameters($parameters);
 
-        //title-1, title-10-19, title-100
-        $this->assertCount(12, $datasource->getResult());
+        // title-1, title-10-19, title-100
+        self::assertCount(12, $datasource->getResult());
     }
 
-    public function testPaginatedResult()
+    public function testPaginatedResult(): void
     {
         $datasource = $this->getNewsDataSource();
         $datasource->addField('title', 'text', 'like');
@@ -71,13 +73,13 @@ class DBALDriverResultTest extends TestBase
 
         $result = $datasource->getResult();
 
-        //all result count
-        $this->assertCount(12, $result);
-        //current page count
-        $this->assertCount(2, iterator_to_array($result));
+        // all result count
+        self::assertCount(12, $result);
+        // current page count
+        self::assertCount(2, iterator_to_array($result));
     }
 
-    public function testSortingField()
+    public function testSortingField(): void
     {
         $datasource = $this->getNewsDataSource();
         $datasource->addField('title', 'text', 'like');
@@ -98,19 +100,16 @@ class DBALDriverResultTest extends TestBase
         $datasource->bindParameters($parameters);
 
         $result = $datasource->getResult();
-        $this->assertCount(12, $result);
-        $this->assertCount(10, iterator_to_array($result));
-
-        foreach ($result as $row) {
-            $this->assertEquals('title-18', $row['title']);
-            break;
-        }
+        self::assertInstanceOf(Paginator::class, $result);
+        self::assertCount(12, $result);
+        self::assertCount(10, iterator_to_array($result));
+        self::assertEquals('title-18', $result->getIterator()->current()['title']);
     }
 
     /**
-     * Checks DataSource wtih DoctrineDriver using more sophisticated QueryBuilder.
+     * Checks DataSource with DoctrineDriver using more sophisticated QueryBuilder.
      */
-    public function testQueryWithJoins()
+    public function testQueryWithJoins(): void
     {
         $dataSourceFactory = $this->getDataSourceFactory();
 
@@ -126,13 +125,10 @@ class DBALDriverResultTest extends TestBase
             'alias' => 'n',
         ];
 
-        $datasource = $dataSourceFactory->createDataSource('doctrine-dbal', $driverOptions, 'name');
-        $datasource
-            ->addField('category', 'text', 'eq', [
-                'field' => 'c.name',
-            ])
+        $datasource = $dataSourceFactory
+            ->createDataSource('doctrine-dbal', $driverOptions, 'name')
+            ->addField('category', 'text', 'eq', ['field' => 'c.name'])
             ->setMaxResults(8);
-        ;
 
         $parameters = [
             $datasource->getName() => [
@@ -145,14 +141,14 @@ class DBALDriverResultTest extends TestBase
         $datasource->bindParameters($parameters);
         $result = $datasource->getResult();
 
-        $this->assertCount(37, $result);
-        $this->assertCount(8, iterator_to_array($result));
+        self::assertCount(37, $result);
+        self::assertCount(8, iterator_to_array($result));
     }
 
     /**
      * Checks DataSource wtih DoctrineDriver using more sophisticated QueryBuilder.
      */
-    public function testQueryWithAggregates()
+    public function testQueryWithAggregates(): void
     {
         $dataSourceFactory = $this->getDataSourceFactory();
 
@@ -192,10 +188,10 @@ class DBALDriverResultTest extends TestBase
         ]);
 
         $result = $datasource->getResult();
-        $this->assertCount(6, $result);
-        $this->assertCount(3, iterator_to_array($result));
+        self::assertCount(6, $result);
+        self::assertCount(3, iterator_to_array($result));
 
-        $this->assertRegExp(
+        self::assertRegExp(
             '/^SELECT c\.\*, COUNT\(n\.id\) newscount FROM category c '
             . 'LEFT JOIN news n ON n\.category_id = c\.id '
             . 'GROUP BY c\.id HAVING newscount > :newscount LIMIT 3( OFFSET 0)?$/',
@@ -209,10 +205,10 @@ class DBALDriverResultTest extends TestBase
         ]);
 
         $result = $datasource->getResult();
-        $this->assertCount(10, $result);
-        $this->assertCount(3, iterator_to_array($result));
+        self::assertCount(10, $result);
+        self::assertCount(3, iterator_to_array($result));
 
-        $this->assertRegExp(
+        self::assertRegExp(
             '/^SELECT c\.\*, COUNT\(n\.id\) newscount FROM category c '
             . 'LEFT JOIN news n ON n\.category_id = c\.id '
             . 'GROUP BY c\.id HAVING newscount > :newscount LIMIT 3( OFFSET 0)?$/',
@@ -242,10 +238,10 @@ class DBALDriverResultTest extends TestBase
 
         $datasource->bindParameters($parameters);
         $result = $datasource->getResult();
-        $this->assertCount(3, $result);
-        $this->assertCount(2, iterator_to_array($result));
+        self::assertCount(3, $result);
+        self::assertCount(2, iterator_to_array($result));
 
-        $this->assertRegExp(
+        self::assertRegExp(
             '/^SELECT c\.\*, COUNT\(n\.id\) newscount FROM category c '
             . 'LEFT JOIN news n ON n\.category_id = c\.id '
             . 'GROUP BY c\.id HAVING newscount BETWEEN :newscount_from AND :newscount_to LIMIT 2( OFFSET 0)?$/',
@@ -256,7 +252,7 @@ class DBALDriverResultTest extends TestBase
     /**
      * Tests if 'having' value of 'clause' option works properly in 'entity' field
      */
-    public function testHavingClauseInEntityField()
+    public function testHavingClauseInEntityField(): void
     {
         $dataSourceFactory = $this->getDataSourceFactory();
 
@@ -288,24 +284,23 @@ class DBALDriverResultTest extends TestBase
         $datasource->bindParameters($parameters);
         $datasource->getResult();
 
-        $this->assertEquals(
-            'SELECT n FROM news n INNER JOIN category c ON n.category_id = c.id HAVING n.category IN (:dcValue1, :dcValue2)',
+        self::assertEquals(
+            preg_replace('/\s+/', ' ', 'SELECT n
+            FROM news n
+                INNER JOIN category c ON n.category_id = c.id
+            HAVING n.category IN (:dcValue1, :dcValue2)'),
             $this->testDoctrineExtension->getQueryBuilder()->getSQL()
         );
     }
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->connection = $this->getMemoryConnection();
         $this->loadTestData($this->connection);
     }
 
-    private function getNewsDataSource()
+    private function getNewsDataSource(): DataSourceInterface
     {
-        return $this->getDataSourceFactory()->createDataSource(
-            'doctrine-dbal',
-            ['table' => 'news'],
-            'name'
-        );
+        return $this->getDataSourceFactory()->createDataSource('doctrine-dbal', ['table' => 'news'], 'name');
     }
 }

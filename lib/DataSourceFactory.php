@@ -164,7 +164,7 @@ class DataSourceFactory implements DataSourceFactoryInterface
             throw new DataSourceException('Name of data source must be unique.');
         }
 
-        if (!preg_match('/^[\w\d]+$/', $name)) {
+        if (!preg_match('/^[\w]+$/', $name)) {
             throw new DataSourceException('Name of data source may contain only word characters and digits.');
         }
     }

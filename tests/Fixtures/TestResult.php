@@ -9,6 +9,8 @@
 
 namespace FSi\Component\DataSource\Tests\Fixtures;
 
+use ArrayIterator;
+
 /**
  * Class for testing result returning.
  */
@@ -16,9 +18,11 @@ class TestResult implements \Countable, \IteratorAggregate
 {
     public function count()
     {
+        return 0;
     }
 
     public function getIterator()
     {
+        return new ArrayIterator([]);
     }
 }

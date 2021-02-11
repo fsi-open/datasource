@@ -9,6 +9,7 @@
 
 namespace FSi\Component\DataSource\Driver\Doctrine\DBAL;
 
+use Closure;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\QueryBuilder;
 use FSi\Component\DataSource\Driver\Doctrine\DBAL\Exception\DBALDriverException;
@@ -44,12 +45,12 @@ class DBALDriver extends DriverAbstract
     /**
      * Query builder available during preGetResult event.
      *
-     * @var QueryBuilder
+     * @var QueryBuilder|null
      */
     private $currentQuery;
 
     /**
-     * @var string|\Closure
+     * @var string|Closure
      */
     private $indexField;
 
@@ -145,7 +146,7 @@ class DBALDriver extends DriverAbstract
     }
 
     /**
-     * @return \Closure|string
+     * @return Closure|string
      */
     public function getIndexField()
     {

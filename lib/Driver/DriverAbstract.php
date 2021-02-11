@@ -9,10 +9,12 @@
 
 namespace FSi\Component\DataSource\Driver;
 
+use Countable;
 use FSi\Component\DataSource\DataSourceInterface;
 use FSi\Component\DataSource\Event\DriverEvent;
 use FSi\Component\DataSource\Event\DriverEvents;
 use FSi\Component\DataSource\Exception\DataSourceException;
+use IteratorAggregate;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
 /**
@@ -20,6 +22,11 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
  */
 abstract class DriverAbstract implements DriverInterface
 {
+    /**
+     * @var DataSourceInterface
+     */
+    protected $datasource;
+
     /**
      * Extensions.
      *
@@ -47,7 +54,7 @@ abstract class DriverAbstract implements DriverInterface
     private $eventDispatcher;
 
     /**
-     * @param $extensions array with extensions
+     * @param array<DriverExtensionInterface> $extensions array with extensions
      * @throws DataSourceException
      */
     public function __construct(array $extensions = [])
@@ -204,13 +211,10 @@ abstract class DriverAbstract implements DriverInterface
      * @param array $fields
      * @param int $first
      * @param int $max
-     * @return \Countable, \IteratorAggregate
+     * @return Countable&IteratorAggregate
      */
     abstract protected function buildResult($fields, $first, $max);
 
-    /**
-     * {@inheritdoc}
-     */
     public function getResult($fields, $first, $max)
     {
         $this->initResult();

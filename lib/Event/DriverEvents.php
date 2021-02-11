@@ -17,10 +17,10 @@ class DriverEvents
     /**
      * PreGetResult event name.
      */
-    const PRE_GET_RESULT = 'datasource_driver.pre_get_result';
+    public const PRE_GET_RESULT = 'datasource_driver.pre_get_result';
 
     /**
      * PostGetResult event name.
      */
-    const POST_GET_RESULT = 'datasource_driver.post_get_result';
+    public const POST_GET_RESULT = 'datasource_driver.post_get_result';
 }
