@@ -13,6 +13,7 @@ namespace FSi\Component\DataSource\Tests;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use FSi\Component\DataSource\DataSource;
+use FSi\Component\DataSource\DataSourceInterface;
 use FSi\Component\DataSource\DataSourceView;
 use FSi\Component\DataSource\Driver\DriverInterface;
 use FSi\Component\DataSource\Exception\DataSourceViewException;
@@ -238,11 +239,10 @@ final class DataSourceViewTest extends TestCase
     }
 
     /**
-     * @return MockObject|DataSource
+     * @return MockObject|DataSourceInterface
      */
     private function createDatasourceMock()
     {
-        return $this->getMockBuilder(DataSourceInterface::class)
-            ->getMock();
+        return $this->getMockBuilder(DataSourceInterface::class)->getMock();
     }
 }

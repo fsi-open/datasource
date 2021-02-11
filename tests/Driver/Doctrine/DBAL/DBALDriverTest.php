@@ -30,7 +30,7 @@ class DBALDriverTest extends TestBase
      */
     private $connection;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->connection = $this->getMemoryConnection();
     }

@@ -12,8 +12,8 @@ declare(strict_types=1);
 namespace FSi\Component\DataSource\Tests\Driver\Doctrine\ORM;
 
 use ArrayIterator;
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\Tools\Pagination\Paginator;
+use Doctrine\Persistence\ManagerRegistry;
 use FSi\Component\DataSource\Driver\Doctrine\ORM\DoctrineResult;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -22,9 +22,9 @@ final class DoctrineResultTest extends TestCase
 {
     public function testEmptyPaginator()
     {
-        /** @var MockObject|ManagerRegistry $registry */
+        /** @var MockObject&ManagerRegistry $registry */
         $registry = $this->createMock(ManagerRegistry::class);
-        /** @var MockObject|Paginator $paginator */
+        /** @var MockObject&Paginator $paginator */
         $paginator = $this->createMock(Paginator::class);
 
         $paginator->expects($this->any())->method('getIterator')->willReturn(new ArrayIterator([]));
@@ -35,7 +35,7 @@ final class DoctrineResultTest extends TestCase
 
     public function testResultWithNotObjectDataInRows()
     {
-        /** @var MockObject|ManagerRegistry $registry */
+        /** @var MockObject&ManagerRegistry $registry */
         $registry = $this->createMock(ManagerRegistry::class);
         /** @var MockObject|Paginator $paginator */
         $paginator = $this->createMock(Paginator::class);

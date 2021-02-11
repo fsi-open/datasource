@@ -9,7 +9,7 @@
 
 namespace FSi\Component\DataSource\Tests\Fixtures;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
 
 /**

@@ -27,6 +27,7 @@ use FSi\Component\DataSource\Tests\Fixtures\Group;
 use FSi\Component\DataSource\Tests\Fixtures\News;
 use FSi\Component\DataSource\Tests\Fixtures\TestManagerRegistry;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
 
 class DoctrineDriverTest extends TestCase
 {
@@ -43,7 +44,7 @@ class DoctrineDriverTest extends TestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         //The connection configuration.
         $dbParams = [
@@ -687,19 +688,17 @@ class DoctrineDriverTest extends TestCase
         );
     }
 
-    /**
-     * @expectedException Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
-     */
     public function testCreateDriverWithoutEntityAndQbOptions()
     {
         $factory = $this->getDoctrineFactory();
+        $this->expectException(InvalidOptionsException::class);
         $factory->createDriver([]);
     }
 
     /**
      * {@inheritdoc}
      */
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->em);
     }

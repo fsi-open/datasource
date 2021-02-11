@@ -26,7 +26,7 @@ class DBALResultTest extends TestBase
      */
     private $paginator;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->connection = $this->getMemoryConnection();
         $this->loadTestData($this->connection);

@@ -10,7 +10,7 @@
 namespace FSi\Component\DataSource\Tests\Driver\Doctrine\DBAL;
 
 use Closure;
-use Doctrine\Common\Persistence\ConnectionRegistry;
+use Doctrine\Persistence\ConnectionRegistry;
 use FSi\Component\DataSource\Driver\Doctrine\DBAL\DBALDriver;
 use FSi\Component\DataSource\Driver\Doctrine\DBAL\DBALFactory;
 use FSi\Component\DataSource\Driver\Doctrine\DBAL\Extension\Core\CoreExtension;
@@ -30,7 +30,7 @@ class DBALFactoryTest extends TestBase
      */
     private $factory;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->connectionRegistry = new TestConnectionRegistry($this->getMemoryConnection());
         $this->factory = new DBALFactory($this->connectionRegistry, []);

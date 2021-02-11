@@ -14,7 +14,7 @@ use FSi\Component\DataSource\DataSourceInterface;
 
 class DBALFieldsTest extends TestBase
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->loadTestData($this->getMemoryConnection());
     }

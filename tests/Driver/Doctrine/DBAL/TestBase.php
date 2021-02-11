@@ -44,10 +44,10 @@ abstract class TestBase extends TestCase
     {
         $this->testDoctrineExtension = new DBALDriverExtension();
 
-        return new DBALFactory(new TestConnectionRegistry($this->getMemoryConnection()), [
-            new CoreExtension(),
-            $this->testDoctrineExtension,
-        ]);
+        return new DBALFactory(
+            new TestConnectionRegistry($this->getMemoryConnection()),
+            [new CoreExtension(), $this->testDoctrineExtension]
+        );
     }
 
     protected function getMemoryConnection(): Connection

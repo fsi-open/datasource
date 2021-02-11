@@ -1,6 +1,4 @@
 /vendor
-/tests/temp
 /bin
 composer.lock
-composer.phar
-autoload.php
+.phpunit.result.cache

@@ -60,15 +60,14 @@ class FactoryTest extends TestCase
     }
 
     /**
-     * Checks exception thrown when loading inproper extensions.
-     *
-     * @expectedException \FSi\Component\DataSource\Exception\DataSourceException
+     * Checks exception thrown when loading improper extensions.
      */
     public function testFactoryException2()
     {
         $driveFactoryManager = new DriverFactoryManager([
             new CollectionFactory()
         ]);
+        $this->expectException(DataSourceException::class);
         new DataSourceFactory($driveFactoryManager, [new \stdClass()]);
     }
 

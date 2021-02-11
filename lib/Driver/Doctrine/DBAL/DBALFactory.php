@@ -10,7 +10,7 @@
 namespace FSi\Component\DataSource\Driver\Doctrine\DBAL;
 
 use Closure;
-use Doctrine\Common\Persistence\ConnectionRegistry;
+use Doctrine\Persistence\ConnectionRegistry;
 use Doctrine\DBAL\Query\QueryBuilder;
 use FSi\Component\DataSource\Driver\DriverFactoryInterface;
 use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
