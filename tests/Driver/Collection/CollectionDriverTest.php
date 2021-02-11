@@ -7,7 +7,7 @@
  * file that was distributed with this source code.
  */
 
-namespace FSi\Component\DataSource\Tests\Driver\Doctrine;
+namespace FSi\Component\DataSource\Tests\Driver\Collection;
 
 use DateTime;
 use Doctrine\Common\Collections\Criteria;
@@ -19,6 +19,7 @@ use FSi\Component\DataSource\DataSource;
 use FSi\Component\DataSource\DataSourceFactory;
 use FSi\Component\DataSource\DataSourceInterface;
 use FSi\Component\DataSource\Driver\Collection\CollectionFactory;
+use FSi\Component\DataSource\Driver\Collection\CollectionResult;
 use FSi\Component\DataSource\Driver\Collection\Exception\CollectionDriverException;
 use FSi\Component\DataSource\Driver\Collection\Extension\Core\CoreExtension;
 use FSi\Component\DataSource\Driver\DriverFactoryManager;
@@ -29,6 +30,7 @@ use FSi\Component\DataSource\Field\FieldTypeInterface;
 use FSi\Component\DataSource\Tests\Fixtures\Category;
 use FSi\Component\DataSource\Tests\Fixtures\Group;
 use FSi\Component\DataSource\Tests\Fixtures\News;
+use IteratorAggregate;
 use PHPUnit\Framework\TestCase;
 
 class CollectionDriverTest extends TestCase
@@ -40,7 +42,6 @@ class CollectionDriverTest extends TestCase
 
     protected function setUp(): void
     {
-        //The connection configuration.
         $dbParams = [
             'driver' => 'pdo_sqlite',
             'memory' => true,
@@ -61,8 +62,7 @@ class CollectionDriverTest extends TestCase
 
     public function testComparingWithZero(): void
     {
-        $datasource = $this->prepareArrayDataSource()
-            ->addField('id', 'number', 'eq');
+        $datasource = $this->prepareArrayDataSource()->addField('id', 'number', 'eq');
 
         $parameters = [
             $datasource->getName() => [
@@ -73,7 +73,7 @@ class CollectionDriverTest extends TestCase
         ];
         $datasource->bindParameters($parameters);
         $result = $datasource->getResult();
-        $this->assertCount(0, $result);
+        self::assertCount(0, $result);
     }
 
     public function testSelectableSource(): void
@@ -97,11 +97,11 @@ class CollectionDriverTest extends TestCase
         ;
 
         $result1 = $datasource->getResult();
-        $this->assertCount(100, $result1);
+        self::assertCount(100, $result1);
         $datasource->createView();
 
-        //Checking if result cache works.
-        $this->assertSame($result1, $datasource->getResult());
+        // Checking if result cache works.
+        self::assertSame($result1, $datasource->getResult());
 
         $parameters = [
             $datasource->getName() => [
@@ -114,13 +114,13 @@ class CollectionDriverTest extends TestCase
         $result2 = $datasource->getResult();
 
         //Checking cache.
-        $this->assertSame($result2, $datasource->getResult());
+        self::assertSame($result2, $datasource->getResult());
 
-        $this->assertCount(50, $result2);
-        $this->assertNotSame($result1, $result2);
+        self::assertCount(50, $result2);
+        self::assertNotSame($result1, $result2);
         unset($result1, $result2);
 
-        $this->assertEquals($parameters, $datasource->getParameters());
+        self::assertEquals($parameters, $datasource->getParameters());
 
         $datasource->setMaxResults(20);
         $parameters = [
@@ -131,8 +131,8 @@ class CollectionDriverTest extends TestCase
 
         $datasource->bindParameters($parameters);
         $result = $datasource->getResult();
-        $this->assertCount(100, $result);
-        $this->assertCount(20, iterator_to_array($result));
+        self::assertCount(100, $result);
+        self::assertCount(20, iterator_to_array($result));
 
         $parameters = [
             $datasource->getName() => [
@@ -148,7 +148,7 @@ class CollectionDriverTest extends TestCase
         $datasource->bindParameters($parameters);
         $datasource->createView();
         $result = $datasource->getResult();
-        $this->assertCount(2, $result);
+        self::assertCount(2, $result);
 
         $parameters = [
             $datasource->getName() => [
@@ -160,9 +160,9 @@ class CollectionDriverTest extends TestCase
         $datasource->bindParameters($parameters);
         $datasource->createView();
         $result = $datasource->getResult();
-        $this->assertCount(1, $result);
+        self::assertCount(1, $result);
 
-        //Checking sorting.
+        // Checking sorting.
         $parameters = [
             $datasource->getName() => [
                 OrderingExtension::PARAMETER_SORT => [
@@ -172,9 +172,11 @@ class CollectionDriverTest extends TestCase
         ];
 
         $datasource->bindParameters($parameters);
-        $this->assertEquals('title99', $datasource->getResult()->first()->getTitle());
+        $result = $datasource->getResult();
+        self::assertInstanceOf(CollectionResult::class, $result);
+        self::assertEquals('title99', $result[0]->getTitle());
 
-        //Checking sorting.
+        // Checking sorting.
         $parameters = [
             $datasource->getName() => [
                 OrderingExtension::PARAMETER_SORT => [
@@ -185,7 +187,9 @@ class CollectionDriverTest extends TestCase
         ];
 
         $datasource->bindParameters($parameters);
-        $this->assertEquals('author99@domain2.com', $datasource->getResult()->first()->getAuthor());
+        $result = $datasource->getResult();
+        self::assertInstanceOf(CollectionResult::class, $result);
+        self::assertEquals('author99@domain2.com', $result[0]->getAuthor());
 
         //Test for clearing fields.
         $datasource->clearFields();
@@ -198,12 +202,12 @@ class CollectionDriverTest extends TestCase
             ],
         ];
 
-        //Since there are no fields now, we should have all of entities.
+        // Since there are no fields now, we should have all of entities.
         $datasource->bindParameters($parameters);
         $result = $datasource->getResult();
-        $this->assertCount(100, $result);
+        self::assertCount(100, $result);
 
-        //Test boolean field
+        // Test boolean field
         $datasource
             ->addField('active', 'boolean', 'eq')
         ;
@@ -219,7 +223,7 @@ class CollectionDriverTest extends TestCase
         $datasource->bindParameters($parameters);
         $datasource->createView();
         $result = $datasource->getResult();
-        $this->assertCount(50, $result);
+        self::assertCount(50, $result);
 
         $parameters = [
             $datasource->getName() => [
@@ -232,7 +236,7 @@ class CollectionDriverTest extends TestCase
         $datasource->bindParameters($parameters);
         $datasource->createView();
         $result = $datasource->getResult();
-        $this->assertCount(50, $result);
+        self::assertCount(50, $result);
 
         $parameters = [
             $datasource->getName() => [
@@ -245,7 +249,7 @@ class CollectionDriverTest extends TestCase
         $datasource->bindParameters($parameters);
         $datasource->createView();
         $result = $datasource->getResult();
-        $this->assertCount(50, $result);
+        self::assertCount(50, $result);
 
         $parameters = [
             $datasource->getName() => [
@@ -258,7 +262,7 @@ class CollectionDriverTest extends TestCase
         $datasource->bindParameters($parameters);
         $datasource->createView();
         $result = $datasource->getResult();
-        $this->assertCount(50, $result);
+        self::assertCount(50, $result);
 
         $parameters = [
             $datasource->getName() => [
@@ -271,7 +275,7 @@ class CollectionDriverTest extends TestCase
         $datasource->bindParameters($parameters);
         $datasource->createView();
         $result = $datasource->getResult();
-        $this->assertCount(100, $result);
+        self::assertCount(100, $result);
 
         $parameters = [
             $datasource->getName() => [
@@ -282,7 +286,9 @@ class CollectionDriverTest extends TestCase
         ];
 
         $datasource->bindParameters($parameters);
-        $this->assertFalse($datasource->getResult()->first()->isActive());
+        $result = $datasource->getResult();
+        self::assertInstanceOf(CollectionResult::class, $result);
+        self::assertFalse($result[0]->isActive());
 
         $parameters = [
             $datasource->getName() => [
@@ -293,7 +299,9 @@ class CollectionDriverTest extends TestCase
         ];
 
         $datasource->bindParameters($parameters);
-        $this->assertFalse(false, $datasource->getResult()->first()->isActive());
+        $result = $datasource->getResult();
+        self::assertInstanceOf(CollectionResult::class, $result);
+        self::assertFalse(false, $result[0]->isActive());
 
 
         // test 'notIn' comparison
@@ -312,7 +320,7 @@ class CollectionDriverTest extends TestCase
         $datasource->bindParameters($parameters);
         $datasource->createView();
         $result = $datasource->getResult();
-        $this->assertCount(97, $result);
+        self::assertCount(97, $result);
     }
 
     public function testExceptions(): void
@@ -321,7 +329,7 @@ class CollectionDriverTest extends TestCase
         $field = $this->createMock(FieldTypeInterface::class);
 
         $field
-            ->expects($this->any())
+            ->expects(self::any())
             ->method('getName')
             ->willReturn('example')
         ;
@@ -369,7 +377,7 @@ class CollectionDriverTest extends TestCase
         return new DataSourceFactory($driverFactoryManager, $extensions);
     }
 
-    private function prepareSelectableDataSource(): DataSource
+    private function prepareSelectableDataSource(): DataSourceInterface
     {
         $driverOptions = [
             'collection' => $this->em->getRepository(News::class),
@@ -379,7 +387,7 @@ class CollectionDriverTest extends TestCase
         return $this->getDataSourceFactory()->createDataSource('collection', $driverOptions, 'datasource1');
     }
 
-    private function prepareArrayDataSource(): DataSource
+    private function prepareArrayDataSource(): DataSourceInterface
     {
         $driverOptions = [
             'collection' => $this->em
@@ -400,38 +408,38 @@ class CollectionDriverTest extends TestCase
         $categories = [];
         for ($i = 0; $i < 5; $i++) {
             $category = new Category();
-            $category->setName('category'.$i);
+            $category->setName('category' . $i);
             $em->persist($category);
             $categories[] = $category;
         }
 
-        //Injects 4 groups.
+        // Injects 4 groups.
         $groups = [];
         for ($i = 0; $i < 4; $i++) {
             $group = new Group();
-            $group->setName('group'.$i);
+            $group->setName('group' . $i);
             $em->persist($group);
             $groups[] = $group;
         }
 
-        //Injects 100 newses.
+        // Injects 100 newses.
         for ($i = 0; $i < 100; $i++) {
             $news = new News();
-            $news->setTitle('title'.$i);
+            $news->setTitle('title' . $i);
 
-            //Half of entities will have different author and content.
+            // Half of entities will have different author and content.
             if ($i % 2 === 0) {
-                $news->setAuthor('author'.$i.'@domain1.com');
+                $news->setAuthor('author' . $i . '@domain1.com');
                 $news->setShortContent('Lorem ipsum.');
                 $news->setContent('Content lorem ipsum.');
             } else {
-                $news->setAuthor('author'.$i.'@domain2.com');
+                $news->setAuthor('author' . $i . '@domain2.com');
                 $news->setShortContent('Dolor sit amet.');
                 $news->setContent('Content dolor sit amet.');
                 $news->setActive();
             }
 
-            //Each entity has different date of creation and one of four hours of creation.
+            // Each entity has different date of creation and one of four hours of creation.
             $createDate = new DateTime(date('Y:m:d H:i:s', $i * 24 * 60 * 60));
             $createTime = new DateTime(date('H:i:s', (($i % 4) + 1 ) * 60 * 60));
 

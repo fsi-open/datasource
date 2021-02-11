@@ -13,11 +13,17 @@ use ArrayAccess;
 use ArrayIterator;
 use Countable;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\Common\Collections\Selectable;
+use InvalidArgumentException;
+use IteratorAggregate;
 use Traversable;
 
-class CollectionResult implements Countable, \IteratorAggregate, ArrayAccess
+use function get_class;
+use function is_array;
+
+class CollectionResult implements Countable, IteratorAggregate, ArrayAccess
 {
     /**
      * @var int
@@ -25,7 +31,7 @@ class CollectionResult implements Countable, \IteratorAggregate, ArrayAccess
     private $count;
 
     /**
-     * @var ArrayCollection
+     * @var Collection
      */
     private $collection;
 
@@ -38,13 +44,13 @@ class CollectionResult implements Countable, \IteratorAggregate, ArrayAccess
         if (false === $collection instanceof Selectable) {
             if ($collection instanceof Traversable) {
                 $collection = new ArrayCollection(iterator_to_array($collection));
-            } elseif (\is_array($collection)) {
+            } elseif (is_array($collection)) {
                 $collection = new ArrayCollection($collection);
             } else {
-                throw new \InvalidArgumentException(
+                throw new InvalidArgumentException(
                     sprintf(
                         'Provided collection type "%s" should be %s or %s or array',
-                        \is_object($collection) ? \get_class($collection) : \gettype($collection),
+                        get_class($collection),
                         Selectable::class,
                         Traversable::class
                     )

@@ -97,7 +97,7 @@ abstract class TestBase extends TestCase
             new Column('category_id', Type::getType(Type::INTEGER)),
         ]));
 
-        for ($i=1; $i<=10; $i++) {
+        for ($i = 1; $i <= 10; $i++) {
             $connection->insert(self::TABLE_CATEGORY_NAME, [
                 'id' => $i,
                 'type' => $i % 2 == 0 ? 'B' : 'A',
@@ -105,7 +105,7 @@ abstract class TestBase extends TestCase
             ]);
         }
 
-        for ($i=1; $i<=100; $i++) {
+        for ($i = 1; $i <= 100; $i++) {
             $connection->insert(self::TABLE_NEWS_NAME, [
                 'id' => $i,
                 'visible' => (int) $i % 2 == 0,

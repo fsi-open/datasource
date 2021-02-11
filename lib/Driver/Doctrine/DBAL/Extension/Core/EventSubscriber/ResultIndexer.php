@@ -27,7 +27,7 @@ class ResultIndexer implements EventSubscriberInterface
     }
 
     /**
-     * @param \FSi\Component\DataSource\Event\DriverEvent\ResultEventArgs $event
+     * @param ResultEventArgs $event
      */
     public function postGetResult(ResultEventArgs $event)
     {

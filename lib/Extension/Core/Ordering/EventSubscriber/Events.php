@@ -40,7 +40,8 @@ class Events implements EventSubscriberInterface
         $datasourceName = $datasource->getName();
         $parameters = $event->getParameters();
 
-        if (isset($parameters[$datasourceName][OrderingExtension::PARAMETER_SORT])
+        if (
+            isset($parameters[$datasourceName][OrderingExtension::PARAMETER_SORT])
             && is_array($parameters[$datasourceName][OrderingExtension::PARAMETER_SORT])
         ) {
             $priority = 0;
@@ -75,7 +76,7 @@ class Events implements EventSubscriberInterface
 
     /**
      * @param FieldTypeInterface $field
-     * @return FieldExtensionInterface
+     * @return FieldExtension
      * @throws DataSourceException
      */
     protected function getFieldExtension(FieldTypeInterface $field)

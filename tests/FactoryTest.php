@@ -26,26 +26,15 @@ class FactoryTest extends TestCase
     /**
      * Checks proper extensions loading.
      */
-    public function testExtensionsLoading()
+    public function testExtensionsLoading(): void
     {
         $extension1 = $this->createMock(DataSourceExtensionInterface::class);
+        $extension1->method('loadDriverExtensions')->willReturn([]);
+
         $extension2 = $this->createMock(DataSourceExtensionInterface::class);
+        $extension2->method('loadDriverExtensions')->willReturn([]);
 
-        $extension1
-            ->expects($this->any())
-            ->method('loadDriverExtensions')
-            ->willReturn([])
-        ;
-
-        $extension2
-            ->expects($this->any())
-            ->method('loadDriverExtensions')
-            ->willReturn([])
-        ;
-
-        $driveFactoryManager = new DriverFactoryManager([
-            new CollectionFactory()
-        ]);
+        $driveFactoryManager = new DriverFactoryManager([new CollectionFactory()]);
 
         $extensions = [$extension1, $extension2];
 
@@ -55,18 +44,16 @@ class FactoryTest extends TestCase
         $factoryExtensions = $factory->getExtensions();
         $datasourceExtensions = $datasource->getExtensions();
 
-        $this->assertCount(count($factoryExtensions), $extensions);
-        $this->assertCount(count($datasourceExtensions), $extensions);
+        self::assertCount(count($factoryExtensions), $extensions);
+        self::assertCount(count($datasourceExtensions), $extensions);
     }
 
     /**
      * Checks exception thrown when loading improper extensions.
      */
-    public function testFactoryException2()
+    public function testFactoryException2(): void
     {
-        $driveFactoryManager = new DriverFactoryManager([
-            new CollectionFactory()
-        ]);
+        $driveFactoryManager = new DriverFactoryManager([new CollectionFactory()]);
         $this->expectException(DataSourceException::class);
         new DataSourceFactory($driveFactoryManager, [new \stdClass()]);
     }
@@ -74,20 +61,18 @@ class FactoryTest extends TestCase
     /**
      * Checks exception thrown when loading scalars in place of extensions.
      */
-    public function testFactoryException3()
+    public function testFactoryException3(): void
     {
         $this->expectException(DataSourceException::class);
 
-        $driveFactoryManager = new DriverFactoryManager([
-            new CollectionFactory()
-        ]);
+        $driveFactoryManager = new DriverFactoryManager([new CollectionFactory()]);
         new DataSourceFactory($driveFactoryManager, ['scalar']);
     }
 
     /**
      * Checks exception thrown when creating DataSource with non-existing driver
      */
-    public function testFactoryException6()
+    public function testFactoryException6(): void
     {
         $this->expectException(DataSourceException::class);
         $this->expectExceptionMessage('Driver "unknownDriver" doesn\'t exist.');
@@ -99,13 +84,11 @@ class FactoryTest extends TestCase
     /**
      * Checks exception thrown when creating DataSource with non unique name.
      */
-    public function testFactoryCreateDataSourceException1()
+    public function testFactoryCreateDataSourceException1(): void
     {
         $this->expectException(DataSourceException::class);
 
-        $driveFactoryManager = new DriverFactoryManager([
-            new CollectionFactory()
-        ]);
+        $driveFactoryManager = new DriverFactoryManager([new CollectionFactory()]);
         $factory = new DataSourceFactory($driveFactoryManager);
 
         $factory->createDataSource('collection', ['collection' => []], 'unique');
@@ -116,13 +99,11 @@ class FactoryTest extends TestCase
     /**
      * Checks exception thrown when creating DataSource with wrong name.
      */
-    public function testFactoryCreateDataSourceException2()
+    public function testFactoryCreateDataSourceException2(): void
     {
         $this->expectException(DataSourceException::class);
 
-        $driveFactoryManager = new DriverFactoryManager([
-            new CollectionFactory()
-        ]);
+        $driveFactoryManager = new DriverFactoryManager([new CollectionFactory()]);
         $factory = new DataSourceFactory($driveFactoryManager);
         $factory->createDataSource('collection', ['collection' => []], 'wrong-one');
     }
@@ -130,13 +111,11 @@ class FactoryTest extends TestCase
     /**
      * Checks exception thrown when creating DataSource with empty name.
      */
-    public function testFactoryCreateDataSourceException3()
+    public function testFactoryCreateDataSourceException3(): void
     {
         $this->expectException(DataSourceException::class);
 
-        $driveFactoryManager = new DriverFactoryManager([
-            new CollectionFactory()
-        ]);
+        $driveFactoryManager = new DriverFactoryManager([new CollectionFactory()]);
         $factory = new DataSourceFactory($driveFactoryManager);
         $factory->createDataSource('collection', ['collection' => []], '');
     }
@@ -144,34 +123,24 @@ class FactoryTest extends TestCase
     /**
      * Checks adding DataSoucre to factory.
      */
-    public function testAddDataSource()
+    public function testAddDataSource(): void
     {
-        $driveFactoryManager = new DriverFactoryManager([
-            new CollectionFactory()
-        ]);
+        $driveFactoryManager = new DriverFactoryManager([new CollectionFactory()]);
         $factory = new DataSourceFactory($driveFactoryManager);
 
         $driver = $this->createMock(DriverInterface::class);
         $datasource = $this->getMockBuilder(DataSource::class)->setConstructorArgs([$driver])->getMock();
+        $datasource->method('getName')->willReturn('name');
+        $datasource->expects(self::atLeastOnce())->method('setFactory')->with($factory);
+
         $datasource2 = $this->getMockBuilder(DataSource::class)->setConstructorArgs([$driver])->getMock();
-
-        $datasource->expects($this->any())
-            ->method('getName')
-            ->willReturn('name');
-
-        $datasource2->expects($this->any())
-            ->method('getName')
-            ->willReturn('name');
-
-        $datasource->expects($this->atLeastOnce())
-            ->method('setFactory')
-            ->with($factory);
+        $datasource2->method('getName')->willReturn('name');
 
         $factory->addDataSource($datasource);
-        //Check if adding it twice won't cause exception.
+        // Check if adding it twice won't cause exception.
         $factory->addDataSource($datasource);
 
-        //Checking exception for adding different datasource with the same name.
+        // Checking exception for adding different datasource with the same name.
         $this->expectException(DataSourceException::class);
         $factory->addDataSource($datasource2);
     }
@@ -179,48 +148,34 @@ class FactoryTest extends TestCase
     /**
      * Checks fetching parameters of all and others datasources.
      */
-    public function testGetAllAndOtherParameters()
+    public function testGetAllAndOtherParameters(): void
     {
-        $driveFactoryManager = new DriverFactoryManager([
-            new CollectionFactory()
-        ]);
+        $driveFactoryManager = new DriverFactoryManager([new CollectionFactory()]);
         $factory = new DataSourceFactory($driveFactoryManager);
 
         $driver = $this->createMock(DriverInterface::class);
-        $datasource1 = $this->getMockBuilder(DataSource::class)->setConstructorArgs([$driver])->getMock();
-        $datasource2 = $this->getMockBuilder(DataSource::class)->setConstructorArgs([$driver])->getMock();
 
         $params1 = [
             'key1' => 'value1',
         ];
+        $datasource1 = $this->getMockBuilder(DataSource::class)->setConstructorArgs([$driver])->getMock();
+        $datasource1->method('getName')->willReturn('name');
+        $datasource1->method('getParameters')->willReturn($params1);
 
         $params2 = [
             'key2' => 'value2',
         ];
+        $datasource2 = $this->getMockBuilder(DataSource::class)->setConstructorArgs([$driver])->getMock();
+        $datasource2->method('getName')->willReturn('name2');
+        $datasource2->method('getParameters')->willReturn($params2);
 
         $result = array_merge($params1, $params2);
-
-        $datasource1->expects($this->any())
-            ->method('getName')
-            ->willReturn('name');
-
-        $datasource2->expects($this->any())
-            ->method('getName')
-            ->willReturn('name2');
-
-        $datasource1->expects($this->any())
-            ->method('getParameters')
-            ->willReturn($params1);
-
-        $datasource2->expects($this->any())
-            ->method('getParameters')
-            ->willReturn($params2);
 
         $factory->addDataSource($datasource1);
         $factory->addDataSource($datasource2);
 
-        $this->assertEquals($factory->getOtherParameters($datasource1), $params2);
-        $this->assertEquals($factory->getOtherParameters($datasource2), $params1);
-        $this->assertEquals($factory->getAllParameters(), $result);
+        self::assertEquals($factory->getOtherParameters($datasource1), $params2);
+        self::assertEquals($factory->getOtherParameters($datasource2), $params1);
+        self::assertEquals($factory->getAllParameters(), $result);
     }
 }

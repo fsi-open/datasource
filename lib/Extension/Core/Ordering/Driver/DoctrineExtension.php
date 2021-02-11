@@ -9,17 +9,18 @@
 
 namespace FSi\Component\DataSource\Extension\Core\Ordering\Driver;
 
-use FSi\Component\DataSource\Driver\Doctrine\DoctrineFieldInterface;
-use \FSi\Component\DataSource\Driver\Doctrine\ORM\DoctrineFieldInterface as DoctrineORMFieldInterface;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use FSi\Component\DataSource\Driver\Doctrine\ORM\DoctrineAbstractField;
+use FSi\Component\DataSource\Driver\Doctrine\ORM\DoctrineDriver;
+use FSi\Component\DataSource\Driver\Doctrine\ORM\DoctrineFieldInterface as DoctrineORMFieldInterface;
 use FSi\Component\DataSource\Extension\Core\Ordering\Field\FieldExtension;
 use FSi\Component\DataSource\Event\DriverEvents;
 use FSi\Component\DataSource\Event\DriverEvent;
+use InvalidArgumentException;
 
 /**
  * Driver extension for ordering that loads fields extension.
  */
-class DoctrineExtension extends DriverExtension implements EventSubscriberInterface
+class DoctrineExtension extends DriverExtension
 {
     /**
      * {@inheritdoc}
@@ -52,16 +53,15 @@ class DoctrineExtension extends DriverExtension implements EventSubscriberInterf
     }
 
     /**
-     * @param \FSi\Component\DataSource\Driver\Doctrine\DoctrineAbstractField $field
+     * @param DoctrineAbstractField $field
      * @param string $alias
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      * @return string
      */
     protected function getFieldName($field, $alias)
     {
-        if (!$field instanceof DoctrineFieldInterface &&
-            !$field instanceof DoctrineORMFieldInterface) {
-            throw new \InvalidArgumentException("Field must be an instance of DoctrineField");
+        if (!$field instanceof DoctrineORMFieldInterface) {
+            throw new InvalidArgumentException("Field must be an instance of DoctrineField");
         }
 
         if ($field->hasOption('field')) {
@@ -85,6 +85,7 @@ class DoctrineExtension extends DriverExtension implements EventSubscriberInterf
         $fields = $event->getFields();
         $sortedFields = $this->sortFields($fields);
 
+        /** @var DoctrineDriver $driver */
         $driver = $event->getDriver();
         $qb = $driver->getQueryBuilder();
         foreach ($sortedFields as $fieldName => $direction) {

@@ -91,7 +91,7 @@ interface FieldTypeInterface
     /**
      * Sets parameter for field.
      *
-     * @param mixed $parameter
+     * @param mixed $data
      */
     public function bindParameter($data);
 

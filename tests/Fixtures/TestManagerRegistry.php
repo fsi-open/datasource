@@ -20,7 +20,7 @@ class TestManagerRegistry implements ManagerRegistry
     /**
      * Test managers name.
      */
-    const NAME = 'test';
+    private const NAME = 'test';
 
     /**
      * @var EntityManager
@@ -79,7 +79,7 @@ class TestManagerRegistry implements ManagerRegistry
     /**
      * {@inheritdoc}
      */
-    function getManager($name = null)
+    public function getManager($name = null)
     {
         return $this->em;
     }
@@ -87,7 +87,7 @@ class TestManagerRegistry implements ManagerRegistry
     /**
      * {@inheritdoc}
      */
-    function getManagers()
+    public function getManagers()
     {
         return [$this->em];
     }
@@ -95,29 +95,7 @@ class TestManagerRegistry implements ManagerRegistry
     /**
      * {@inheritdoc}
      */
-    function resetManager($name = null)
-    {
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    function getAliasNamespace($alias)
-    {
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    function getManagerNames()
-    {
-        return [self::NAME];
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    function getRepository($persistentObject, $persistentManagerName = null)
+    public function resetManager($name = null)
     {
         return $this->em;
     }
@@ -125,7 +103,31 @@ class TestManagerRegistry implements ManagerRegistry
     /**
      * {@inheritdoc}
      */
-    function getManagerForClass($class)
+    public function getAliasNamespace($alias)
+    {
+        return '';
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getManagerNames()
+    {
+        return [self::NAME];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getRepository($persistentObject, $persistentManagerName = null)
+    {
+        return $this->em;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getManagerForClass($class)
     {
         return $this->em;
     }

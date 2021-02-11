@@ -9,7 +9,11 @@
 
 namespace FSi\Component\DataSource;
 
+use Countable;
+use Doctrine\Common\Collections\ArrayCollection;
+use FSi\Component\DataSource\Field\FieldViewInterface;
 use FSi\Component\DataSource\Util\AttributesContainerInterface;
+use IteratorAggregate;
 
 /**
  * DataSources view is responsible for keeping options needed to build view, fields view objects,
@@ -76,14 +80,14 @@ interface DataSourceViewInterface extends AttributesContainerInterface, \ArrayAc
     /**
      * Removes all fields.
      *
-     * @return array
+     * @return DataSourceViewInterface
      */
     public function clearFields();
 
     /**
      * Adds new field view.
      *
-     * @param \FSi\Component\DataSource\Field\FieldViewInterface $fieldView
+     * @param FieldViewInterface $fieldView
      */
     public function addField(Field\FieldViewInterface $fieldView);
 
@@ -92,12 +96,12 @@ interface DataSourceViewInterface extends AttributesContainerInterface, \ArrayAc
      *
      * Each of field must be instance of \FSi\Component\DataSource\Field\FieldViewInterface
      *
-     * @param \FSi\Component\DataSource\Field\FieldViewInterface[] $fieldView
+     * @param FieldViewInterface[] $fields
      */
     public function setFields(array $fields);
 
     /**
-     * @return \Doctrine\Common\Collections\ArrayCollection
+     * @return Countable&IteratorAggregate
      */
     public function getResult();
 }

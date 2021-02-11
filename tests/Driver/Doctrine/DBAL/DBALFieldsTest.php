@@ -132,7 +132,7 @@ class DBALFieldsTest extends TestBase
                 'time',
                 [
                     ['eq', new DateTime('1970-01-01 01:00:00'), 5],
-                    ['neq',new DateTime( '1970-01-01 01:00:00'), 95],
+                    ['neq',new DateTime('1970-01-01 01:00:00'), 95],
                     ['lt', new DateTime('1970-01-01 03:00:00'), 15],
                     ['lte', new DateTime('1970-01-01 03:00:00'), 20],
                     ['gt', new DateTime('1970-01-02 03:00:00'), 80],
@@ -194,16 +194,12 @@ class DBALFieldsTest extends TestBase
                 ],
             ]);
 
-            $this->assertCount($expectedCount, $datasource->getResult());
+            self::assertCount($expectedCount, $datasource->getResult());
         }
     }
 
-    private function getNewsDataSource()
+    private function getNewsDataSource(): DataSourceInterface
     {
-        return $this->getDataSourceFactory()->createDataSource(
-            'doctrine-dbal',
-            ['table' => 'news'],
-            'name'
-        );
+        return $this->getDataSourceFactory()->createDataSource('doctrine-dbal', ['table' => 'news'], 'name');
     }
 }

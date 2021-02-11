@@ -9,6 +9,7 @@
 
 namespace FSi\Component\DataSource\Extension\Core\Ordering\Driver;
 
+use FSi\Component\DataSource\Driver\Collection\CollectionDriver;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use FSi\Component\DataSource\Event\DriverEvent\DriverEventArgs;
 use FSi\Component\DataSource\Extension\Core\Ordering\Field\FieldExtension;
@@ -56,12 +57,13 @@ class CollectionExtension extends DriverExtension implements EventSubscriberInte
         $fields = $event->getFields();
         $sortedFields = $this->sortFields($fields);
 
+        /** @var CollectionDriver $driver */
         $driver = $event->getDriver();
         $c = $driver->getCriteria();
         $orderings = $c->getOrderings();
         foreach ($sortedFields as $fieldName => $direction) {
             $field = $fields[$fieldName];
-            $fieldName = $field->hasOption('field')?$field->getOption('field'):$field->getName();
+            $fieldName = $field->hasOption('field') ? $field->getOption('field') : $field->getName();
             $orderings[$fieldName] = strtoupper($direction);
         }
         $c->orderBy($orderings);

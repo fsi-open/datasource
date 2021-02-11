@@ -9,7 +9,10 @@
 
 namespace FSi\Component\DataSource\Driver;
 
+use Countable;
 use FSi\Component\DataSource\DataSourceInterface;
+use FSi\Component\DataSource\Field\FieldTypeInterface;
+use IteratorAggregate;
 
 /**
  * Driver is responsible for fetching data based on passed fields and data.
@@ -26,14 +29,14 @@ interface DriverInterface
     /**
      * Sets reference to DataSource.
      *
-     * @param \FSi\Component\DataSource\DataSourceInterface $datasource
+     * @param DataSourceInterface $datasource
      */
     public function setDataSource(DataSourceInterface $datasource);
 
     /**
      * Return reference to assigned DataSource.
      *
-     * @return \FSi\Component\DataSource\DataSourceInterface
+     * @return DataSourceInterface
      */
     public function getDataSource();
 
@@ -48,7 +51,8 @@ interface DriverInterface
     /**
      * Return field for given type.
      *
-     * @param \FSi\Component\DataSource\Field\FieldTypeInterface $type
+     * @param string $type
+     * @return FieldTypeInterface
      */
     public function getFieldType($type);
 
@@ -62,21 +66,21 @@ interface DriverInterface
      * @param array $fields
      * @param int $first
      * @param int $max
-     * @return \Countable, \IteratorAggregate
+     * @return Countable&IteratorAggregate
      */
     public function getResult($fields, $first, $max);
 
     /**
      * Returns loaded extensions.
      *
-     * @return array
+     * @return array<DriverExtensionInterface>
      */
     public function getExtensions();
 
     /**
      * Adds extension to driver.
      *
-     * @param \FSi\Component\DataSource\Driver\DriverExtensionInterface $extension
+     * @param DriverExtensionInterface $extension
      */
     public function addExtension(DriverExtensionInterface $extension);
 }

@@ -11,7 +11,7 @@ declare(strict_types=1);
 
 namespace FSi\Component\DataSource\Driver\Doctrine\ORM\Extension\Core\EventSubscriber;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use FSi\Component\DataSource\Driver\Doctrine\ORM\DoctrineResult;
 use FSi\Component\DataSource\Event\DriverEvent\ResultEventArgs;

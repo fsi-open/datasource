@@ -46,7 +46,7 @@ class DataSource implements DataSourceInterface
     private $view;
 
     /**
-     * @var DataSourceFactoryInterface
+     * @var DataSourceFactoryInterface|null
      */
     private $factory;
 
@@ -228,7 +228,8 @@ class DataSource implements DataSourceInterface
     {
         $this->checkFieldsClarity();
 
-        if (isset($this->cache['result'])
+        if (
+            isset($this->cache['result'])
             && $this->cache['result']['maxresults'] == $this->getMaxResults()
             && $this->cache['result']['firstresult'] == $this->getFirstResult()
         ) {
@@ -240,11 +241,6 @@ class DataSource implements DataSourceInterface
         $this->eventDispatcher->dispatch(DataSourceEvents::PRE_GET_RESULT, $event);
 
         $result = $this->driver->getResult($this->fields, $this->getFirstResult(), $this->getMaxResults());
-
-        foreach ($this->getFields() as $field) {
-            $field->setDirty(false);
-        }
-
         if (false === is_object($result)) {
             throw new DataSourceException(sprintf(
                 'Returned result must be object implementing both %s and %s.',
@@ -262,12 +258,17 @@ class DataSource implements DataSourceInterface
             ));
         }
 
-        //PostGetResult event.
+
+        foreach ($this->getFields() as $field) {
+            $field->setDirty(false);
+        }
+
+        // PostGetResult event.
         $event = new DataSourceEvent\ResultEventArgs($this, $result);
         $this->eventDispatcher->dispatch(DataSourceEvents::POST_GET_RESULT, $event);
         $result = $event->getResult();
 
-        //Creating cache.
+        // Creating cache.
         $this->cache['result'] = [
             'result' => $result,
             'firstresult' => $this->getFirstResult(),

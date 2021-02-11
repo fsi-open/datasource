@@ -79,7 +79,7 @@ abstract class DBALAbstractField extends FieldAbstractType implements DBALFieldI
             }
             //this is because "in" and "notIn" was added in DBAL 2.4
             $comparison = $comparison === 'in' ? 'IN' : 'NOT IN';
-            $qb->$func($expr->comparison($fieldName, $comparison, '('.implode(', ', $placeholders).')'));
+            $qb->$func($expr->comparison($fieldName, $comparison, '(' . implode(', ', $placeholders) . ')'));
             return;
         } elseif (in_array($comparison, ['like', 'contains'])) {
             $data = "%$data%";

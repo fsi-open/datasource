@@ -75,7 +75,7 @@ class Events implements EventSubscriberInterface
             $page = 1;
         } else {
             $current = $datasource->getFirstResult();
-            $page = (int) floor($current/$maxresults) + 1;
+            $page = (int) floor($current / $maxresults) + 1;
         }
 
         unset($parameters[$datasourceName][PaginationExtension::PARAMETER_PAGE]);
@@ -103,9 +103,9 @@ class Events implements EventSubscriberInterface
             $all = 1;
             $page = 1;
         } else {
-            $all = (int) ceil(count($datasource->getResult())/$maxresults);
+            $all = (int) ceil(count($datasource->getResult()) / $maxresults);
             $current = $datasource->getFirstResult();
-            $page = (int) floor($current/$maxresults) + 1;
+            $page = (int) floor($current / $maxresults) + 1;
         }
 
         unset($parameters[$datasourceName][PaginationExtension::PARAMETER_PAGE]);

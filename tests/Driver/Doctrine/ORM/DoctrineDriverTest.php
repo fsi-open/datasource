@@ -16,7 +16,9 @@ use Doctrine\ORM\Tools\Setup;
 use FSi\Component\DataSource\DataSourceFactory;
 use FSi\Component\DataSource\DataSourceInterface;
 use FSi\Component\DataSource\Driver\Doctrine\ORM\DoctrineFactory;
+use FSi\Component\DataSource\Driver\Doctrine\ORM\DoctrineResult;
 use FSi\Component\DataSource\Driver\Doctrine\ORM\Extension\Core\CoreExtension;
+use FSi\Component\DataSource\Driver\Doctrine\ORM\Paginator;
 use FSi\Component\DataSource\Driver\DriverFactoryManager;
 use FSi\Component\DataSource\Extension\Core;
 use FSi\Component\DataSource\Extension\Core\Ordering\OrderingExtension;
@@ -41,19 +43,20 @@ class DoctrineDriverTest extends TestCase
      */
     private $em;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
-        //The connection configuration.
+        // The connection configuration.
         $dbParams = [
             'driver' => 'pdo_sqlite',
             'memory' => true,
         ];
 
         $config = Setup::createAnnotationMetadataConfiguration(
-            [__DIR__ . '/../../../Fixtures'], true, null, null, false
+            [__DIR__ . '/../../../Fixtures'],
+            true,
+            null,
+            null,
+            false
         );
         $em = EntityManager::create($dbParams, $config);
         $tool = new SchemaTool($em);
@@ -70,7 +73,7 @@ class DoctrineDriverTest extends TestCase
     /**
      * Test number field when comparing with 0 value.
      */
-    public function testComparingWithZero()
+    public function testComparingWithZero(): void
     {
         $datasourceFactory = $this->getDataSourceFactory();
         $driverOptions = [
@@ -90,13 +93,13 @@ class DoctrineDriverTest extends TestCase
         ];
         $datasource->bindParameters($parameters);
         $result = $datasource->getResult();
-        $this->assertCount(0, $result);
+        self::assertCount(0, $result);
     }
 
     /**
      * General test for DataSource wtih DoctrineDriver in basic configuration.
      */
-    public function testGeneral()
+    public function testGeneral(): void
     {
         $datasourceFactory = $this->getDataSourceFactory();
         $datasources = [];
@@ -140,11 +143,11 @@ class DoctrineDriverTest extends TestCase
             ;
 
             $result1 = $datasource->getResult();
-            $this->assertCount(100, $result1);
+            self::assertCount(100, $result1);
             $view1 = $datasource->createView();
 
-            //Checking if result cache works.
-            $this->assertSame($result1, $datasource->getResult());
+            // Checking if result cache works.
+            self::assertSame($result1, $datasource->getResult());
 
             $parameters = [
                 $datasource->getName() => [
@@ -156,14 +159,14 @@ class DoctrineDriverTest extends TestCase
             $datasource->bindParameters($parameters);
             $result2 = $datasource->getResult();
 
-            //Checking cache.
-            $this->assertSame($result2, $datasource->getResult());
+            // Checking cache.
+            self::assertSame($result2, $datasource->getResult());
 
-            $this->assertCount(50, $result2);
-            $this->assertNotSame($result1, $result2);
+            self::assertCount(50, $result2);
+            self::assertNotSame($result1, $result2);
             unset($result1, $result2);
 
-            $this->assertEquals($parameters, $datasource->getParameters());
+            self::assertEquals($parameters, $datasource->getParameters());
 
             $datasource->setMaxResults(20);
             $parameters = [
@@ -174,8 +177,8 @@ class DoctrineDriverTest extends TestCase
 
             $datasource->bindParameters($parameters);
             $result = $datasource->getResult();
-            $this->assertCount(100, $result);
-            $this->assertCount(20, iterator_to_array($result));
+            self::assertCount(100, $result);
+            self::assertCount(20, iterator_to_array($result));
 
             $parameters = [
                 $datasource->getName() => [
@@ -190,9 +193,10 @@ class DoctrineDriverTest extends TestCase
             $datasource->bindParameters($parameters);
             $view = $datasource->createView();
             $result = $datasource->getResult();
-            $this->assertCount(2, $result);
+            self::assertCount(2, $result);
 
-            //Checking entity fields. We assume that database was created so first category and first group have ids equal to 1.
+            // Checking entity fields. We assume that database has just been created so first category and first group
+            // have ids equal to 1.
             $parameters = [
                 $datasource->getName() => [
                     DataSourceInterface::PARAMETER_FIELDS => [
@@ -203,7 +207,7 @@ class DoctrineDriverTest extends TestCase
 
             $datasource->bindParameters($parameters);
             $result = $datasource->getResult();
-            $this->assertCount(25, $result);
+            self::assertCount(25, $result);
 
             $parameters = [
                 $datasource->getName() => [
@@ -215,7 +219,7 @@ class DoctrineDriverTest extends TestCase
 
             $datasource->bindParameters($parameters);
             $result = $datasource->getResult();
-            $this->assertCount(75, $result);
+            self::assertCount(75, $result);
 
             $parameters = [
                 $datasource->getName() => [
@@ -227,7 +231,7 @@ class DoctrineDriverTest extends TestCase
 
             $datasource->bindParameters($parameters);
             $result = $datasource->getResult();
-            $this->assertCount(20, $result);
+            self::assertCount(20, $result);
 
             $parameters = [
                 $datasource->getName() => [
@@ -239,7 +243,7 @@ class DoctrineDriverTest extends TestCase
 
             $datasource->bindParameters($parameters);
             $result = $datasource->getResult();
-            $this->assertCount(40, $result);
+            self::assertCount(40, $result);
 
             $parameters = [
                 $datasource->getName() => [
@@ -252,9 +256,9 @@ class DoctrineDriverTest extends TestCase
 
             $datasource->bindParameters($parameters);
             $result = $datasource->getResult();
-            $this->assertCount(5, $result);
+            self::assertCount(5, $result);
 
-            //Checking sorting.
+            // Checking sorting.
             $parameters = [
                 $datasource->getName() => [
                     OrderingExtension::PARAMETER_SORT => [
@@ -264,12 +268,11 @@ class DoctrineDriverTest extends TestCase
             ];
 
             $datasource->bindParameters($parameters);
-            foreach ($datasource->getResult() as $news) {
-                $this->assertEquals('title0', $news->getTitle());
-                break;
-            }
+            $result = $datasource->getResult();
+            self::assertInstanceOf(Paginator::class, $result);
+            self::assertEquals('title0', $result->getIterator()->current()->getTitle());
 
-            //Checking sorting.
+            // Checking sorting.
             $parameters = [
                 $datasource->getName() => [
                     OrderingExtension::PARAMETER_SORT => [
@@ -280,12 +283,11 @@ class DoctrineDriverTest extends TestCase
             ];
 
             $datasource->bindParameters($parameters);
-            foreach ($datasource->getResult() as $news) {
-                $this->assertEquals('title99', $news->getTitle());
-                break;
-            }
+            $result = $datasource->getResult();
+            self::assertInstanceOf(Paginator::class, $result);
+            self::assertEquals('title99', $result->getIterator()->current()->getTitle());
 
-            //checking isnull & notnull
+            // checking isnull & notnull
             $parameters = [
                 $datasource->getName() => [
                     DataSourceInterface::PARAMETER_FIELDS => [
@@ -296,10 +298,10 @@ class DoctrineDriverTest extends TestCase
 
             $datasource->bindParameters($parameters);
             $result1 = $datasource->getResult();
-            $this->assertCount(50, $result1);
+            self::assertCount(50, $result1);
             $ids = [];
 
-            foreach($result1 as $item) {
+            foreach ($result1 as $item) {
                 $ids[] = $item->getId();
             }
 
@@ -313,10 +315,10 @@ class DoctrineDriverTest extends TestCase
 
             $datasource->bindParameters($parameters);
             $result2 = $datasource->getResult();
-            $this->assertCount(50, $result2);
+            self::assertCount(50, $result2);
 
-            foreach($result2 as $item) {
-                $this->assertNotContains($item->getId(), $ids);
+            foreach ($result2 as $item) {
+                self::assertNotContains($item->getId(), $ids);
             }
 
             unset($result1, $result2);
@@ -329,13 +331,13 @@ class DoctrineDriverTest extends TestCase
                 ],
             ];
 
-            //checking isnull & notnull - field type entity
+            // checking isnull & notnull - field type entity
             $datasource->bindParameters($parameters);
             $result1 = $datasource->getResult();
-            $this->assertCount(50, $result1);
+            self::assertCount(50, $result1);
             $ids = [];
 
-            foreach($result1 as $item) {
+            foreach ($result1 as $item) {
                 $ids[] = $item->getId();
             }
 
@@ -349,15 +351,15 @@ class DoctrineDriverTest extends TestCase
 
             $datasource->bindParameters($parameters);
             $result2 = $datasource->getResult();
-            $this->assertCount(50, $result2);
+            self::assertCount(50, $result2);
 
-            foreach($result2 as $item) {
-                $this->assertNotContains($item->getId(), $ids);
+            foreach ($result2 as $item) {
+                self::assertNotContains($item->getId(), $ids);
             }
 
             unset($result1, $result2);
 
-            //checking - field type boolean
+            // checking - field type boolean
             $parameters = [
                 $datasource->getName() => [
                     DataSourceInterface::PARAMETER_FIELDS => [
@@ -368,7 +370,7 @@ class DoctrineDriverTest extends TestCase
 
             $datasource->bindParameters($parameters);
             $result1 = $datasource->getResult();
-            $this->assertCount(100, $result1);
+            self::assertCount(100, $result1);
 
             $parameters = [
                 $datasource->getName() => [
@@ -380,10 +382,10 @@ class DoctrineDriverTest extends TestCase
 
             $datasource->bindParameters($parameters);
             $result2 = $datasource->getResult();
-            $this->assertCount(50, $result2);
+            self::assertCount(50, $result2);
             $ids = [];
 
-            foreach($result2 as $item) {
+            foreach ($result2 as $item) {
                 $ids[] = $item->getId();
             }
 
@@ -397,10 +399,10 @@ class DoctrineDriverTest extends TestCase
 
             $datasource->bindParameters($parameters);
             $result3 = $datasource->getResult();
-            $this->assertCount(50, $result3);
+            self::assertCount(50, $result3);
 
-            foreach($result3 as $item) {
-                $this->assertNotContains($item->getId(), $ids);
+            foreach ($result3 as $item) {
+                self::assertNotContains($item->getId(), $ids);
             }
 
             $parameters = [
@@ -413,10 +415,10 @@ class DoctrineDriverTest extends TestCase
 
             $datasource->bindParameters($parameters);
             $result2 = $datasource->getResult();
-            $this->assertCount(50, $result2);
+            self::assertCount(50, $result2);
 
-            foreach($result2 as $item) {
-                $this->assertContains($item->getId(), $ids);
+            foreach ($result2 as $item) {
+                self::assertContains($item->getId(), $ids);
             }
 
             $parameters = [
@@ -429,10 +431,10 @@ class DoctrineDriverTest extends TestCase
 
             $datasource->bindParameters($parameters);
             $result3 = $datasource->getResult();
-            $this->assertCount(50, $result3);
+            self::assertCount(50, $result3);
 
-            foreach($result3 as $item) {
-                $this->assertNotContains($item->getId(), $ids);
+            foreach ($result3 as $item) {
+                self::assertNotContains($item->getId(), $ids);
             }
 
             unset($result1, $result2, $result3);
@@ -446,10 +448,9 @@ class DoctrineDriverTest extends TestCase
             ];
 
             $datasource->bindParameters($parameters);
-            foreach ($datasource->getResult() as $news) {
-                $this->assertTrue($news->isActive());
-                break;
-            }
+            $result = $datasource->getResult();
+            self::assertInstanceOf(Paginator::class, $result);
+            self::assertTrue($result->getIterator()->current()->isActive());
 
             $parameters = [
                 $datasource->getName() => [
@@ -460,10 +461,9 @@ class DoctrineDriverTest extends TestCase
             ];
 
             $datasource->bindParameters($parameters);
-            foreach ($datasource->getResult() as $news) {
-                $this->assertFalse($news->isActive());
-                break;
-            }
+            $result = $datasource->getResult();
+            self::assertInstanceOf(Paginator::class, $result);
+            self::assertFalse($result->getIterator()->current()->isActive());
 
             //Test for clearing fields.
             $datasource->clearFields();
@@ -478,14 +478,14 @@ class DoctrineDriverTest extends TestCase
             //Since there are no fields now, we should have all of entities.
             $datasource->bindParameters($parameters);
             $result = $datasource->getResult();
-            $this->assertCount(100, $result);
+            self::assertCount(100, $result);
         }
     }
 
     /**
      * Checks DataSource wtih DoctrineDriver using more sophisticated QueryBuilder.
      */
-    public function testQueryWithJoins()
+    public function testQueryWithJoins(): void
     {
         $dataSourceFactory = $this->getDataSourceFactory();
 
@@ -519,7 +519,7 @@ class DoctrineDriverTest extends TestCase
         ];
 
         $datasource->bindParameters($parameters);
-        $this->assertCount(25, $datasource->getResult());
+        self::assertCount(25, $datasource->getResult());
 
         $parameters = [
             $datasource->getName() => [
@@ -530,7 +530,7 @@ class DoctrineDriverTest extends TestCase
         ];
 
         $datasource->bindParameters($parameters);
-        $this->assertCount(100, $datasource->getResult());
+        self::assertCount(100, $datasource->getResult());
 
         $parameters = [
             $datasource->getName() => [
@@ -542,13 +542,13 @@ class DoctrineDriverTest extends TestCase
         ];
 
         $datasource->bindParameters($parameters);
-        $this->assertCount(5, $datasource->getResult());
+        self::assertCount(5, $datasource->getResult());
     }
 
     /**
-     * Checks DataSource wtih DoctrineDriver using more sophisticated QueryBuilder.
+     * Checks DataSource with DoctrineDriver using more sophisticated QueryBuilder.
      */
-    public function testQueryWithAggregates()
+    public function testQueryWithAggregates(): void
     {
         $dataSourceFactory = $this->getDataSourceFactory();
 
@@ -586,11 +586,11 @@ class DoctrineDriverTest extends TestCase
         $datasource->bindParameters($parameters);
         $datasource->getResult();
 
-        $this->assertEquals(
+        self::assertEquals(
             $this->testDoctrineExtension->getQueryBuilder()->getQuery()->getDQL(),
             sprintf(
                 'SELECT c, COUNT(n) AS newscount FROM %s c INNER JOIN c.news n'
-                . ' GROUP BY c HAVING newscount > :newscount',
+                    . ' GROUP BY c HAVING newscount > :newscount',
                 Category::class
             )
         );
@@ -606,11 +606,11 @@ class DoctrineDriverTest extends TestCase
         $datasource->bindParameters($parameters);
         $datasource->getResult();
 
-        $this->assertEquals(
+        self::assertEquals(
             $this->testDoctrineExtension->getQueryBuilder()->getQuery()->getDQL(),
             sprintf(
                 'SELECT c, COUNT(n) AS newscount FROM %s c INNER JOIN c.news n'
-                . ' GROUP BY c HAVING newscount > :newscount',
+                    . ' GROUP BY c HAVING newscount > :newscount',
                 Category::class
             )
         );
@@ -637,11 +637,11 @@ class DoctrineDriverTest extends TestCase
         $datasource->bindParameters($parameters);
         $datasource->getResult();
 
-        $this->assertEquals(
+        self::assertEquals(
             $this->testDoctrineExtension->getQueryBuilder()->getQuery()->getDQL(),
             sprintf(
                 'SELECT c, COUNT(n) AS newscount FROM %s c INNER JOIN c.news n'
-                . ' GROUP BY c HAVING newscount BETWEEN :newscount_from AND :newscount_to',
+                    . ' GROUP BY c HAVING newscount BETWEEN :newscount_from AND :newscount_to',
                 Category::class
             )
         );
@@ -650,7 +650,7 @@ class DoctrineDriverTest extends TestCase
     /**
      * Tests if 'having' value of 'clause' option works properly in 'entity' field
      */
-    public function testHavingClauseInEntityField()
+    public function testHavingClauseInEntityField(): void
     {
         $dataSourceFactory = $this->getDataSourceFactory();
 
@@ -682,22 +682,19 @@ class DoctrineDriverTest extends TestCase
         $datasource->bindParameters($parameters);
         $datasource->getResult();
 
-        $this->assertEquals(
+        self::assertEquals(
             $this->testDoctrineExtension->getQueryBuilder()->getQuery()->getDQL(),
             sprintf('SELECT n FROM %s n INNER JOIN n.category c HAVING n.category IN (:category)', News::class)
         );
     }
 
-    public function testCreateDriverWithoutEntityAndQbOptions()
+    public function testCreateDriverWithoutEntityAndQbOptions(): void
     {
         $factory = $this->getDoctrineFactory();
         $this->expectException(InvalidOptionsException::class);
         $factory->createDriver([]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function tearDown(): void
     {
         unset($this->em);
@@ -729,46 +726,46 @@ class DoctrineDriverTest extends TestCase
         return new DataSourceFactory($driverFactoryManager, $extensions);
     }
 
-    private function load(EntityManager $em)
+    private function load(EntityManager $em): void
     {
-        //Injects 5 categories.
+        // Injects 5 categories.
         $categories = [];
         for ($i = 0; $i < 5; $i++) {
             $category = new Category();
-            $category->setName('category'.$i);
+            $category->setName('category' . $i);
             $em->persist($category);
             $categories[] = $category;
         }
 
-        //Injects 4 groups.
+        // Injects 4 groups.
         $groups = [];
         for ($i = 0; $i < 4; $i++) {
             $group = new Group();
-            $group->setName('group'.$i);
+            $group->setName('group' . $i);
             $em->persist($group);
             $groups[] = $group;
         }
 
-        //Injects 100 newses.
+        // Injects 100 newses.
         for ($i = 0; $i < 100; $i++) {
             $news = new News();
-            $news->setTitle('title'.$i);
+            $news->setTitle('title' . $i);
 
-            //Half of entities will have different author and content.
-            if ($i % 2 == 0) {
-                $news->setAuthor('author'.$i.'@domain1.com');
+            // Half of entities will have different author and content.
+            if (0 === $i % 2) {
+                $news->setAuthor('author' . $i . '@domain1.com');
                 $news->setShortContent('Lorem ipsum.');
                 $news->setContent('Content lorem ipsum.');
                 $news->setTags('lorem ipsum');
                 $news->setCategory2($categories[($i + 1) % 5]);
             } else {
-                $news->setAuthor('author'.$i.'@domain2.com');
+                $news->setAuthor('author' . $i . '@domain2.com');
                 $news->setShortContent('Dolor sit amet.');
                 $news->setContent('Content dolor sit amet.');
                 $news->setActive();
             }
 
-            //Each entity has different date of creation and one of four hours of creation.
+            // Each entity has different date of creation and one of four hours of creation.
             $createDate = new DateTime(date('Y:m:d H:i:s', $i * 24 * 60 * 60));
             $createTime = new DateTime(date('H:i:s', (($i % 4) + 1 ) * 60 * 60));
 

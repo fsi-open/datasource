@@ -44,13 +44,15 @@ class DriverFactoryManager implements DriverFactoryManagerInterface
 
     /**
      * @param string $driverType
-     * @return null|DriverFactoryInterface
+     * @return DriverFactoryInterface|null
      */
     public function getFactory($driverType)
     {
         if ($this->hasFactory($driverType)) {
             return $this->factories[$driverType];
         }
+
+        return null;
     }
 
     /**

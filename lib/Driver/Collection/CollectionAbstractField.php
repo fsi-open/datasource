@@ -12,6 +12,7 @@ namespace FSi\Component\DataSource\Driver\Collection;
 use Doctrine\Common\Collections\Criteria;
 use FSi\Component\DataSource\Driver\Collection\Exception\CollectionDriverException;
 use FSi\Component\DataSource\Field\FieldAbstractType;
+
 use function count;
 
 abstract class CollectionAbstractField extends FieldAbstractType implements CollectionFieldInterface
@@ -45,14 +46,14 @@ abstract class CollectionAbstractField extends FieldAbstractType implements Coll
         $comparison = $this->getComparison();
         $eb = Criteria::expr();
 
-        if ($comparison == 'between') {
+        if ('between' === $comparison) {
             if (false === is_array($data)) {
                 throw new CollectionDriverException(
                     'Fields with \'between\' comparison require to bind an array.'
                 );
             }
 
-            $from = count($data) ? array_shift($data) : null;
+            $from = array_shift($data);
             $to = count($data) ? array_shift($data) : null;
 
             if (!$from && ($from !== 0)) {

@@ -9,10 +9,12 @@
 
 namespace FSi\Component\DataSource\Tests\Driver;
 
+use DateTime;
 use FSi\Component\DataSource\Driver\Collection\CollectionFactory;
 use FSi\Component\DataSource\Driver\Doctrine\DBAL\DBALFactory;
 use FSi\Component\DataSource\Driver\Doctrine\ORM;
 use FSi\Component\DataSource\Driver\DriverFactoryManager;
+use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -20,42 +22,32 @@ use PHPUnit\Framework\TestCase;
  */
 class DriverFactoryManagerTest extends TestCase
 {
-    public function testBasicManagerOperations()
+    public function testBasicManagerOperations(): void
     {
         $doctrineDbalFactory = $this->createMock(DBALFactory::class);
-        $doctrineDbalFactory->expects($this->any())
-            ->method('getDriverType')
-            ->willReturn('doctrine-dbal');
+        $doctrineDbalFactory->method('getDriverType')->willReturn('doctrine-dbal');
 
         $doctrineOrmFactory = $this->createMock(ORM\DoctrineFactory::class);
-        $doctrineOrmFactory->expects($this->any())
-            ->method('getDriverType')
-            ->willReturn('doctrine-orm');
+        $doctrineOrmFactory->method('getDriverType')->willReturn('doctrine-orm');
 
         $collectionFactory = $this->createMock(CollectionFactory::class);
-        $collectionFactory->expects($this->any())
-            ->method('getDriverType')
-            ->willReturn('collection');
+        $collectionFactory->method('getDriverType')->willReturn('collection');
 
-        $manager = new DriverFactoryManager([
-            $doctrineDbalFactory,
-            $doctrineOrmFactory,
-            $collectionFactory
-        ]);
+        $manager = new DriverFactoryManager([$doctrineDbalFactory, $doctrineOrmFactory, $collectionFactory]);
 
-        $this->assertTrue($manager->hasFactory('doctrine-dbal'));
-        $this->assertTrue($manager->hasFactory('doctrine-orm'));
-        $this->assertTrue($manager->hasFactory('collection'));
+        self::assertTrue($manager->hasFactory('doctrine-dbal'));
+        self::assertTrue($manager->hasFactory('doctrine-orm'));
+        self::assertTrue($manager->hasFactory('collection'));
 
-        $this->assertSame($doctrineDbalFactory, $manager->getFactory('doctrine-dbal'));
-        $this->assertSame($doctrineOrmFactory, $manager->getFactory('doctrine-orm'));
-        $this->assertSame($collectionFactory, $manager->getFactory('collection'));
+        self::assertSame($doctrineDbalFactory, $manager->getFactory('doctrine-dbal'));
+        self::assertSame($doctrineOrmFactory, $manager->getFactory('doctrine-orm'));
+        self::assertSame($collectionFactory, $manager->getFactory('collection'));
     }
 
-    public function testAddInvalidFactory()
+    public function testAddInvalidFactory(): void
     {
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
 
-        new DriverFactoryManager([new \DateTime()]);
+        new DriverFactoryManager([new DateTime()]);
     }
 }

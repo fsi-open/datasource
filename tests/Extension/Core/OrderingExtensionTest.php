@@ -30,7 +30,7 @@ final class OrderingExtensionTest extends TestCase
     /**
      * Checks DataSource subscriber and storing of passed parameters.
      */
-    public function testStoringParameters()
+    public function testStoringParameters(): void
     {
         $extension = new OrderingExtension();
         /** @var MockObject|DataSourceInterface $datasource */
@@ -40,30 +40,11 @@ final class OrderingExtensionTest extends TestCase
         $field = $this->createMock(FieldTypeInterface::class);
         $fieldExtension = new FieldExtension();
 
-        $field
-            ->expects($this->atLeastOnce())
-            ->method('getExtensions')
-            ->willReturn([$fieldExtension])
-        ;
+        $field->expects(self::atLeastOnce())->method('getExtensions')->willReturn([$fieldExtension]);
 
-        $datasource
-            ->expects($this->any())
-            ->method('getFields')
-            ->willReturn(['test' => $field])
-        ;
-
-        $datasource
-            ->expects($this->any())
-            ->method('getField')
-            ->with('test')
-            ->willReturn($field)
-        ;
-
-        $datasource
-            ->expects($this->any())
-            ->method('getName')
-            ->willReturn('ds')
-        ;
+        $datasource->method('getFields')->willReturn(['test' => $field]);
+        $datasource->method('getField')->with('test')->willReturn($field);
+        $datasource->method('getName')->willReturn('ds');
 
         $subscribers = $extension->loadSubscribers();
         $subscriber = array_shift($subscribers);
@@ -71,8 +52,8 @@ final class OrderingExtensionTest extends TestCase
         $parameters = ['ds' => [OrderingExtension::PARAMETER_SORT => ['test' => 'asc']]];
         $subscriber->preBindParameters(new DataSourceEvent\ParametersEventArgs($datasource, $parameters));
 
-        //Assert that request parameters are properly stored in FieldExtension.
-        $this->assertEquals(
+        // Assert that request parameters are properly stored in FieldExtension.
+        self::assertEquals(
             ['priority' => 0, 'direction' => 'asc'],
             $fieldExtension->getOrdering($field)
         );
@@ -80,7 +61,7 @@ final class OrderingExtensionTest extends TestCase
         $event = new DataSourceEvent\ParametersEventArgs($datasource, []);
         $subscriber->postGetParameters($event);
 
-        $this->assertEquals($parameters, $event->getParameters());
+        self::assertEquals($parameters, $event->getParameters());
     }
 
     /**
@@ -88,7 +69,7 @@ final class OrderingExtensionTest extends TestCase
      * and expected fields array which should be sorted in terms of priority of sorting results.
      * Expected array contain sorting passed in parameters first and then default sorting passed in options.
      */
-    public function orderingDataProvider()
+    public function orderingDataProvider(): array
     {
         return [
             [
@@ -293,8 +274,12 @@ final class OrderingExtensionTest extends TestCase
      * Checks if sort order is properly calculated from default sorting options and parameters passed from user request.
      * @dataProvider orderingDataProvider
      */
-    public function testOrdering(array $fields, array $parameters, array $expectedOrdering, array $expectedParameters)
-    {
+    public function testOrdering(
+        array $fields,
+        array $parameters,
+        array $expectedOrdering,
+        array $expectedParameters
+    ): void {
         $datasource = $this->createMock(DataSourceInterface::class);
 
         $fieldExtension = new FieldExtension();
@@ -313,28 +298,19 @@ final class OrderingExtensionTest extends TestCase
             $dataSourceFields[$fieldData['name']] = $field;
         }
 
-        $datasource
-            ->expects($this->atLeastOnce())
-            ->method('getName')
-            ->willReturn('ds')
-        ;
+        $datasource->expects(self::atLeastOnce())->method('getName')->willReturn('ds');
+        $datasource->method('getFields')->willReturn($fields);
 
         $datasource
-            ->expects($this->any())
-            ->method('getFields')
-            ->willReturn($fields)
-        ;
-
-        $datasource
-            ->expects($this->any())
             ->method('getField')
-            ->will($this->returnCallback(function () use ($dataSourceFields) {
-                return $dataSourceFields[func_get_arg(0)];
-            }))
+            ->willReturnCallback(
+                function () use ($dataSourceFields) {
+                    return $dataSourceFields[func_get_arg(0)];
+                }
+            )
         ;
 
         $datasource
-            ->expects($this->any())
             ->method('getParameters')
             ->willReturn(['ds' => [OrderingExtension::PARAMETER_SORT => $parameters]])
         ;
@@ -347,80 +323,64 @@ final class OrderingExtensionTest extends TestCase
             ['ds' => [OrderingExtension::PARAMETER_SORT => $parameters]]
         ));
 
-        //We use fake driver extension instead of specific driver extension because we want to test common DriverExtension functionality.
+        // We use fake driver extension instead of specific driver extension because we want to test common
+        // DriverExtension functionality.
         $driverExtension = new FakeDriverExtension();
         $result = $driverExtension->sort($dataSourceFields);
-        $this->assertSame($expectedOrdering, $result);
+        self::assertSame($expectedOrdering, $result);
 
         foreach ($dataSourceFields as $field) {
             $view = $this->createMock(FieldViewInterface::class);
 
             $view
-                ->expects($this->exactly(5))
+                ->expects(self::exactly(5))
                 ->method('setAttribute')
-                ->will($this->returnCallback(function ($attribute, $value) use ($field, $parameters, $expectedParameters) {
-                    switch ($attribute) {
-                        case 'sorted_ascending':
-                            $this->assertEquals(
-                                (key($parameters) === $field->getName()) && (current($parameters) === 'asc'),
-                                $value
-                            );
-                            break;
+                ->willReturnCallback(
+                    function ($attribute, $value) use ($field, $parameters, $expectedParameters) {
+                        switch ($attribute) {
+                            case 'sorted_ascending':
+                                self::assertEquals(
+                                    (key($parameters) === $field->getName()) && (current($parameters) === 'asc'),
+                                    $value
+                                );
+                                break;
 
-                        case 'sorted_descending':
-                            $this->assertEquals(
-                                (key($parameters) === $field->getName()) && (current($parameters) === 'desc'),
-                                $value
-                            );
-                            break;
+                            case 'sorted_descending':
+                                self::assertEquals(
+                                    (key($parameters) === $field->getName()) && (current($parameters) === 'desc'),
+                                    $value
+                                );
+                                break;
 
-                        case 'parameters_sort_ascending':
-                            $this->assertSame(
-                                [
-                                    'ds' => [
-                                        OrderingExtension::PARAMETER_SORT => $expectedParameters[$field->getName()]['ordering_ascending']
-                                    ]
-                                ],
-                                $value
-                            );
-                            break;
+                            case 'parameters_sort_ascending':
+                                self::assertSame(
+                                    [
+                                        'ds' => [
+                                            OrderingExtension::PARAMETER_SORT
+                                                => $expectedParameters[$field->getName()]['ordering_ascending']
+                                        ]
+                                    ],
+                                    $value
+                                );
+                                break;
 
-                        case 'parameters_sort_descending':
-                            $this->assertSame(
-                                [
-                                    'ds' => [
-                                        OrderingExtension::PARAMETER_SORT => $expectedParameters[$field->getName()]['ordering_descending']
-                                    ]
-                                ],
-                                $value
-                            );
-                            break;
+                            case 'parameters_sort_descending':
+                                self::assertSame(
+                                    [
+                                        'ds' => [
+                                            OrderingExtension::PARAMETER_SORT
+                                                => $expectedParameters[$field->getName()]['ordering_descending']
+                                        ]
+                                    ],
+                                    $value
+                                );
+                                break;
+                        }
                     }
-                }))
+                )
             ;
 
             $fieldExtension->postBuildView(new FieldEvent\ViewEventArgs($field, $view));
         }
-    }
-}
-
-class FakeFieldType extends FieldAbstractType
-{
-    public function getType()
-    {
-        return 'fake';
-    }
-}
-
-class FakeDriverExtension extends DriverExtension
-{
-    public function getExtendedDriverTypes()
-    {
-        return [];
-    }
-
-    public function sort(array $fields)
-    {
-        return $this->sortFields($fields);
     }
 }

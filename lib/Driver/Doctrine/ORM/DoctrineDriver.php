@@ -44,7 +44,7 @@ class DoctrineDriver extends DriverAbstract
     /**
      * Query builder available during preGetResult event.
      *
-     * @var QueryBuilder
+     * @var QueryBuilder|null
      */
     private $currentQuery;
 

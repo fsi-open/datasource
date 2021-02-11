@@ -22,7 +22,7 @@ class DBALResultTest extends TestBase
     private $connection;
 
     /**
-     * @var
+     * @var Paginator
      */
     private $paginator;
 
@@ -39,7 +39,7 @@ class DBALResultTest extends TestBase
         $this->paginator = new Paginator($qb);
     }
 
-    public function testEmptyResult()
+    public function testEmptyResult(): void
     {
         $qb = $this->connection->createQueryBuilder()
             ->select('*')
@@ -49,36 +49,36 @@ class DBALResultTest extends TestBase
         $paginator = new Paginator($qb);
         $result = new DBALResult($paginator, '[id]');
 
-        $this->assertCount(0, $result);
-        $this->assertCount(0, $result->toArray());
+        self::assertCount(0, $result);
+        self::assertCount(0, $result->toArray());
     }
 
-    public function testInvalidStringIndexField()
+    public function testInvalidStringIndexField(): void
     {
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Index cannot be null');
         new DBALResult($this->paginator, '[invalid]');
     }
 
-    public function testDuplicatedStringIndex()
+    public function testDuplicatedStringIndex(): void
     {
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Duplicate index "A"');
         new DBALResult($this->paginator, '[type]');
     }
 
-    public function testStringIndexField()
+    public function testStringIndexField(): void
     {
         $result = new DBALResult($this->paginator, '[id]');
-        $this->assertCount(10, $result);
-        $this->assertEquals([
+        self::assertCount(10, $result);
+        self::assertEquals([
             1 => ['id' => 1, 'type' => 'A', 'name' => 'name-1'],
             2 => ['id' => 2, 'type' => 'B', 'name' => 'name-2'],
             3 => ['id' => 3, 'type' => 'A', 'name' => 'name-3'],
         ], $result->toArray());
     }
 
-    public function testDuplicatedCallbackIndex()
+    public function testDuplicatedCallbackIndex(): void
     {
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Duplicate index "C"');
@@ -87,14 +87,14 @@ class DBALResultTest extends TestBase
         });
     }
 
-    public function testClosureresult()
+    public function testClosureresult(): void
     {
         $result = new DBALResult($this->paginator, function ($row) {
             return sprintf('A_%s', $row['id']);
         });
 
-        $this->assertCount(10, $result);
-        $this->assertEquals([
+        self::assertCount(10, $result);
+        self::assertEquals([
             'A_1' => ['id' => 1, 'type' => 'A', 'name' => 'name-1'],
             'A_2' => ['id' => 2, 'type' => 'B', 'name' => 'name-2'],
             'A_3' => ['id' => 3, 'type' => 'A', 'name' => 'name-3'],

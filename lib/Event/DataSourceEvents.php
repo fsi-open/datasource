@@ -17,40 +17,40 @@ class DataSourceEvents
     /**
      * PreBindParameters event name.
      */
-    const PRE_BIND_PARAMETERS = 'datasource.pre_bind_parameters';
+    public const PRE_BIND_PARAMETERS = 'datasource.pre_bind_parameters';
 
     /**
      * PostBindParameters event name.
      */
-    const POST_BIND_PARAMETERS = 'datasource.post_bind_parameters';
+    public const POST_BIND_PARAMETERS = 'datasource.post_bind_parameters';
 
     /**
      * PreGetResult event name.
      */
-    const PRE_GET_RESULT = 'datasource.pre_get_result';
+    public const PRE_GET_RESULT = 'datasource.pre_get_result';
 
     /**
      * PostGetResult event name.
      */
-    const POST_GET_RESULT = 'datasource.post_get_result';
+    public const POST_GET_RESULT = 'datasource.post_get_result';
 
     /**
      * PreBuildView event name.
      */
-    const PRE_BUILD_VIEW = 'datasource.pre_build_view';
+    public const PRE_BUILD_VIEW = 'datasource.pre_build_view';
 
     /**
      * PostBuildView event name.
      */
-    const POST_BUILD_VIEW = 'datasource.post_build_view';
+    public const POST_BUILD_VIEW = 'datasource.post_build_view';
 
     /**
      * PreGetParameters event name.
      */
-    const PRE_GET_PARAMETERS = 'datasource.pre_get_parameters';
+    public const PRE_GET_PARAMETERS = 'datasource.pre_get_parameters';
 
     /**
      * PostGetParameters event name.
      */
-    const POST_GET_PARAMETERS = 'datasource.post_get_parameters';
+    public const POST_GET_PARAMETERS = 'datasource.post_get_parameters';
 }

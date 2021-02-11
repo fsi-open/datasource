@@ -43,7 +43,7 @@ class DBALDriverExtension extends DriverAbstractExtension
      *
      * @return array
      */
-    public function getCalls()
+    public function getCalls(): array
     {
         return $this->calls;
     }
@@ -51,7 +51,7 @@ class DBALDriverExtension extends DriverAbstractExtension
     /**
      * Resets calls.
      */
-    public function resetCalls()
+    public function resetCalls(): void
     {
         $this->calls = [];
     }

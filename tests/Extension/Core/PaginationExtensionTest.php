@@ -22,7 +22,7 @@ use FSi\Component\DataSource\DataSourceViewInterface;
 
 class PaginationExtensionTest extends TestCase
 {
-    public function paginationCases()
+    public function paginationCases(): array
     {
         return [
             [
@@ -45,83 +45,60 @@ class PaginationExtensionTest extends TestCase
             ],
         ];
     }
-    
+
     /**
      * First case of event (when page is not 1).
      * @dataProvider paginationCases
      */
-    public function testPaginationExtension(int $firstResult, int $maxResults, ?int $page, int $currentPage)
+    public function testPaginationExtension(int $firstResult, int $maxResults, ?int $page, int $currentPage): void
     {
         $driver = $this->createMock(DriverInterface::class);
         $extension = new PaginationExtension();
 
-            $datasource = $this->getMockBuilder(DataSource::class)
-                ->setConstructorArgs([$driver])
-                ->getMock();
+            $datasource = $this->getMockBuilder(DataSource::class)->setConstructorArgs([$driver])->getMock();
 
-            $datasource
-                ->expects($this->any())
-                ->method('getName')
-                ->willReturn('datasource')
-            ;
-
-            $datasource
-                ->expects($this->any())
-                ->method('getResult')
-                ->willReturn([])
-            ;
-
-            $datasource
-                ->expects($this->any())
-                ->method('getMaxResults')
-                ->willReturn($maxResults)
-            ;
-
-            $datasource
-                ->expects($this->any())
-                ->method('getFirstResult')
-                ->willReturn($firstResult)
-            ;
+            $datasource->method('getName')->willReturn('datasource');
+            $datasource->method('getResult')->willReturn([]);
+            $datasource->method('getMaxResults')->willReturn($maxResults);
+            $datasource->method('getFirstResult')->willReturn($firstResult);
 
             $subscribers = $extension->loadSubscribers();
             $subscriber = array_shift($subscribers);
             $event = new DataSourceEvent\ParametersEventArgs($datasource, []);
             $subscriber->postGetParameters($event);
 
-            if ($page !== null) {
-                $this->assertSame(
-                    [
-                        'datasource' => [
-                            PaginationExtension::PARAMETER_MAX_RESULTS => 20,
-                            PaginationExtension::PARAMETER_PAGE => 2
-                        ]
-                    ],
-                    $event->getParameters()
-                );
-            } else {
-                $parameters = $event->getParameters();
-                if (isset($parameters['datasource'])) {
-                    $this->assertArrayNotHasKey(PaginationExtension::PARAMETER_PAGE, $parameters['datasource']);
-                }
+        if (null !== $page) {
+            self::assertSame(
+                [
+                    'datasource' => [
+                        PaginationExtension::PARAMETER_MAX_RESULTS => 20,
+                        PaginationExtension::PARAMETER_PAGE => 2
+                    ]
+                ],
+                $event->getParameters()
+            );
+        } else {
+            $parameters = $event->getParameters();
+            if (isset($parameters['datasource'])) {
+                self::assertArrayNotHasKey(PaginationExtension::PARAMETER_PAGE, $parameters['datasource']);
             }
+        }
 
             $view = $this->createMock(DataSourceViewInterface::class);
-            $view
-                ->expects($this->any())
-                ->method('setAttribute')
-                ->will($this->returnCallback(function($attribute, $value) use ($currentPage) {
-                    switch ($attribute) {
-                        case 'page':
-                            $this->assertEquals($currentPage, $value);
-                            break;
-                    };
-                }))
+            $view->method('setAttribute')
+                ->willReturnCallback(
+                    function ($attribute, $value) use ($currentPage) {
+                        if ('page' === $attribute) {
+                            self::assertEquals($currentPage, $value);
+                        }
+                    }
+                )
             ;
 
             $subscriber->postBuildView(new DataSourceEvent\ViewEventArgs($datasource, $view));
     }
 
-    public function testSetMaxResultsByBindRequest()
+    public function testSetMaxResultsByBindRequest(): void
     {
         $extensions = [
             new PaginationExtension()
@@ -130,7 +107,7 @@ class PaginationExtensionTest extends TestCase
         $driverFactory = new CollectionFactory($driverExtensions);
         $driverFactoryManager = new DriverFactoryManager([$driverFactory]);
         $factory = new DataSourceFactory($driverFactoryManager, $extensions);
-        $dataSource = $factory->createDataSource('collection',  [], 'foo_source');
+        $dataSource = $factory->createDataSource('collection', [], 'foo_source');
 
         $dataSource->bindParameters([
             'foo_source' => [
@@ -138,6 +115,6 @@ class PaginationExtensionTest extends TestCase
             ]
         ]);
 
-        $this->assertEquals(105, $dataSource->getMaxResults());
+        self::assertEquals(105, $dataSource->getMaxResults());
     }
 }

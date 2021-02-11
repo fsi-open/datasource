@@ -9,6 +9,11 @@
 
 namespace FSi\Component\DataSource;
 
+use Countable;
+use FSi\Component\DataSource\Exception\DataSourceException;
+use FSi\Component\DataSource\Field\FieldTypeInterface;
+use IteratorAggregate;
+
 /**
  * DataSource abstracts fetching data from various sources. For more information
  * about usage please view README file.
@@ -49,8 +54,8 @@ interface DataSourceInterface
      * @param string $type
      * @param string $comparison
      * @param array $options
-     * @return \FSi\Component\DataSource\DataSourceInterface
-     * @throws \FSi\Component\DataSource\Exception\DataSourceException
+     * @return DataSourceInterface
+     * @throws DataSourceException
      */
     public function addField($name, $type = null, $comparison = null, $options = []);
 
@@ -68,21 +73,22 @@ interface DataSourceInterface
      * Returns field for given name.
      *
      * @param string $name
+     * @return FieldTypeInterface
      */
     public function getField($name);
 
     /**
      * Returns array of all fields.
      *
-     * @return array
-     * @throws \FSi\Component\DataSource\Exception\DataSourceException
+     * @return array<FieldTypeInterface>
+     * @throws DataSourceException
      */
     public function getFields();
 
     /**
      * Removes all fields from datasource.
      *
-     * @return \FSi\Component\DataSource\DataSourceInterface
+     * @return DataSourceInterface
      */
     public function clearFields();
 
@@ -93,6 +99,7 @@ interface DataSourceInterface
      * If 0, then theres no limit.
      *
      * @param int $max
+     * @return DataSourceInterface
      */
     public function setMaxResults($max);
 
@@ -102,6 +109,7 @@ interface DataSourceInterface
      * It should just proxy request to driver.
      *
      * @param int $first
+     * @return DataSourceInterface
      */
     public function setFirstResult($first);
 
@@ -110,7 +118,7 @@ interface DataSourceInterface
      *
      * It should just proxy request to driver.
      *
-     * @return int
+     * @return int|null
      */
     public function getMaxResults();
 
@@ -119,7 +127,7 @@ interface DataSourceInterface
      *
      * It should just proxy request to driver.
      *
-     * @return int
+     * @return int|null
      */
     public function getFirstResult();
 
@@ -135,29 +143,29 @@ interface DataSourceInterface
      *
      * It should just proxy request to driver.
      *
-     * @return \Countable, \IteratorAggregate
-     * @throws \FSi\Component\DataSource\Exception\DataSourceException
+     * @return Countable&IteratorAggregate
+     * @throws DataSourceException
      */
     public function getResult();
 
     /**
      * Adds extension.
      *
-     * @param \FSi\Component\DataSource\DataSourceExtensionInterface $extension
+     * @param DataSourceExtensionInterface $extension
      */
     public function addExtension(DataSourceExtensionInterface $extension);
 
     /**
      * Return array of loaded extensions.
      *
-     * @return array
+     * @return array<DataSourceExtensionInterface>
      */
     public function getExtensions();
 
     /**
      * Return ready view.
      *
-     * @return \FSi\Component\DataSource\DataSourceViewInterface
+     * @return DataSourceViewInterface
      */
     public function createView();
 
@@ -195,14 +203,14 @@ interface DataSourceInterface
      *
      * DataSource needs that reference for example during getAllParameters method.
      *
-     * @param \FSi\Component\DataSource\DataSourceFactoryInterface $factory
+     * @param DataSourceFactoryInterface $factory
      */
     public function setFactory(DataSourceFactoryInterface $factory);
 
     /**
      * Return assigned factory.
      *
-     * @return \FSi\Component\DataSource\DataSourceFactoryInterface|null
+     * @return DataSourceFactoryInterface|null
      */
     public function getFactory();
 }

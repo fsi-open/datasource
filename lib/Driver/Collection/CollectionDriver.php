@@ -10,11 +10,17 @@
 namespace FSi\Component\DataSource\Driver\Collection;
 
 use Doctrine\Common\Collections\Criteria;
+use Doctrine\Common\Collections\Selectable;
 use FSi\Component\DataSource\Driver\DriverAbstract;
 use FSi\Component\DataSource\Driver\Collection\Exception\CollectionDriverException;
+use FSi\Component\DataSource\Exception\DataSourceException;
+use Traversable;
 
 class CollectionDriver extends DriverAbstract
 {
+    /**
+     * @var array|Traversable|Selectable
+     */
     private $collection;
 
     /**
@@ -31,7 +37,9 @@ class CollectionDriver extends DriverAbstract
 
     /**
      * @param array $extensions
-     * @param $collection
+     * @param array|Traversable|Selectable $collection
+     * @param Criteria|null $criteria
+     * @throws DataSourceException
      */
     public function __construct(array $extensions, $collection, ?Criteria $criteria = null)
     {

@@ -9,7 +9,11 @@
 
 namespace FSi\Component\DataSource\Driver\Doctrine\DBAL;
 
+use ArrayIterator;
+use Countable;
+use Doctrine\DBAL\Exception;
 use Doctrine\DBAL\Query\QueryBuilder;
+use Iterator;
 
 class Paginator implements \Countable, \IteratorAggregate
 {
@@ -23,9 +27,13 @@ class Paginator implements \Countable, \IteratorAggregate
         $this->query = $query;
     }
 
+    /**
+     * @return Iterator&Countable
+     * @throws Exception
+     */
     public function getIterator()
     {
-        return new \ArrayIterator($this->query->execute()->fetchAll());
+        return new ArrayIterator($this->query->execute()->fetchAll());
     }
 
     public function count()
